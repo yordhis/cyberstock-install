@@ -1,0 +1,27 @@
+body{
+    background: #ece6e6;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    background-color: #2196F3;
+    padding: 7%;
+    grid-auto-rows: minmax(100px, auto);
+  }
+  
+  .grid-container > div {
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 20px 0;
+    font-size: 30px;
+  }
+  
+  .col-3 {
+    grid-column: 1 / span 3;
+  }
+
+  .bg-white{
+    background-color: #ece6e6;
+  }
