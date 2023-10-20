@@ -9,11 +9,16 @@ const facturaStore = async (factura) => {
     .then((res) => res.json())
     .catch((error) => console.error("Error:", error))
     .then((response) => {
-        log(response)
+        // log(response)
         if (response.estatus == 200) {
+            // log(response.data)
             resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
             if(resultado){
-                imprimirElemento(htmlTicket)
+                 window.location.href = `http://cyberstock.com/pos/imprimirFactura/${response.data.codigo}`;
+
+                 setTimeout(()=>{
+                    window.location.href = "http://cyberstock.com/pos";
+                 }, 2000)
             }else{
                 window.location.href = "http://cyberstock.com/pos";
             }
@@ -36,99 +41,106 @@ function imprimirElemento(elemento){
     return true;
   }
 
-  const htmlTicket = `
-  <div class="ticket" id="ticket">
-  @if ($pos[0]->estatusImagen)
-      <img src="" alt="Logotipo">
-  @endif
+//   const htmlTicket = (factura)=> {
+       
+//        imagen = factura.pos.imagen;
 
-  <p class="centrado">
+//         return `
+//         <div class="ticket" id="ticket">
+  
+//           <img src="${imagen}" alt="Logotipo">
+        
       
-      <br>J-505256564
-      <br>Barins Venezuela
-      <br>ZONA POSTAL 5201
-  </p>
-  <table>
-      <thead>
-          <tr>
-              <th class="producto">FACTURA</th>
-
-              <th class="precio">000001</th>
-          </tr>
-          <tr>
-              <th class="producto">FECHA</th>
-
-              <th class="precio">11-02-2023
-              </th>
-          </tr>
-          <tr>
-              <th class="producto">HORA</th>
-
-              <th class="precio">02:45pm
-              </th>
-          </tr>
-         
-      </thead>
-      <tbody>
-          
-              <tr>
-                  <td class="producto">10 X productos</td>
-
-                  <td class="precio">Bs 100</td>
-              </tr>
-              <tr>
-                  <td class="producto">10 X productos</td>
-
-                  <td class="precio">Bs 100</td>
-              </tr>
-              <tr>
-                  <td class="producto">10 X productos</td>
-
-                  <td class="precio">Bs 100</td>
-              </tr>
-              <tr>
-                  <td class="producto">10 X productos</td>
-
-                  <td class="precio">Bs 100</td>
-              </tr>
-         
-
-
-          <tr>
-              <td class="producto">
-                  |Total de Articulos:30| <br>
-                  SUB-TOTAL <br>
-              </td>
-
-              <td class="precio"><br> Bs
-                  100</td>
-          </tr>
-          <tr>
-              <td class="producto">IVA </td>
-
-              <td class="precio">Bs
-                 10545
-              </td>
-          </tr>
-          <tr>
-              <td class="producto">TOTAL</td>
-
-              <td class="precio">Bs 54546</td>
-          </tr>
-          <tr>
-              <td class="producto">EFECTIVO 3</td>
-
-              <td class="precio">Bs 31354</td>
-          </tr>
-      </tbody>
-  </table>
-
-
-  <p class="centrado">
-      ¡GRACIAS POR SU COMPRA!
-  </p>
-</div>
-  `;
+//         <p class="centrado">
+            
+//             <br>${factura.pos.empresa}
+//             <br>${factura.pos.rif}
+//             <br>${factura.pos.direccion}
+//             <br>ZONA POSTAL ${factura.pos.postal}
+//         </p>
+//         <table>
+//             <thead>
+//                 <tr>
+//                     <th class="producto">FACTURA</th>
+      
+//                     <th class="precio">${factura.codigo}</th>
+//                 </tr>
+//                 <tr>
+//                     <th class="producto">FECHA</th>
+      
+//                     <th class="precio">${factura.fecha}
+//                     </th>
+//                 </tr>
+//                 <tr>
+//                     <th class="producto">HORA</th>
+      
+//                     <th class="precio">02:45pm
+//                     </th>
+//                 </tr>
+               
+//             </thead>
+//             <tbody>
+                
+//                     <tr>
+//                         <td class="producto">10 X productos</td>
+      
+//                         <td class="precio">Bs 100</td>
+//                     </tr>
+//                     <tr>
+//                         <td class="producto">10 X productos</td>
+      
+//                         <td class="precio">Bs 100</td>
+//                     </tr>
+//                     <tr>
+//                         <td class="producto">10 X productos</td>
+      
+//                         <td class="precio">Bs 100</td>
+//                     </tr>
+//                     <tr>
+//                         <td class="producto">10 X productos</td>
+      
+//                         <td class="precio">Bs 100</td>
+//                     </tr>
+               
+      
+      
+//                 <tr>
+//                     <td class="producto">
+//                         |Total de Articulos:30| <br>
+//                         SUB-TOTAL <br>
+//                     </td>
+      
+//                     <td class="precio"><br> Bs
+//                         100</td>
+//                 </tr>
+//                 <tr>
+//                     <td class="producto">IVA </td>
+      
+//                     <td class="precio">Bs
+//                        10545
+//                     </td>
+//                 </tr>
+//                 <tr>
+//                     <td class="producto">TOTAL</td>
+      
+//                     <td class="precio">Bs 54546</td>
+//                 </tr>
+//                 <tr>
+//                     <td class="producto">EFECTIVO 3</td>
+      
+//                     <td class="precio">Bs 31354</td>
+//                 </tr>
+//             </tbody>
+//         </table>
+      
+      
+//         <p class="centrado">
+//             ¡GRACIAS POR SU COMPRA!
+//         </p>
+//       </div>
+//         `;
+      
+//   }
 // const imprimirFactura = async (codigoFactura) => {
 //     await fetch(`${URL_BASE}/facturas/${codigoFactura}`, {
 //         method: "POST", // or 'PUT'

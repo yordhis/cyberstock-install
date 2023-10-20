@@ -295,10 +295,11 @@
 
 
                                             </tbody>
-
+                                                
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="6">
+                                                        <input type="hidden" class="factura" id="fecha" name="fecha" value="{{ date('Y-m-d')}}">
                                                         <span class="btn btn-primary w-100" id="procesarVenta">Procesar
                                                             Venta</span>
                                                     </td>

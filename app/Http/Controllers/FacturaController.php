@@ -60,13 +60,13 @@ class FacturaController extends Controller
         $pos = Po::all();
         $utilidades = $this->data->utilidades;
 
-            $pathname = Request::path();
-             return view('admin.facturas.ticket', 
-                 compact(
-                    'factura', 
-                    'pos',
-                    'utilidades'
-             ));
+            // $pathname = Request::path();
+            //  return view('admin.facturas.ticket', 
+            //      compact(
+            //         'factura', 
+            //         'pos',
+            //         'utilidades'
+            //  ));
        
             $pdf = PDF::loadView(
                 'admin.facturas.ticket',
@@ -76,7 +76,7 @@ class FacturaController extends Controller
                     'utilidades'
                 )
             );
-            return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
+            return $pdf->stream("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
     
     }
     /**
@@ -113,6 +113,9 @@ class FacturaController extends Controller
             }
 
             if($resultado){
+                // obtenemos los datos del POS
+                $pos = Po::all()[0];
+
                 // Procedemos a descontar del inventario
                 $carritos = Carrito::where("codigo", $request->codigo)->get();
                 foreach ($carritos as $key => $producto) {
@@ -121,7 +124,8 @@ class FacturaController extends Controller
                         "cantidad" =>  $cantidadActualProducto - $producto->cantidad
                     ]);
                 } 
-
+                $resultado['carrito'] = $carrito;
+                $resultado['pos'] = $pos;
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 
