@@ -34,6 +34,7 @@ class UserController extends Controller
         try {
             $usuarios = Helpers::getUsuarios();
             $pathname = Request::path();
+           
             $menuSuperior = $this->data->menuSuperior;
         
             return view('admin.usuarios.lista', compact('menuSuperior', 'pathname', 'usuarios'));
@@ -143,12 +144,12 @@ class UserController extends Controller
      * @param  \App\Models\Usuario  $usuario
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, $id)
     {
      
         try {
-           
-            $user = User::where('email',$request->email)->get()[0];
+    
+            $user = count(User::where('id',$id)->get()) ? User::where('id',$id)->get()[0]: User::where('id',$id)->get();
              // Validamos si se envio una foto
             if (isset($request->file)) {
                 // Eliminamos la imagen anterior

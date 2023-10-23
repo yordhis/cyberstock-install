@@ -60,13 +60,15 @@ class FacturaController extends Controller
         $pos = Po::all();
         $utilidades = $this->data->utilidades;
 
-            // $pathname = Request::path();
-            //  return view('admin.facturas.ticket', 
-            //      compact(
-            //         'factura', 
-            //         'pos',
-            //         'utilidades'
-            //  ));
+
+
+            $pathname = Request::path();
+             return view('admin.facturas.ticket', 
+                 compact(
+                    'factura', 
+                    'pos',
+                    'utilidades'
+             ));
        
             $pdf = PDF::loadView(
                 'admin.facturas.ticket',
@@ -76,7 +78,7 @@ class FacturaController extends Controller
                     'utilidades'
                 )
             );
-            return $pdf->stream("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
+            return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
     
     }
     /**
@@ -113,19 +115,23 @@ class FacturaController extends Controller
             }
 
             if($resultado){
-                // obtenemos los datos del POS
-                $pos = Po::all()[0];
-
                 // Procedemos a descontar del inventario
                 $carritos = Carrito::where("codigo", $request->codigo)->get();
+                $totalArticulos = 0;
                 foreach ($carritos as $key => $producto) {
                     $cantidadActualProducto = Inventario::where("codigo", $producto->codigo_producto)->get()[0]->cantidad;
                     Inventario::where("codigo", $producto->codigo_producto)->update([
                         "cantidad" =>  $cantidadActualProducto - $producto->cantidad
                     ]);
+                    $totalArticulos = $totalArticulos  + $producto->cantidad;
                 } 
-                $resultado['carrito'] = $carrito;
-                $resultado['pos'] = $pos;
+
+                $resultado['carrito'] = $carritos;
+                $resultado['pos'] = Po::all()[0];
+                $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
+                $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
+                
+                $resultado['totalArticulo']  = $totalArticulos;
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 

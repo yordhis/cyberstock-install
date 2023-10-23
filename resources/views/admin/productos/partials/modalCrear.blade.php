@@ -178,7 +178,7 @@
                                     <i class="bx bx-checkbox-minus fs-3"></i>
                                 </span>
     
-                                <input type="number" name="pvp" step="any" class="form-control"
+                                <input type="number" name="pvp" class="form-control"
                                     id="pvp" placeholder="Ingrese PVP"
                                     value="{{ $request->pvp ?? '' }}">
                                 <div class="invalid-feedback">Por favor ingrese El PVP! </div>

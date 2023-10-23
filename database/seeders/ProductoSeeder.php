@@ -66,10 +66,10 @@ class ProductoSeeder extends Seeder
             $nuevoProducto = new Producto();
             $nuevoProducto->codigo = $producto['codigo'];
             $nuevoProducto->descripcion = $producto['descripcion'];
-            $nuevoProducto->costo = $producto['costo'];
-            $nuevoProducto->utilidad_personalizada = $producto['utilidad_personalizada'];
+            //$nuevoProducto->costo = $producto['costo'];
+            //$nuevoProducto->utilidad_personalizada = $producto['utilidad_personalizada'];
             $nuevoProducto->imagen = $producto['imagen'];
-            $nuevoProducto->cantidad_inicial = $producto['cantidad_inicial'];
+            //$nuevoProducto->cantidad_inicial = $producto['cantidad_inicial'];
             $nuevoProducto->id_marca = $producto['id_marca'];
             $nuevoProducto->id_categoria = $producto['id_categoria'];
             $nuevoProducto->fecha_vencimiento = $producto['fecha_vencimiento'];

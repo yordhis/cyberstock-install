@@ -25,6 +25,12 @@
       <script src="./js/productos/productoController.js" defer></script>
   @endif
 
+  @if ($pathname == 'pos/facturas')
+  <script src="./js/main.js" defer></script>
+  <script src="./js/facturas/facturaController.js" defer></script>
+  <script src="./js/facturas/index.js" defer></script>
+  @endif
+
   @if ($pathname == 'inventarios/crearEntrada')
   <script src="./js/main.js" defer></script>
   <script src="./js/productosEntradas/index.js" defer></script>
@@ -38,7 +44,7 @@
       <script src="./js/pos/index.js" defer></script>
       <script src="./js/clientes/clienteController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
-      <script src="./js/pos/facturaController.js" defer></script>
+      <script src="./js/facturas/facturaController.js" defer></script>
   @endif
   {{-- <script src="./js/productosEntradas/index.js"></script> --}}
 

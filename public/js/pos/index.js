@@ -153,6 +153,7 @@ const hanledBotonProcesarVenta = async (e) => {
     
         inputsFactura.forEach((element, key) => {
             if(element.id == "dataCliente"){
+                log("entro")
                 facturaTemporal[element.id] = element.textContent;
             }else{
                 facturaTemporal[element.id] = element.value;

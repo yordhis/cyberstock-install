@@ -100,7 +100,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-          <a href="pos/imprimirFactura/{{$factura->codigo}}" target="_blank" rel="noopener noreferrer">
+          <a href="#" id="imprimirFactura" class="btn btn-primary " target="_self" rel="" >
             IMPRIMIR
           </a>
           

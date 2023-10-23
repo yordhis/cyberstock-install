@@ -19,11 +19,15 @@
 
                         <div class="d-flex flex-row-reverse bd-highlight">
 
-                            <div class="list-group w-25">
-                                <label for="">Tasa del dia BCV </label>
-                                <input type="number" name="tasa" id="tasa" readonly
-                                    class="form-control d-flex justify-content-end mb-2 factura"
+                           
+                                {{-- Valor de la tasa --}}
+                                <input type="hidden" name="tasa" id="tasa" readonly
+                                    class="factura"
                                     value="{{ $tasa ?? 0 }}">
+                           
+                            <div class="list-group w-25">
+                                {{-- Boton para abrir el modal de la tasa --}}
+                                <button class="btn btn-primary  mt-4">Actualizar Tasa</button>
                             </div>
 
                             @include('admin.pos.partials.modalEliminarFactura')
@@ -295,11 +299,11 @@
 
 
                                             </tbody>
-                                                
+
                                             <tfoot>
                                                 <tr>
+                                                    <input type="hidden" name="fecha" class="factura" id="fecha" value="{{ date('Y-m-d') }} ">
                                                     <td colspan="6">
-                                                        <input type="hidden" class="factura" id="fecha" name="fecha" value="{{ date('Y-m-d')}}">
                                                         <span class="btn btn-primary w-100" id="procesarVenta">Procesar
                                                             Venta</span>
                                                     </td>
