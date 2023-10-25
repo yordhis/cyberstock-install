@@ -33,10 +33,10 @@
 
   @if ($pathname == 'inventarios/crearEntrada')
   <script src="./js/main.js" defer></script>
-  <script src="./js/productosEntradas/index.js" defer></script>
   <script src="./js/proveedores/proveedorController.js" defer></script>
   <script src="./js/productos/productoController.js" defer></script>
   <script src="./js/productosEntradas/entradaController.js" defer></script>
+  <script src="./js/productosEntradas/index.js" defer></script>
   @endif
 
   @if ($pathname == 'pos')

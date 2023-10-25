@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Inventario;
-use App\Models\Producto;
 use Illuminate\Database\Seeder;
 
-class ProductoSeeder extends Seeder
+class FacturaInventarioSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,6 +13,6 @@ class ProductoSeeder extends Seeder
      */
     public function run()
     {
-     
+        //
     }
 }

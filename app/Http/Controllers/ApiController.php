@@ -22,19 +22,23 @@ class ApiController extends Controller
             if (count($proveedor)) {
                 return response()->json([
                     "mensaje" => "Busqueda Exitosa",
-                    "data" => $proveedor[0],
+                    "data" => $proveedor,
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             } else {
                 return response()->json([
                     "mensaje" => "No hay Resultados",
                     "data" => [],
-                    "estatus" => Response::HTTP_NOT_FOUND
-                ], Response::HTTP_NOT_FOUND);
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar los datos del Proveedor en el método getProveedor,");
-            return response()->view('errors.404', compact("errorInfo"), 404);
+            return response()->json([
+                "mensaje" => $errorInfo ,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

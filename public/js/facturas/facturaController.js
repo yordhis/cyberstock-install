@@ -29,63 +29,61 @@ function imprimirElemento(elemento) {
     ventana.document.write('<html><head><title>Factura</title>');
     ventana.document.write('<base href="http://cyberstock.com/public" target="objetivo">');
     ventana.document.write(`<style>
-    * {
-    margin-top: 0%;
-    font-size: 20px;
-    font-family: 'Times New Roman';
-}
+        * {
+            margin-top: 0%;
+            font-size: 20px;
+            font-family: 'Times New Roman';
+        }
 
+        td,
+        th,
+        tr,
+        table {
+            border-top: 1px solid rgb(27, 25, 25);
+            border-collapse: collapse;
+        }
 
+        td.producto,
+        th.producto {
+            width: 200px;
+            max-width: 200px;
+            text-align: left;
+        }
 
-td,
-th,
-tr,
-table {
-    border-top: 1px solid rgb(27, 25, 25);
-    border-collapse: collapse;
-}
+        td.cantidad,
+        th.cantidad {
+            width: 0px;
+            max-width: 0px;
+            word-break: break-all;
+        }
 
-td.producto,
-th.producto {
-    width: 200px;
-    max-width: 200px;
-    text-align: left;
-}
+        td.precio,
+        th.precio {
+            font-size: 18px;
+            width: 160px;
+            max-width: 160px;
+            word-break: break-all;
+            text-align: right;
+        }
 
-td.cantidad,
-th.cantidad {
-    width: 0px;
-    max-width: 0px;
-    word-break: break-all;
-}
+        .centrado {
+            margin: 0%;
+            text-align: center;
+            align-content: center;
+        }
 
-td.precio,
-th.precio {
-    font-size: 18px;
-    width: 160px;
-    max-width: 160px;
-    word-break: break-all;
-    text-align: right;
-}
+        .ticket {
+            width: 325px;
+            max-width: 355px;
+        }
 
-.centrado {
-    margin: 0%;
-    text-align: center;
-    align-content: center;
-}
-
-.ticket {
-    width: 325px;
-    max-width: 355px;
-}
-
-img {
-    max-width: 150px;
-    width: 150px;
-    margin-top: 3%;
-    margin-bottom: 0%;
-    padding-left: 28%;
-}
+        img {
+            max-width: 150px;
+            width: 150px;
+            margin-top: 3%;
+            margin-bottom: 0%;
+            padding-left: 28%;
+        }
     </style>`);
     ventana.document.write('</head><body >');
     ventana.document.write(elemento);
@@ -99,13 +97,14 @@ img {
 
 const htmlTicket = (factura) => {
     let carritoHtml = '', 
+    descuentoHtml = ''
     ivaHtml = '';
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
                 <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
 
-                <td class="precio">Bs ${producto.subtotal * factura.tasa }</td>
+                <td class="precio">Bs ${parseFloat(producto.subtotal * factura.tasa).toFixed(2) }</td>
             </tr>
         `;
     });
@@ -116,6 +115,15 @@ const htmlTicket = (factura) => {
                 <td class="producto">IVA </td>
 
                 <td class="precio">Bs ${parseFloat(factura.subtotal * factura.tasa * (factura.iva/100)).toFixed(2)  }</td>
+            </tr>
+        `;
+    }
+
+    if(factura.descuento > 0){
+        descuentoHtml = ` 
+            <tr>
+                <td class="producto">Descuento ${factura.descuento}%</td>
+                <td class="precio">Bs ${((factura.subtotal * (factura.descuento/100)) * factura.tasa).toFixed(2)}</td>
             </tr>
         `;
     }
@@ -167,6 +175,8 @@ const htmlTicket = (factura) => {
         
                     <td class="precio"><br> Bs  ${parseFloat(factura.subtotal * factura.tasa).toFixed(2) }</td>
                 </tr>
+              
+                ${descuentoHtml}
 
                 ${ivaHtml}
 

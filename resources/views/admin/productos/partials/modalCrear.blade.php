@@ -137,7 +137,7 @@
                                     <i class="bx bx-checkbox-minus fs-3"></i>
                                 </span>
     
-                                <input type="number" name="cantidad_inicial" class="form-control" id="cantidad_inicial"
+                                <input type="number" name="cantidad_inicial" class="form-control" step="any" id="cantidad_inicial"
                                     placeholder="Ingrese cantidad inical del producto"
                                     value="{{ $request->cantidad_inicial ?? '' }}">
                                 <div class="invalid-feedback">Por favor ingrese El cantidad inical del producto! </div>
@@ -178,7 +178,7 @@
                                     <i class="bx bx-checkbox-minus fs-3"></i>
                                 </span>
     
-                                <input type="number" name="pvp" class="form-control"
+                                <input type="number" name="pvp" step="any" class="form-control"
                                     id="pvp" placeholder="Ingrese PVP"
                                     value="{{ $request->pvp ?? '' }}">
                                 <div class="invalid-feedback">Por favor ingrese El PVP! </div>

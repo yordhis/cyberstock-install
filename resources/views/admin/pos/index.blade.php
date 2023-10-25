@@ -27,7 +27,7 @@
                            
                             <div class="list-group w-25">
                                 {{-- Boton para abrir el modal de la tasa --}}
-                                <button class="btn btn-primary  mt-4">Actualizar Tasa</button>
+                                @include('admin.pos.partials.modalEditar')
                             </div>
 
                             @include('admin.pos.partials.modalEliminarFactura')
@@ -291,6 +291,49 @@
                                                     <td>Total en Divisdas</td>
                                                     <td class="text-center fs-4">
                                                         <input type="number" name="totalDivias" id="totalDivias"
+                                                            readonly class="form-control factura" step="any">
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                
+                                                {{--  Métodos de pagos --}}
+                                                <tr>
+                                                    <td colspan="3" class="bg-primary">
+                                                    <td>Métodos de pago</td>
+                                                    <td class="text-center fs-4 row g-3">
+                                                        <div class="col-md-6">
+                                                            <select class="form-select metodoPago">
+                                                              <option selected>Método de pago</option>
+                                                              <option value="EFECTIVO">EFECTIVO</option>
+                                                              <option value="PAGO MOVIL">PAGO MOVIL</option>
+                                                              <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                              <option value="TD">TD | PUNTO</option>
+                                                              <option value="TC">TC | PUNTO</option>
+                                                             
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" step="any" class="form-control metodoPago">
+                                                        </div>
+
+                                                        <div class="col-md-2 ">
+                                                            <a href="#" id="agregarMetodo" type="buttom" class="metodoPago">
+                                                                <i class='bx bx-plus-medical text-primary fs-5' id="agregarMetodo"></i>
+                                                            </a>
+                                                        </div>
+                                                    
+                                                        <div id="otroMetodoPago" class="row g-3"></div>
+                                                        
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+
+                                                {{-- Restante o vuelto --}}
+                                                <tr>
+                                                    <td colspan="3" class="bg-primary">
+                                                    <td>Cambio</td>
+                                                    <td class="text-center fs-4">
+                                                        <input type="number" name="restante" id="restante"
                                                             readonly class="form-control factura" step="any">
                                                     </td>
                                                     <td></td>

@@ -22,9 +22,8 @@ class CreateInventariosTable extends Migration
             $table->string("cantidad", 11)->nullable();
             $table->string("costo", 11)->nullable();
             $table->string("pvp", 11)->nullable();
-            // $table->string("ultimo_costo", 11)->nullable();
-            // $table->string("cantidad_ultimo_costo", 11)->nullable();
-            // $table->string("utilidad_personalizada", 55)->nullable();
+            $table->string("pvp_2", 11)->nullable();
+            $table->string("pvp_3", 11)->nullable();
             $table->string("imagen", 255)->default(FOTO_PORDEFECTO_PRODUCTO);
             $table->string("fecha_entrada", 85)->nullable();
             // $table->string("fecha_vencimiento", 85)->nullable();

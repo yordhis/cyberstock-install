@@ -33,9 +33,15 @@ class ProductoController extends Controller
     {
         $menuSuperior = $this->data->menuSuperior;
         $utilidades = $this->data->utilidades;
+        $inventarioPorDefecto = ['costo'=>0,'cantidad'=>0, 'pvp'=>0];
         
         $productos = Helpers::setNameElementId(Producto::where('id', '>', 0)->orderBy('id', 'desc')->get( ), 'id,nombre', 'categorias,marcas');
  
+        foreach ($productos as $key => $producto) {
+            $resultado = Inventario::where('codigo', $producto->codigo)->select('costo', 'cantidad', 'pvp')->get();
+            $producto['inventario'] = count($resultado) ? $resultado[0] :  $inventarioPorDefecto;
+        }
+
         $pathname = Request::path();
         $categorias = Categoria::all();
         $marcas = Marca::all();
@@ -68,7 +74,7 @@ class ProductoController extends Controller
 
     public function getProductoData($barcode){
         try {
-            $utilidades = $this->data->utilidades;
+          
             $product = Producto::where(['codigo'=> $barcode])->get();
             if (count($product)) {
                 return response()->json([
@@ -169,11 +175,10 @@ class ProductoController extends Controller
                         "cantidad" => $request->cantidad_inicial,
                         "costo" => $request->costo,
                         "pvp" => $request->pvp,
+                        "pvp_2" => 0,
+                        "pvp_3" => 0,
+                        "imagen" => $request->imagen,
                         "fecha_entrada" => date('Y-m-d'),
-                        // "ultimo_costo" => $request->ultimo_costo,
-                        // "cantidad_ultimo_costo" => $request->cantidad_ultimo_costo,
-                        // "utilidad_personalizada" => $request->utilidad_personalizada,
-                        // "fecha_vencimiento" => $request->fecha_vencimiento,
                     ]);
                 }else{
                     $mensaje = [
@@ -192,9 +197,7 @@ class ProductoController extends Controller
                 "id_marca" => $request->id_marca,
                 "id_categoria" => $request->id_categoria,
                 "fecha_vencimiento" => $request->fecha_vencimiento,
-                // "cantidad_inicial" => $request->cantidad_inicial,
-                // "costo" => $request->costo,
-                // "utilidad_personalizada" => $request->utilidad_personalizada,
+              
             ]);
             
             $mensaje = $estatusCrear ? "El producto se creo correctamente." : "El producto no se creo";
@@ -243,19 +246,57 @@ class ProductoController extends Controller
      */
     public function update(UpdateProductoRequest $request, Producto $producto)
     {
-        $menuSuperior = $this->data->menuSuperior;
-        $productos = Producto::all();
-        $categorias = Categoria::all();
-        $marcas = Marca::all();
-
-        // Actualizar el producto
-        $estatusActualizar = $producto->update($request->all());
-        
-        $mensaje = $estatusActualizar ? "El producto se Actualizó correctamente." : "El producto No se Actualizo";
-        $estatus = $estatusActualizar ? 201 : 404;
-        
-        return $estatusActualizar ? redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') )
-        : view('admin.productos.lista', compact('mensaje', 'estatus', 'menuSuperior', 'request', 'categorias', 'marcas', 'productos'));
+        try {
+            $menuSuperior = $this->data->menuSuperior;
+            $productos = Producto::all();
+            $categorias = Categoria::all();
+            $marcas = Marca::all();
+    
+           
+             // Seteamos la imagen
+             if($request->file){
+                // Removemos la imagen anterior
+                if($producto->imagen != FOTO_PORDEFECTO_PRODUCTO){
+                    Helpers::removeFile($producto->imagen);
+                }
+                $url = Helpers::setFile($request);
+                $request['imagen'] = $url;
+             }
+            
+             // Capturamos el codigo en caso de ser diferente
+            $codigo = $producto->codigo;
+             
+            // Actualizar el producto
+            $estatusActualizar = $producto->update($request->all());
+    
+            
+            if ($estatusActualizar) {
+                  
+                // Procesar una entrada sin facturar
+                Inventario::updateOrCreate(
+                    [
+                        "codigo" => $codigo,
+                    ],
+                    [
+                        "descripcion" => $producto->descripcion,
+                        "id_marca" => $producto->id_marca,
+                        "id_categoria" => $producto->id_categoria,
+                        "imagen" => $producto->imagen,
+                        "cantidad" => $request->cantidad_inicial,
+                        "costo" => $request->costo,
+                        "pvp" => $request->pvp
+                    ]);
+            }
+            
+            $mensaje = $estatusActualizar ? "El producto se Actualizó correctamente." : "El producto No se Actualizo";
+            $estatus = $estatusActualizar ? 201 : 404;
+            
+            return $estatusActualizar ? redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') )
+            : view('admin.productos.lista', compact('mensaje', 'estatus', 'menuSuperior', 'request', 'categorias', 'marcas', 'productos'));
+        } catch (\Throwable $th) {
+            $mensajeError = Helpers::getMensajeError($th, "Error Al actualizar el producto, ");
+            return view('errors.404', compact('mensajeError'));
+        }
     }
 
     /**

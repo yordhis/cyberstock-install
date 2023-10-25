@@ -9,10 +9,17 @@ const getProveedor = async (idProveedor, elemento) => {
             .then(response => response.json())
             .catch(err => log(err))
             .then(data => {
-                log(data.data)
-                if(data.data){
+                log(data)
+                if(data.estatus == 200){
+                  if (data.data.length) {
                     elemento.innerHTML = `<label for="validationCustom04" class="form-label">Datos del proveedor</label> <br>
-                    <h4>${data.data.empresa} | ${data.data.contacto}</h4>`;
+                    <h4>${data.data[0].empresa} | ${data.data[0].contacto}</h4>`;
+                  }else{
+                    elemento.innerHTML = ` <span class="text-danger"> No hay registro de este proveedor </span>`;
+                  }
+                }else if(data.estatus == 500){
+                  log(data)
+                  elemento.innerHTML = ` <span class="text-danger"> Error al conectarse al servidor </span>`;
                 }
             })
        

@@ -25,7 +25,8 @@
                                         <th scope="col">#</th>
                                         <th scope="col">N° Factura</th>
                                         <th scope="col">Razón social</th>
-                                        <th scope="col">Documento de identidad</th>
+                                        <th scope="col">Rif o Cédula</th>
+                                        <th scope="col">Fecha</th>
                                         <th scope="col">Total BS</th>
                                         <th scope="col">Total Divisas</th>
                                         <th scope="col">Acciones</th>
@@ -39,9 +40,10 @@
                                                 <td scope="row">{{ $contador }}</td> 
                                                 <td>{{ $factura->codigo }}</td>
                                                 <td>{{ $factura->razon_social }}</td>
-                                                <td>{{ $factura->identificacion }}</td>
-                                                <td>Bs{{ $factura->total * $factura->tasa }}</td>
-                                                <td>REF: {{ $factura->total }}</td>
+                                                <td>{{ number_format($factura->identificacion, 0, ',', '.') }}</td>
+                                                <td>{{  date_format(date_create($factura->fecha), 'd-m-Y') }}</td>
+                                                <td>Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</td>
+                                                <td>REF: {{ number_format($factura->total, 2, ',', '.') }}</td>
                                                 <td> 
 
                                                     {{-- @include('admin.facturas.partials.modalEditar') --}}

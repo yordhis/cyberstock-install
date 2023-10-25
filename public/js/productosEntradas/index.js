@@ -1,17 +1,19 @@
 let btnProcesarEntrada = d.querySelector("#btnProcesarEntrada"),
 btnAgregarAlCarro = d.querySelector('#agregarAlCarro'),
 inputsEntrys = d.querySelectorAll('.input-entrada'),
-inputIdentificacion = document.querySelector('#cedula'),
+inputRif = document.querySelector('#rif'),
 dataProveedor = d.querySelector('#dataProveedor'),
 inputBarcode = d.querySelector('#codigo_producto'),
 inputQuantity = d.querySelector('#cantidad'),
 inputUnitCost = d.querySelector('#costo_unitario'),
+inputCostoUnitarioBs = d.querySelector('#costo_unitario_bs'),
+inputTasa = d.querySelector('#tasa'),
 inputSubtotal = d.querySelector('#subtotal'),
 tbodyEntryProduct = d.querySelector('#carritoEntrada'),
 productos = [],
 producto = null;
 
-log(inputIdentificacion)
+
 const addRow = (products) => {
       products.forEach((product, key) =>{
             tbodyEntryProduct.innerHTML += `
@@ -41,20 +43,24 @@ const addRow = (products) => {
      })    
 };
 
+const hanledCostoUnitario = (e) => {
+    log(e.target.value)
+    log(e.key)
+
+    inputCostoUnitarioBs.value = e.target.value * inputTasa.value;
+};
+
+
 const handleInputBarcode = async (e) => {
     // e.preventDefault();
     log(e.target.value)
     if (e.target.value.length > 3) {
         resultado = await getProductoData(e.target.value)
-     
         producto = await resultado.result;
         log(producto);
         inputsEntrys.forEach(input => {
             if(input.id == "descripcion") input.value = producto.data.descripcion;
         });
-        
-     
-        // return inputBarcode.addEventListener('keypress', handleEnterKey);
     }
 };
 
@@ -99,14 +105,16 @@ const hanledClicAgregarAlCarrito = (e) =>{
     log('hizo submit')
 };
 
-const hanledIdentificacionProveedor = async (e) =>{
-    log("keyup")
-    if(e.target.value.length > 5){
+const hanledRifProveedor = async (e) =>{
+    // log(e.key)
+    if(e.target.value.length > 4){
         await getProveedor(e.target.value, dataProveedor)
     }
 };
 
-inputIdentificacion.addEventListener('keyup', hanledIdentificacionProveedor);
+inputUnitCost.addEventListener('keyup', hanledCostoUnitario);
+
+inputRif.addEventListener('keyup', hanledRifProveedor);
 
 inputBarcode.addEventListener('keyup', handleInputBarcode);
 

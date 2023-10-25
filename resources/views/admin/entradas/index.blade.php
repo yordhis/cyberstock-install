@@ -19,8 +19,8 @@
                         <div class="d-flex flex-row-reverse bd-highlight">
 
                             <div class="list-group w-25">
-                                <label for="">Tasa del dia BCV </label>
-                                <input type="number" name="tasa" id="tasa" readonly
+                                <label for="">Tasa de compra </label>
+                                <input type="number" name="tasa" id="tasa"
                                     class="form-control d-flex justify-content-end mb-2 factura"
                                     value="{{ $tasa }}">
                             </div>
@@ -37,26 +37,60 @@
                         <div class="card ">
                             <div class="card-body">
                                 <!-- Formulario de agregar productos al caarrito -->
-                                <form action="carritos" method="post" target="_self">
+                                <form action="carritoInventario" method="post" target="_self">
                                     @csrf
                                     @method('post')
                                     <div class="row g-3">
-                                        <input type="hidden" name="formulario" value="crearEntrada">
-                                        <!-- Input de codigo de factura -->
+                                       
+                                        <!-- Input de codigo de transacción -->
                                         <div class="col-sm-6 col-xs-12 mt-4">
-                                            <label for="yourUsername" class="form-label">Número de factura
+                                            <label for="yourUsername" class="form-label">Número de transacción
+                                                <span class=" text-primary">(Es Automático)</span>
+                                            </label>
+                                            <div class="input-group has-validation">
+                                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
+                                                    <i class="bi bi-upc-scan"></i>
+                                                </span>
+                                                <input type="number" name="codigo_transaccion"
+                                                    class="form-control fs-5 text-danger input-entrada factura"
+                                                    id="codigo_transaccion" placeholder="Ingrese número de transacción" 
+                                                    value="{{ $codigo }}" readonly
+                                                    required>
+                                                <div class="invalid-feedback">Por favor, ingrese código de transaccion! </div>
+                                            </div>
+                                        </div><!-- Cierre Input de codigo de factura -->
+
+                                        <!-- Input de codigo de factura proveedor -->
+                                        <div class="col-sm-6 col-xs-12 mt-4">
+                                            <label for="yourUsername" class="form-label">Número de factura del proveedor
                                                 <span class=" text-primary">(Es Obligatorio)</span>
                                             </label>
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
                                                     <i class="bi bi-upc-scan"></i>
                                                 </span>
-                                                <input type="number" name="codigo"
+                                                <input type="number" name="codigo_factura"
                                                     class="form-control fs-5 text-danger input-entrada factura"
                                                     id="codigo_factura" placeholder="Ingrese número de factura" required>
                                                 <div class="invalid-feedback">Por favor, ingrese código de factura! </div>
                                             </div>
-                                        </div><!-- Cierre Input de codigo de factura -->
+                                        </div><!-- Cierre Input de codigo de factura proveedor -->
+
+                                        <!-- Input de codigo de factura proveedor -->
+                                        <div class="col-sm-6 col-xs-12 mt-4">
+                                            <label for="yourUsername" class="form-label">Fecha de la factura del proveedor
+                                                <span class=" text-primary">(Es Obligatorio)</span>
+                                            </label>
+                                            <div class="input-group has-validation">
+                                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
+                                                    <i class="bi bi-calendar"></i>
+                                                </span>
+                                                <input type="date" name="fecha_factura_proveedor"
+                                                    class="form-control fs-5 text-danger input-entrada factura"
+                                                    id="fecha_factura_proveedor" placeholder="Ingrese número de factura" required>
+                                                <div class="invalid-feedback">Por favor, ingrese código de factura! </div>
+                                            </div>
+                                        </div><!-- Cierre Input de codigo de factura proveedor -->
 
                                         <!-- Input de IDENTIFICACION -->
                                         <div class="col-sm-6 col-xs-12 mt-4">
@@ -69,15 +103,15 @@
                                                 </span>
 
                                                 @if (isset($carritos[0]))
-                                                    <input type="number" name="identificacion"
-                                                        class="form-control fs-5 input-entrada factura identificacion"
-                                                        id="cedula"
+                                                    <input type="number" name="rif"
+                                                        class="form-control fs-5 input-entrada factura rif"
+                                                        id="rif"
                                                         value="{{ $_GET['identificacion'] ?? $carritos[0]->identificacion}}"
                                                         {{ $carritos[0]->identificacion ? 'readonly' : '' }} required>
                                                 @else
                                                     <input type="number" name="identificacion"
-                                                        class="form-control fs-5 input-entrada factura identificacion"
-                                                        id="cedula" value="" placeholder="Ingrese RIF o Documento de identidad " required>
+                                                        class="form-control fs-5 input-entrada factura rif"
+                                                        id="rif" value="" placeholder="Ingrese RIF o Documento de identidad " required>
                                                 @endif
                                                 <div class="invalid-feedback">Por favor, ingrese Rif o Documento de identidad del proveedor o vendedor! </div>
                                             </div>
@@ -156,14 +190,20 @@
                                                                     </button>
                                                                 </td>
                                                             </tr>
+                                                             {{--  Configuración de precios del producto --}}
+                                                            <tr>
+                                                                <td>
 
-                                                            @isset($_GET['mensajeInventario'])
+                                                                </td>
+                                                            </tr>
+
+                                                            {{-- @isset($_GET['mensajeInventario'])
                                                                 <tr>
                                                                     <td colspan="6" class="text-danger">
                                                                         {{ $_GET['mensajeInventario'] ?? ''}}
                                                                     </td>
                                                                 </tr>
-                                                            @endisset
+                                                            @endisset --}}
 
                                                         </tbody>
                                                     </table>
@@ -288,8 +328,8 @@
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="6">
-                                                        <span class="btn btn-primary w-100" id="procesarVenta">Procesar
-                                                            Venta</span>
+                                                        <span class="btn btn-primary w-100" id="btnProcesarEntrada">Procesar
+                                                            Entrada de inventario</span>
                                                     </td>
                                                 </tr>
                                             </tfoot>

@@ -1,3 +1,11 @@
+{{-- @php
+    if (Auth::check()) {
+        echo "hola";
+    }else{
+        echo "hola no check";
+    }
+@endphp --}}
+
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 

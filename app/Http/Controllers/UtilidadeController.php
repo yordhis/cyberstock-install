@@ -101,6 +101,25 @@ class UtilidadeController extends Controller
      * @param  \App\Models\Utilidade  $utilidade
      * @return \Illuminate\Http\Response
      */
+    public function updateTasa($idUtil)
+    {
+        try {
+            $nuevaTasa = $_POST['tasa'];
+     
+            // $id = explode("/",$request->path())[1];
+            $estatusActualizar = Utilidade::where("id", $idUtil)->update(['tasa' => $nuevaTasa]);
+     
+            $mensaje = $estatusActualizar ? "Tasa se actualizó correctamente." : "Los cambios no se guardaron!";
+            $estatus = $estatusActualizar ? 200 : 404;
+            
+            $pathname = Request::path();
+            $menuSuperior = $this->data->menuSuperior;
+            return redirect()->route( 'admin.pos.index', compact('mensaje', 'estatus') );
+        } catch (\Throwable $th) {
+            $mensajeError = Helpers::getMensajeError($th, "Error Al Actualizar la utilidades, ");
+            return view('errors.404', compact('mensajeError'));
+        }
+    }
     public function update(UpdateUtilidadeRequest $request, Utilidade $utilidade)
     {
         try {

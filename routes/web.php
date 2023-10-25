@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     CarritoController,
+    CarritoInventarioController,
     CategoriaController,
     ClienteController,
     UserController,
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
     
     //  Usuarios
     Route::resource('/usuarios', UserController::class)->names('admin.users');
+    Route::put('/updateTasa/{idTasa}', [UtilidadeController::class, 'updateTasa'])->name('admin.utilidades.updateTasa');
     Route::resource('/utilidades', UtilidadeController::class)->names('admin.utilidades');
   
     //  Inventario
@@ -58,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventarios/listaSalidas', [InventarioController::class, "listaSalidas"])->name('admin.inventarios.listaSalidas');
     Route::get('/inventarios/crearEntrada', [InventarioController::class, "crearEntrada"])->name('admin.inventarios.crearEntrada');
     Route::get('/inventarios/crearSalida', [InventarioController::class, "crearSalida"])->name('admin.inventarios.crearSalida');
+    Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
     Route::resource('/inventarios', InventarioController::class)->names('admin.inventarios');
     
     /** Rutas de productos */
@@ -74,21 +77,18 @@ Route::middleware('auth')->group(function () {
         Route::resource('/marcas', MarcaController::class)->names('admin.marcas');
     });
     
+    /** POS */
     Route::prefix('pos')->group(function (){
         Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
         Route::resource('facturas', FacturaController::class)->names('admin.facturas');
         Route::resource('clientes', ClienteController::class)->names('admin.clientes');
     });
     Route::resource('pos', PoController::class)->names('admin.pos');
-    /** POS */
+    
     /** Carrito */
-
     Route::delete('/eliminarCarritoCompleto/{codigo}', [CarritoController::class, 'eliminarCarritoCompleto'])->name('admin.eliminarCarritoCompleto');
     Route::resource('/carritos', CarritoController::class)->names('admin.carritos');
-
-    /** Clientes */
-
-   
+  
 
     // Route::get('/generarReciboDePago/{id}/recibopdf', [PagoController::class, 'recibopdf'])->name('admin.pagos.recibopdf');
     

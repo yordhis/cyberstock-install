@@ -34,8 +34,34 @@ let inputDescuento = d.querySelector("#descuento"),
         concepto: "", // venta: "", compra ...
         descuento: "", // venta, compra ...
     },
-    facturaTemporal = {};
+    facturaTemporal = {},
+    // Elementos de Metodos de pago
+    metodoPago = d.querySelectorAll(".metodoPago"),
+    divOtroMetodoPago = d.querySelector("#otroMetodoPago"),
+    btnAgregarMetodo = d.querySelector("#agregarMetodo");
 
+log(metodoPago);
+
+const htmlMetodoPago = `
+    <div class="col-md-6">
+        <select class="form-select metodoPago">
+            <option selected>Método de pago</option>
+            <option value="EFECTIVO">EFECTIVO</option>
+            <option value="PAGO MOVIL">PAGO MOVIL</option>
+            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+            <option value="TD">TD | PUNTO</option>
+            <option value="TC">TC | PUNTO</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="number" step="any" class="form-control metodoPago" >
+    </div>
+    <div class="col-md-2 ">
+        <a href="#" id="agregarMetodo" type="buttom" class="metodoPago">
+            <i class='bx bx-trash text-danger fs-5' id="agregarMetodo"></i>
+        </a>
+    </div>
+`;
 
 const hanledInputIdentificacion = async (e) => {
     // log(e.target.value);
@@ -45,41 +71,31 @@ const hanledInputIdentificacion = async (e) => {
         cliente = await resultado.result;
         if (cliente.status == 200) {
             if (cliente.data.nombre == undefined) {
-                log('entro')
+                log("entro");
                 elementoDataCliente.hidden = false;
                 elementoDataCliente.innerHTML = `<span class="text-danger">Cliente No registrado</span>`;
                 procesarVenta.hidden = true;
-            }else {
+            } else {
                 elementoDataCliente.hidden = false;
                 elementoDataCliente.innerHTML = `<h4>Cliente: ${cliente.data.nombre}</h4>`;
                 procesarVenta.hidden = false;
             }
-        } 
+        }
     }
 };
 
 const hanledInputDescuento = (e) => {
-    log(e.target.value);
+    log(subtotal);
     // log(subtotal)
     if (e.target.value) {
-        inputSubtotalTemporalBs.value = (
-            subtotal * parseFloat(inputTasa.value) -
-            subtotal * parseFloat(inputTasa.value) * (e.target.value / 100)
-        ).toFixed(2);
-        subtotalTemporal = inputSubtotalTemporalUsd.value = (
-            subtotal -
-            subtotal * (e.target.value / 100)
-        ).toFixed(2);
-        subtotalTemporal = parseFloat(subtotalTemporal);
-        inputTotal.value = (
-            subtotalTemporal *
-            inputTasa.value *
-            (inputIva.value / 100 + 1)
-        ).toFixed(2);
-        inputTotalDivisas.value = (
-            (subtotalTemporal * inputTasa.value * (inputIva.value / 100 + 1)) /
-            inputTasa.value
-        ).toFixed(2);
+        let descuento = e.target.value;
+        // inputSubtotalTemporalBs.value = ( ((subtotal * parseFloat(inputTasa.value)) - ((subtotal * parseFloat(inputTasa.value)) * (e.target.value / 100))) ).toFixed(2);
+        // subtotalTemporal = inputSubtotalTemporalUsd.value = (subtotal - subtotal * (e.target.value / 100)).toFixed(2);
+        // subtotalTemporal = parseFloat(subtotalTemporal);
+        descuento = (descuento / 100) * subtotal;
+        inputTotal.value = ( (subtotal * inputTasa.value - (descuento * inputTasa.value)) * ((inputIva.value / 100) + 1) ).toFixed(2);
+
+        inputTotalDivisas.value = ( (subtotal - descuento) * (inputIva.value / 100 + 1) ).toFixed(2);
     }
 };
 
@@ -104,16 +120,17 @@ const hanledInputCodigoBarra = async (e) => {
         resultado = await getProducto(e.target.value);
 
         producto = await resultado.result;
-    
-        log(producto.data)
+
+        log(producto.data);
         if (producto.status == 200) {
-            if(producto.data.id > 0){
+            if (producto.data.id > 0) {
                 inputDescripcion.value = producto.data.descripcion;
                 inputCostoUnitario.value = producto.data.pvp; // usd
-                inputCostoUnitarioBs.value = producto.data.pvp * inputTasa.value; // Bs
+                inputCostoUnitarioBs.value =
+                    producto.data.pvp * inputTasa.value; // Bs
 
                 mensajeInventario.innerText = "";
-            }else{
+            } else {
                 mensajeInventario.innerText = `${producto.message} `;
             }
         }
@@ -126,7 +143,8 @@ const hanledInputSubtotal = (e) => {
             costo = parseFloat(inputCostoUnitario.value);
         if (cantidad && costo) {
             inputSubtotal.value = cantidad * costo;
-            inputSubtotalBS.value = cantidad * costo * parseFloat(inputTasa.value);
+            inputSubtotalBS.value =
+                cantidad * costo * parseFloat(inputTasa.value);
         } else {
             log("Los datos ingresados no son números!");
         }
@@ -146,23 +164,21 @@ const hanledInputSubtotalCosto = (e) => {
 };
 
 const hanledBotonProcesarVenta = async (e) => {
-   
-    if(tdSubtotales.length){
-
+    if (tdSubtotales.length) {
         let inputsFactura = d.querySelectorAll(".factura");
-    
+
         inputsFactura.forEach((element, key) => {
-            if(element.id == "dataCliente"){
-                log("entro")
+            if (element.id == "dataCliente") {
+                log("entro");
                 facturaTemporal[element.id] = element.textContent;
-            }else{
+            } else {
                 facturaTemporal[element.id] = element.value;
             }
         });
         // log(facturaTemporal);
         // adactamos para enviar a guardar e imprimir ticket
         factura.codigo = facturaTemporal.codigo;
-        factura.razon_social = facturaTemporal.dataCliente.split(':')[1];
+        factura.razon_social = facturaTemporal.dataCliente.split(":")[1];
         factura.identificacion = facturaTemporal.cedula; // aqui va el nombre
         factura.subtotal = facturaTemporal.subtotal_temporal_usd;
         factura.total = facturaTemporal.totalDivias;
@@ -174,26 +190,41 @@ const hanledBotonProcesarVenta = async (e) => {
         factura.fecha = facturaTemporal.fecha;
 
         await facturaStore(factura);
-    }else{
+    } else {
         alert("Debe agregar productos a la factura para poder ser procesada");
     }
+};
 
+const hanledBtnAgregarMetodoPago = (e) => {
+    e.preventDefault();
+    log(e.target.id);
+
+    divOtroMetodoPago.innerHTML += htmlMetodoPago;
+
+    metodoPago = d.querySelectorAll(".metodoPago");
+    log(metodoPago);
+
+    //     metodoPago.forEach((element, i) => {
+    //         log(element + " - " + i)
+    //         if (i >=3 && i < 6) {
+
+    //         }
+    //    });
 };
 
 // Cada ves que cargue la pagina se ejecuta
 addEventListener("load", (ev) => {
+    // ocultar la carta de cliente
+    elementoDataCliente.hidden = false;
+    if (elementoDataCliente.children.length == 0) {
+        elementoDataCliente.hidden = true;
+    }
 
-        // ocultar la carta de cliente
-        elementoDataCliente.hidden = false;
-        if(elementoDataCliente.children.length == 0){
-            elementoDataCliente.hidden = true;
-        }
-
-        // if (inputIdentificacionCliente.value > 0) {
-        //     componenteCardCliente(inputIdentificacionCliente.value)
-        // }
-        // OCULTAMOS EL BOTON DE PROCESAR HASTA QUE LA DATA ESTE COMPLETA
-        procesarVenta.hidden = true;
+    // if (inputIdentificacionCliente.value > 0) {
+    //     componenteCardCliente(inputIdentificacionCliente.value)
+    // }
+    // OCULTAMOS EL BOTON DE PROCESAR HASTA QUE LA DATA ESTE COMPLETA
+    procesarVenta.hidden = true;
     if (tdSubtotales.length) {
         tdSubtotales.forEach((element) => {
             // log(typeof(element.textContent))
@@ -201,20 +232,13 @@ addEventListener("load", (ev) => {
             subtotal = subtotal + sub;
         });
 
-        // inpust
-        inputSubtotalTemporalBs.value = (
-            subtotal * parseFloat(inputTasa.value)
-        ).toFixed(2);
+        // inpust subtotal
+        inputSubtotalTemporalBs.value = (subtotal * parseFloat(inputTasa.value)).toFixed(2);
         inputSubtotalTemporalUsd.value = parseFloat(subtotal).toFixed(2);
-        inputTotal.value = (
-            subtotal *
-            inputTasa.value *
-            (inputIva.value / 100 + 1)
-        ).toFixed(2);
-        inputTotalDivisas.value = (
-            (subtotal * inputTasa.value * (inputIva.value / 100 + 1)) /
-            inputTasa.value
-        ).toFixed(2);
+        
+        // inpust TOTAL
+        inputTotal.value = (subtotal *inputTasa.value *(inputIva.value / 100 + 1)).toFixed(2);
+        inputTotalDivisas.value = ((subtotal * inputTasa.value * (inputIva.value / 100 + 1)) /inputTasa.value).toFixed(2);
 
         procesarVenta.hidden = false;
     } else {
@@ -234,9 +258,6 @@ inputCostoUnitario.addEventListener("change", hanledInputSubtotalCosto);
 
 procesarVenta.addEventListener("click", hanledBotonProcesarVenta);
 
-inputIdentificacionCliente.addEventListener(
-    "keyup",
-    hanledInputIdentificacion
-);
+inputIdentificacionCliente.addEventListener("keyup", hanledInputIdentificacion);
 
-
+btnAgregarMetodo.addEventListener("click", hanledBtnAgregarMetodoPago);

@@ -157,13 +157,13 @@
                         <div class="col-12">
                             <hr>
                             <p class="text-start text-mute">
-                                Los siguientes datos solicitados son opcionales; 
-                                pero al ingresar una cantidad se procesara una entrada en el Inventario automaticamente.
+                                Los siguientes datos solicitados son opcionales; y pertenecen a una entrada inicial del 
+                                inventario si desea actualizar afectará los datos de inventario de este producto.
                             </p>
                         </div>
     
                         {{-- inputs Cantidad Inicial --}}
-                        {{-- <div class="col-sm-6 col-xs-12 text-start mt-2">
+                        <div class="col-sm-6 col-xs-12 text-start mt-2">
                             <label for="yourUsername" class="form-label">Cantidad Inicial (opcional)</label>
                             <div class="input-group has-validation">
     
@@ -171,9 +171,9 @@
                                     <i class="bx bx-checkbox-minus fs-3"></i>
                                 </span>
     
-                                <input type="number" name="cantidad_inicial" class="form-control" id="cantidad_inicial"
+                                <input type="number" name="cantidad_inicial" step="any" class="form-control" id="cantidad_inicial"
                                     placeholder="Ingrese cantidad inical del producto"
-                                    value="{{ $producto->cantidad_inicial  ?? ''}}">
+                                    value="{{ $producto->inventario->cantidad  ?? ''}}">
                                 <div class="invalid-feedback">Por favor ingrese El cantidad inical del producto! </div>
                                 @error('cantidad_inicial')
                                     <span class="text-danger">
@@ -181,10 +181,10 @@
                                     </span>
                                 @enderror
                             </div>
-                        </div> --}}
+                        </div>
     
                         {{-- inputs Costo --}}
-                        {{-- <div class="col-sm-6 col-xs-12 text-start mt-2">
+                        <div class="col-sm-6 col-xs-12 text-start mt-2">
                             <label for="yourUsername" class="form-label">Costo (opcional)</label>
                             <div class="input-group has-validation">
     
@@ -192,9 +192,9 @@
                                     <i class="bx bx-checkbox-minus fs-3"></i>
                                 </span>
     
-                                <input type="number" name="costo" class="form-control"
+                                <input type="number" name="costo" step="any" class="form-control"
                                     id="costo" placeholder="Ingrese costo proveedor"
-                                    value="{{ $producto->costo ?? '' }}">
+                                    value="{{ $producto->inventario->costo ?? '' }}">
                                 @isset($mensaje)
                                     <div class="{{ $mensaje['input'] == 'costo' ? 'text-danger' : "" }}">{{ $mensaje['input'] == 'costo' ? $mensaje['texto'] : '' }} </div>                                
                                 @endisset
@@ -205,24 +205,24 @@
                                     </span>
                                 @enderror
                             </div>
-                        </div> --}}
+                        </div>
     
                         {{-- inputs Utilidad --}}
-                        {{-- <div class="col-12 text-start mt-2">
-                            <label for="yourUsername" class="form-label">Utilidad personalizada (opcional)</label>
+                        <div class="col-12 text-start mt-2">
+                            <label for="yourUsername" class="form-label">Precio de Venta al público (PVP)</label>
                             <div class="input-group has-validation">
     
                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
-                                    <i class="bx bx-checkbox-minus fs-3"></i>
+                                    <i class="bx bx-building fs-3"></i>
                                 </span>
     
-                                <input type="number" name="utilidad_personalizada" class="form-control"
-                                    id="utilidad_personalizada" placeholder="Ingrese utilidad"
-                                    value="{{ $producto->utilidad_personalizada ??   '' }}">
-                                <div class="invalid-feedback">Por favor ingrese El utilidad! </div>
+                                <input type="number" name="pvp" step="any" class="form-control"
+                                    id="pvp" placeholder="Ingrese PVP"
+                                    value="{{ $producto->inventario->pvp ??   '' }}">
+                                <div class="invalid-feedback">Por favor, ingrese El PVP! </div>
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
 
                 </div> <!--Fin div body-->
 

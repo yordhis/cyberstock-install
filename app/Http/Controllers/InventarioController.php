@@ -102,6 +102,7 @@ class InventarioController extends Controller
             $tiposEntradas = $this->data->tiposEntradas;
             $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);
             $iva = $this->data->utilidades[0]->iva;
+            $codigo = Helpers::getCodigo('factura_inventarios');
             $pathname = $request->path();
 
             $carritos = Carrito::where([
@@ -117,7 +118,7 @@ class InventarioController extends Controller
                 }
             }
 
-            return view('admin.entradas.index', compact('request', 'carritos', 'tiposEntradas', 'menuSuperior', 'pathname', 'tasa', 'iva'));
+            return view('admin.entradas.index', compact('request', 'codigo', 'carritos', 'tiposEntradas', 'menuSuperior', 'pathname', 'tasa', 'iva'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de entradas, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

@@ -33,8 +33,7 @@ class PoController extends Controller
             $codigo = Helpers::getCodigo('facturas');
             $carritos = Carrito::where('codigo', $codigo)->get();
             $pos = Po::all();
-
-            
+            $utilidades = $this->data->utilidades;
             
             if(count($this->data->utilidades)){
                 $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);   
@@ -53,7 +52,7 @@ class PoController extends Controller
                 }
             }
             
-            return view('admin.pos.index', compact('menuSuperior', 'codigo', 'carritos', 'tasa', 'iva', 'pathname', 'pos'));
+            return view('admin.pos.index', compact('menuSuperior', 'codigo', 'carritos', 'tasa', 'iva', 'pathname', 'pos', 'utilidades'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error al entrar al pos de venta index, ");
             return view('errors.404', compact('mensajeError'));

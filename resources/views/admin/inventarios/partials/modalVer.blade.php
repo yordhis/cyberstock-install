@@ -33,7 +33,7 @@
                           <span class="text-primary">Costo: REF</span> {{ doubleval($inventario->costo) }} <br>
                           <span class="text-primary">Costo: Bs</span> {{ doubleval($inventario->costo)  * $utilidades[0]->tasa}} <br>
                           <span class="text-primary">PVP: REF</span> {{ doubleval($inventario->pvp) }} <br>
-                          <span class="text-primary">PVP:Bs</span> {{ doubleval($inventario->costo) * $utilidades[0]->tasa }} 
+                          <span class="text-primary">PVP:Bs</span> {{ doubleval($inventario->pvp) * $utilidades[0]->tasa }} 
                         </div>
 
                         <div class="col-md-12 label"> 
