@@ -11,6 +11,7 @@ class FacturaInventario extends Model
 
     protected $fillable = [
         "codigo",
+        "codigo_factura",
         "razon_social", //  proveedor
         "identificacion", // rif
         "subtotal", // se guarda en divisas
@@ -21,6 +22,7 @@ class FacturaInventario extends Model
         "concepto", // venta, compra ...
         "descuento", // descuento
         "fecha", // fecha venta, compra ...
+        "observacion", // una nota...
         "metodos" // metodo de pago...
     ];
 }

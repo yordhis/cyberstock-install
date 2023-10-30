@@ -16,12 +16,17 @@ class CreateCarritoInventariosTable extends Migration
         Schema::create('carrito_inventarios', function (Blueprint $table) {
             $table->id();
             $table->string("codigo")->nullable(); // Codigo de la transaccion
+            $table->string("codigo_factura")->nullable();
             $table->string("codigo_producto")->nullable();
             $table->string("identificacion")->nullable();
             $table->string("descripcion")->nullable();
             $table->string("cantidad")->nullable();
             $table->string("costo")->nullable();
+            $table->string("pvp")->nullable();
+            $table->string("pvp_2")->nullable();
+            $table->string("pvp_3")->nullable();
             $table->string("subtotal")->nullable();
+            $table->string("fecha")->nullable();
             $table->timestamps();
         });
     }

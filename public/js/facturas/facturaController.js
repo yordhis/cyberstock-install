@@ -13,7 +13,12 @@ const facturaStore = async (factura) => {
             if (response.estatus == 200) {
                 resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
                 if (resultado) {
-                    imprimirElemento(htmlTicket(response.data))
+                    imprimirElemento(htmlTicket(response.data));
+                    
+                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                    if (resultadoOtraCapia) {
+                        imprimirElemento(htmlTicket(response.data));
+                    }
                     window.location.href = "http://cyberstock.com/pos";
                 } else {
                     window.location.href = "http://cyberstock.com/pos";
@@ -22,7 +27,74 @@ const facturaStore = async (factura) => {
                 alert(response.mensaje)
             }
         })
-}
+};
+
+
+const facturaStoreSalida  = async (factura) => {
+    log('llego aqui')
+     await fetch(`${URL_BASE}/storeSalida`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(factura), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((response) => {
+            log(response)
+            if (response.estatus == 200) {
+                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                if (resultado) {
+                    imprimirElemento(htmlTicket(response.data));
+                    
+                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                    if (resultadoOtraCapia) {
+                        imprimirElemento(htmlTicket(response.data));
+                    }
+                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+                } else {
+                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+                }
+            } else {
+                alert(response.mensaje)
+            }
+        })
+};
+
+const facturaStoreEntrada  = async (factura) => {
+    log('llego aqui')
+     await fetch(`${URL_BASE}/facturasInventarios`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(factura), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((response) => {
+            log(response)
+            if (response.estatus == 200) {
+                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                if (resultado) {
+                    imprimirElemento(htmlTicketEntrada(response.data));
+                    
+                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                    if (resultadoOtraCapia) {
+                        imprimirElemento(htmlTicketEntrada(response.data));
+                    }
+                    window.location.href = "http://cyberstock.com/inventarios/crearEntrada";
+                } else {
+                    window.location.href = "http://cyberstock.com/inventarios/crearEntrada";
+                }
+            } else {
+                alert(response.mensaje)
+            }
+        })
+};
+
+
 
 function imprimirElemento(elemento) {
     var ventana = window.open('', 'PRINT', 'height=400,width=600');
@@ -93,12 +165,17 @@ function imprimirElemento(elemento) {
     ventana.print();
     ventana.close();
     return true;
-}
+};
 
-const htmlTicket = (factura) => {
+const htmlTicketEntrada = (factura) => {
+    // Declaracion de variables
     let carritoHtml = '', 
-    descuentoHtml = ''
+    descuentoHtml = '',
+    metodosPagosHtml = '',
+    // metodosPagos = factura.metodos.split(','),
     ivaHtml = '';
+
+    // Recorremos el carrito
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
@@ -109,6 +186,7 @@ const htmlTicket = (factura) => {
         `;
     });
 
+    // Verificacamos si se aplico el impuesto
     if( factura.iva > 0 ){
         ivaHtml = `
             <tr>
@@ -119,6 +197,7 @@ const htmlTicket = (factura) => {
         `;
     }
 
+    // Verificamos si se aplico un descuento
     if(factura.descuento > 0){
         descuentoHtml = ` 
             <tr>
@@ -127,6 +206,129 @@ const htmlTicket = (factura) => {
             </tr>
         `;
     }
+
+
+    return `
+        <div class="ticket" id="ticket">
+        
+            <img src="${factura.pos.imagen}" alt="Logotipo">
+        
+        
+        <p class="centrado">
+            <br>${factura.pos.empresa}
+            <br>${factura.pos.codigo}
+            <br>${factura.pos.direccion}
+            
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th class="producto">FACTURA DE ENTRADA</th>
+        
+                    <th class="precio">${factura.codigo}</th>
+                </tr>
+                <tr>
+                    <th class="producto">FECHA</th>
+        
+                    <th class="precio">${factura.fecha}
+                    </th>
+                </tr>
+                <tr>
+                    <th class="producto">HORA</th>
+        
+                    <th class="precio">${factura.hora}
+                    </th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                
+                    ${carritoHtml}
+                
+        
+        
+                <tr>
+                    <td class="producto">
+                        |Total de Articulos: ${factura.totalArticulo } | <br>
+                        SUB-TOTAL <br>
+                    </td>
+        
+                    <td class="precio"><br> Bs  ${parseFloat(factura.subtotal * factura.tasa).toFixed(2) }</td>
+                </tr>
+              
+                ${descuentoHtml}
+
+                ${ivaHtml}
+
+                <tr>
+                    <td class="producto">TOTAL</td>
+        
+                    <td class="precio">Bs ${ parseFloat(factura.total * factura.tasa).toFixed(2)  }</td>
+                </tr>
+              
+                
+            </tbody>
+        </table>
+        
+        
+        <p class="centrado">
+            ¡GRACIAS POR SU COMPRA!
+        </p>
+        </div>
+      `;
+};
+
+
+const htmlTicket = (factura) => {
+    // Declaracion de variables
+    let carritoHtml = '', 
+    descuentoHtml = '',
+    metodosPagosHtml = '',
+    metodosPagos = factura.metodos.split(','),
+    ivaHtml = '';
+
+    // Recorremos el carrito
+    factura.carrito.forEach(producto => {
+        carritoHtml+=`
+            <tr>
+                <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
+
+                <td class="precio">Bs ${parseFloat(producto.subtotal * factura.tasa).toFixed(2) }</td>
+            </tr>
+        `;
+    });
+
+    // Verificacamos si se aplico el impuesto
+    if( factura.iva > 0 ){
+        ivaHtml = `
+            <tr>
+                <td class="producto">IVA </td>
+
+                <td class="precio">Bs ${parseFloat(factura.subtotal * factura.tasa * (factura.iva/100)).toFixed(2)  }</td>
+            </tr>
+        `;
+    }
+
+    // Verificamos si se aplico un descuento
+    if(factura.descuento > 0){
+        descuentoHtml = ` 
+            <tr>
+                <td class="producto">Descuento ${factura.descuento}%</td>
+                <td class="precio">Bs ${((factura.subtotal * (factura.descuento/100)) * factura.tasa).toFixed(2)}</td>
+            </tr>
+        `;
+    }
+
+    // recorremos los metodos de pagos
+    metodosPagos.forEach((pago)=>{
+        metodosPagosHtml += `
+            <tr>
+                <td class="producto">${pago.split('|')[0]}</td>
+
+                <td class="precio">Bs ${ parseFloat(pago.split('|')[1]).toFixed(2)  }</td>
+            </tr>
+        `;
+    });
 
     return `
         <div class="ticket" id="ticket">
@@ -185,11 +387,8 @@ const htmlTicket = (factura) => {
         
                     <td class="precio">Bs ${ parseFloat(factura.total * factura.tasa).toFixed(2)  }</td>
                 </tr>
-                <tr>
-                    <td class="producto">EFECTIVO 1</td>
-        
-                    <td class="precio">Bs ${parseFloat(factura.total * factura.tasa).toFixed(2) }</td>
-                </tr>
+              
+                ${metodosPagosHtml}
             </tbody>
         </table>
         
@@ -199,7 +398,7 @@ const htmlTicket = (factura) => {
         </p>
         </div>
       `;
-}
+};
 
 
 const imprimirFactura = async (codigoFactura) => {
@@ -221,4 +420,4 @@ const imprimirFactura = async (codigoFactura) => {
             alert(response.mensaje)
         }
     })
-}
+};

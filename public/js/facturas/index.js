@@ -1,13 +1,22 @@
-let btnImprimirFactura = d.querySelector('#imprimirFactura');
+let btnImprimirFactura = document.querySelectorAll('.facturaMaster');
 
 log('conectado con facturas')
-log(btnImprimirFactura)
+// log(btnImprimirFactura)
 
 
 const hanledImprimirFactura = (e) => {
-    e.preventDefault()
     log(e.target)
 };
 
 
-btnImprimirFactura.addEventListener('click', hanledImprimirFactura);
+addEventListener('load', (e)=>{
+
+    log(btnImprimirFactura)
+    // btnImprimirFactura.forEach((btnImprimir)=>{
+    //     btnImprimir.addEventListener('click', (e)=>{
+    //         log(e.target)
+       
+    //     });
+    // });
+
+})

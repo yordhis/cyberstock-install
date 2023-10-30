@@ -8,6 +8,7 @@ use App\Http\Controllers\{
     ApiController,
     ClienteController,
     FacturaController,
+    FacturaInventarioController,
     ProductoController,
     ProveedoreController
 };
@@ -32,8 +33,10 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.productos');
     Route::resource('productos', ProductoController::class)->names('api.productos');
     
-    Route::post('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+    Route::post('imprimirFactura/{codigoFactura}', [FacturaIController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
+    Route::post('storeSalida', [FacturaInventarioController::class, 'storeSalida'])->name('api.facturasInventarios.storeSalida');
+    Route::resource('facturasInventarios', FacturaInventarioController::class)->names('api.facturasInventarios');
     
     Route::get('getCliente/{idCliente}', [ClienteController::class, 'getCliente'])->name('api.clientes');
     Route::get('getProveedor/{idProveedor}', [ApiController::class, 'getProveedor'])->name('api.getProveedor');

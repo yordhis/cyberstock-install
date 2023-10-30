@@ -111,12 +111,12 @@
 
 
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer facturaMaster">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-          <a href="#"  id="imprimirFactura" class="btn btn-primary " target="_self" rel="" >
+          <button  class="btn btn-primary " >
             IMPRIMIR
-          </a>
+          </button>
           
         </div>
       </div>

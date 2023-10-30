@@ -86,15 +86,15 @@ class ProductoController extends Controller
                 return response()->json([
                     "message" => "No hay resultados",
                     "data" => [],
-                    "status" => Response::HTTP_NOT_FOUND
-                ], Response::HTTP_NOT_FOUND);
+                    "status" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
         } catch (\Throwable $th) {
             return response()->json([
                 "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
                 "data" => [],
-                "status" => 500
-            ], 500);
+                "status" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -285,7 +285,7 @@ class ProductoController extends Controller
                         "cantidad" => $request->cantidad_inicial,
                         "costo" => $request->costo,
                         "pvp" => $request->pvp
-                    ]);
+                ]);
             }
             
             $mensaje = $estatusActualizar ? "El producto se Actualizó correctamente." : "El producto No se Actualizo";

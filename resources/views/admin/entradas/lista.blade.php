@@ -24,6 +24,10 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">N° factura</th>
+                                        <th scope="col">Proveedor</th>
+                                        <th scope="col">Monto</th>
+                                        <th scope="col">Total de articulos</th>
+                                        <th scope="col">Concepto</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
@@ -33,11 +37,14 @@
                                         <tr>
                                             <td scope="row">{{ $contador }}</td>
                                             <td>{{ $factura->codigo }}</td>
+                                            <td>{{ $factura->proveedor[0]->empresa }}</td>
+                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ $factura->totalArticulos }}</td>
+                                            <td>{{ $factura->concepto }}</td>
+                                            
                                             <td>
-
                                                 {{-- @include('admin.entradas.partials.modalEditar') --}}
                                                 @include('admin.entradas.partials.modaldialog')
-  
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp

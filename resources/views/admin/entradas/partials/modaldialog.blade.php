@@ -20,19 +20,19 @@
                   <div class="card-header text-black">
                     <div class="text-center">
                       {{-- <p class="p-0 fs-5">{{ $factura->iva > 0 ? "SENIAT" : '' }}</p> --}}
-                      <p class="p-0 m-0 fs-6">{{ $pos->rif ?? '' }}</p>
-                      <p class="p-0 m-0 fs-6">{{ $pos->empresa ?? '' }}</p>
-                      <p class="p-0 m-0 fs-6">{{ $pos->direccion ?? '' }}</p>
-                      <p class="p-0 m-0 fs-6">ZONA POSTAL {{ $pos->postal ?? '' }}</p>
+                      <p class="p-0 fs-5">Proveedor</p>
+                      <p class="p-0 m-0 fs-4">{{ $factura->proveedor[0]->empresa ?? '' }}</p>
+                      <p class="p-0 m-0 fs-6">{{  $factura->proveedor[0]->tipo_documento ?? '' }}-{{ $factura->proveedor[0]->codigo ?? '' }}</p>
+                      <p class="p-0 m-0 fs-6">{{ $factura->proveedor[0]->direccion ?? '' }}</p>
+                      {{-- <p class="p-0 m-0 fs-6">ZONA POSTAL {{ $pos->postal ?? '' }}</p> --}}
                     </div>
-                    <span class="text-start ">Cliente: </span> {{ $factura->razon_social ?? '' }} <br>
-                    <span class="text-start ">RIF:</span> {{ number_format($factura->identificacion, 0, ',', '.') ?? '' }} <br>
+                    
                   </div>
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                     {{-- <img src="{{ $factura->imagen }}" alt="Profile" class="rounded-circle">
                     <h2>  {{ $factura->descripcion }}</h2> --}}
                       
-                      <p class="text-center p-0 m-0">FACTURA</p>
+                      <p class="text-center p-0 m-0">FACTURA DE ENTRADA</p>
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight"><b>N° Factura: </b></div>
                         <div class="p-2 bd-highlight">{{ $factura->codigo }}</div>
@@ -57,7 +57,7 @@
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">
                           SUBTIL: <br>
-                          |Total de Articulos: {{ $factura->total_articulos }} |
+                          |Total de Articulos: {{ $factura->totalArticulos }} |
                         </div>
                         <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
                       </div>
@@ -78,10 +78,10 @@
                         <div class="p-2 bd-highlight">TOTAL:</div>
                         <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
                       </div>
-                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                      {{-- <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">EFECTIVO 3</div>
                         <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
-                      </div>
+                      </div> --}}
 
                   
                   </div>

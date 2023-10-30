@@ -11,11 +11,16 @@ class CarritoInventario extends Model
 
     protected $fillable = [
         "codigo", // Codigo de la factura
+        "codigo_factura",
         "codigo_producto",
         "identificacion",
+        "descripcion",
         "cantidad",
         "costo",
-        "descripcion",
+        "pvp",
+        "pvp_2",
+        "pvp_3",
+        "fecha",
         "subtotal",
     ];
 }

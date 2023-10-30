@@ -38,14 +38,14 @@ Route::get('/', function () {
 /**
  * Rutas de Profesor
  */
-Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
+Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout');
 
 
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     // Panel Principal
     Route::get('/panel', [DashboardController::class, 'index']);
     
@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventarios/listaSalidas', [InventarioController::class, "listaSalidas"])->name('admin.inventarios.listaSalidas');
     Route::get('/inventarios/crearEntrada', [InventarioController::class, "crearEntrada"])->name('admin.inventarios.crearEntrada');
     Route::get('/inventarios/crearSalida', [InventarioController::class, "crearSalida"])->name('admin.inventarios.crearSalida');
+    Route::post('/storeSalida', [CarritoInventarioController::class, "storeSalida"])->name('admin.carrito.inventario.salida');
     Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
     Route::resource('/inventarios', InventarioController::class)->names('admin.inventarios');
     

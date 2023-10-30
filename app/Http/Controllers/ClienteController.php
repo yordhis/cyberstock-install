@@ -58,16 +58,26 @@ class ClienteController extends Controller
     public function store(StoreClienteRequest $request)
     {
         try {
-
-            $estatusCrear = Cliente::create($request->all());
-    
-            $mensaje = $estatusCrear ? "El cliente se creo correctamente." : "El cliente no se creo";
-            $estatus = $estatusCrear ? 201 : 404;
             $pathname = Request::path();
+
+            $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
+            if(count($clienteExiste)){
+                $mensaje = "El cliente Ya existe.";
+                $estatus = 401;
+            }else{
+                $estatusCrear = Cliente::create($request->all());
+                $mensaje = $estatusCrear ? "El cliente se creo correctamente." : "El cliente no se creo";
+                $estatus = $estatusCrear ? 201 : 404;
+            }
 
             if($request->formulario == "modalCrearCliente"){
                 return $estatusCrear ? redirect()->route( 'admin.pos.index', compact('mensaje', 'estatus') )
                 : view('admin.pos.index', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $request));
+            }
+
+            if($request->formulario == "modalCrearClienteSalida"){
+                $identificacion = $estatusCrear->identificacion;
+                return redirect()->route( 'admin.inventarios.crearSalida', compact('mensaje', 'estatus', 'identificacion') );
             }
 
             return $estatusCrear ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )

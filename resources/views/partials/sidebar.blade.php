@@ -100,11 +100,18 @@ $subcategoria = 'LISTA';
                 </li><!-- End Components Nav | Utilidades -->
 
                 <!-- Start Components Nav | Metodos de pago -->
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link" href="metodosPagos" target="_self">
                         <i class="bi bi-paypal fs-3"></i><span>Métodos de pago</span>
                     </a>
-                </li><!-- End Components Nav | Metodos de pago -->
+                </li><!-- End Components Nav | Metodos de pago --> --}}
+
+                <!-- Start Components Nav | TIPOS DE TRANSACCIONES -->
+                {{-- <li class="nav-item">
+                    <a class="nav-link" href="tiposTransacciones" target="_self">
+                        <i class="bi bi-paypal fs-3"></i><span>Tipo de Transacciones</span>
+                    </a>
+                </li><!-- End Components Nav | TIPOS DE TRANSACCIONES --> --}}
 
                 <!-- Start Components Nav | usuarios -->
                 <li class="nav-item">
@@ -116,7 +123,7 @@ $subcategoria = 'LISTA';
                 <!-- Start Components Nav | usuarios -->
                 <li class="nav-item">
                     <a class="nav-link" href="pos/1" target="_self">
-                        <i class="bi bi-people fs-3"></i><span>Configurar POS</span>
+                        <i class="bi bi-tools fs-3"></i><span>Configurar POS</span>
                     </a>
                 </li><!-- End Components Nav | usuarios -->
 

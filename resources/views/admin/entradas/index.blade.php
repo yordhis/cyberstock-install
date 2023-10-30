@@ -37,12 +37,28 @@
                         <div class="card ">
                             <div class="card-body">
                                 <!-- Formulario de agregar productos al caarrito -->
-                                <form action="carritoInventario" method="post" target="_self">
+                                <form action="carritoInventario" method="post" target="_self" class="g-3 needs-validation" novalidate>
                                     @csrf
                                     @method('post')
                                     <div class="row g-3">
-                                       
-                                        <!-- Input de codigo de transacción -->
+                                        <!-- Input de Tipo de Transacción -->
+                                        <div class="col-sm-6 col-xs-12 mt-4">
+                                            <label for="yourUsername" class="form-label">Transacción</label>
+
+                                            <div class="input-group has-validation">
+                                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
+                                                    <i class="bi bi-server"></i>
+                                                </span>
+                                                <input type="text" name="tipoTransaccion"
+                                                    class="form-control fs-5 text-danger input-entrada factura"
+                                                    id="tipoTransaccion" 
+                                                    value="ENTRADA" readonly
+                                                    required>
+                                                <div class="invalid-feedback">Por favor, ingrese tipo de transaccion! </div>
+                                            </div>
+                                        </div><!-- Cierre Input de Tipo de Transacción -->
+
+                                        <!-- Input de cod   igo de transacción -->
                                         <div class="col-sm-6 col-xs-12 mt-4">
                                             <label for="yourUsername" class="form-label">Número de transacción
                                                 <span class=" text-primary">(Es Automático)</span>
@@ -51,9 +67,9 @@
                                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
                                                     <i class="bi bi-upc-scan"></i>
                                                 </span>
-                                                <input type="number" name="codigo_transaccion"
+                                                <input type="number" name="codigo"
                                                     class="form-control fs-5 text-danger input-entrada factura"
-                                                    id="codigo_transaccion" placeholder="Ingrese número de transacción" 
+                                                    id="codigo" placeholder="Ingrese número de transacción" 
                                                     value="{{ $codigo }}" readonly
                                                     required>
                                                 <div class="invalid-feedback">Por favor, ingrese código de transaccion! </div>
@@ -69,7 +85,11 @@
                                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
                                                     <i class="bi bi-upc-scan"></i>
                                                 </span>
-                                                <input type="number" name="codigo_factura"
+                                                <input type="text" name="codigo_factura"
+                                                @if(count($carritos))
+                                                    
+                                                value="{{ $carritos[0]->codigo_factura ?? '' }}"
+                                                @endif
                                                     class="form-control fs-5 text-danger input-entrada factura"
                                                     id="codigo_factura" placeholder="Ingrese número de factura" required>
                                                 <div class="invalid-feedback">Por favor, ingrese código de factura! </div>
@@ -85,12 +105,46 @@
                                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
                                                     <i class="bi bi-calendar"></i>
                                                 </span>
-                                                <input type="date" name="fecha_factura_proveedor"
+                                                <input type="date" name="fecha"
+                                                @if(count($carritos))
+                                                    value="{{ $carritos[0]->fecha ?? ''}}"
+                                                @endif
                                                     class="form-control fs-5 text-danger input-entrada factura"
                                                     id="fecha_factura_proveedor" placeholder="Ingrese número de factura" required>
                                                 <div class="invalid-feedback">Por favor, ingrese código de factura! </div>
                                             </div>
                                         </div><!-- Cierre Input de codigo de factura proveedor -->
+
+                                       
+                                        
+                                         <!-- Input de CONCEPTO DE MOVIMIENTO -->
+                                         <div class="col-sm-6 col-xs-12 mt-4">
+                                            <label for="yourUsername" class="form-label">Espesífique Concepto
+                                                <span class=" text-danger">(Es Obligatorio)</span>
+                                            </label>
+                                            <div class="input-group has-validation">
+                                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
+                                                    <i class="bi bi-option"></i>
+                                                </span>
+
+                                                @if(isset($_GET['conceptoDeMovimiento']))
+                                                    <input type="text" name="conceptoDeMovimiento"
+                                                    class="form-control fs-5 text-danger input-entrada factura"
+                                                    id="conceptoDeMovimiento" placeholder="Ingrese concepto de movimiento" 
+                                                    value="{{ $_GET['conceptoDeMovimiento'] }}" readonly
+                                                    required>
+                                                @else
+                                                    <select id="conceptoDeMovimiento" name="conceptoDeMovimiento"  class="form-select factura" required>
+                                                        <option  selected disabled value="">Concepto de movimiento</option>
+                                                        <option value="CREDITO"> CREDITO </option>
+                                                        <option value="COMPRA"> COMPRA </option>
+                                                    </select>
+                                                @endif
+                                               
+                                             
+                                                <div class="invalid-feedback">Por favor, ingrese concepto de movimiento de inventario. </div>
+                                            </div>
+                                        </div><!-- Cierre Input de CONCEPTO DE MOVIMIENTO -->
 
                                         <!-- Input de IDENTIFICACION -->
                                         <div class="col-sm-6 col-xs-12 mt-4">
@@ -103,7 +157,7 @@
                                                 </span>
 
                                                 @if (isset($carritos[0]))
-                                                    <input type="number" name="rif"
+                                                    <input type="number" name="identificacion"
                                                         class="form-control fs-5 input-entrada factura rif"
                                                         id="rif"
                                                         value="{{ $_GET['identificacion'] ?? $carritos[0]->identificacion}}"
@@ -115,8 +169,13 @@
                                                 @endif
                                                 <div class="invalid-feedback">Por favor, ingrese Rif o Documento de identidad del proveedor o vendedor! </div>
                                             </div>
-                                            <span id="dataProveedor" class="factura card p-3">@isset($carritos[0]['proveedor'])<h4>{{ "Proveedor: " . $carritos[0]['proveedor']->nombre ?? '' }}</h4>@endisset</span>
+                                            <span id="razon_social" class="factura card p-2">@isset($carritos[0]['proveedor'])<h4>Razón Social:{{ $carritos[0]['proveedor']->empresa . " | ". $carritos[0]['proveedor']->contacto ?? '' }}</h4>@endisset</span>
                                         </div><!-- Cierre Input de IDENTIFICACION -->
+
+                                       
+
+
+
 
                                         <!-- Span de informacion del cliente -->
                                         {{-- <div class="col-sm-6 col-xs-12 mt-2">
@@ -178,7 +237,7 @@
                                                                         id="cantidad" class="form-control input-entrada"
                                                                         placeholder="Cantidad" required>
                                                                 </td>
-                                                                <td>
+                                                                <td class="tdSubtotales">
                                                                     <input type="number" step="any" name="subtotal"
                                                                         
                                                                         id="subtotal" class="form-control input-entrada"
@@ -190,20 +249,47 @@
                                                                     </button>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td colspan="7" id="mensajeInventario"></td>
+                                                            </tr>
                                                              {{--  Configuración de precios del producto --}}
                                                             <tr>
-                                                                <td>
-
+                                                                <td colspan="7" class="text-center">Configure los precio del producto</td>
+                                                            
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="2">PVP DETAL</td>
+                                                                <td colspan="3">PVP 2</td>
+                                                                <td colspan="2">PVP 3</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="2">
+                                                                    <input type="number" step="any" name="pvp"
+                                                                        id="pvp"
+                                                                        class="form-control input-entrada"
+                                                                        placeholder="Precio Venta" required>
+                                                                </td>
+                                                                <td colspan="3">
+                                                                    <input type="number" step="any" name="pvp_2"
+                                                                    id="pvp_2"
+                                                                    class="form-control input-entrada"
+                                                                    placeholder="Precio 2" >
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <input type="number" step="any" name="pvp_3"
+                                                                    id="pvp_3"
+                                                                    class="form-control input-entrada"
+                                                                    placeholder="Precio 3" >
                                                                 </td>
                                                             </tr>
 
-                                                            {{-- @isset($_GET['mensajeInventario'])
+                                                            @isset($_GET['mensajeInventario'])
                                                                 <tr>
                                                                     <td colspan="6" class="text-danger">
                                                                         {{ $_GET['mensajeInventario'] ?? ''}}
                                                                     </td>
                                                                 </tr>
-                                                            @endisset --}}
+                                                            @endisset
 
                                                         </tbody>
                                                     </table>
@@ -235,7 +321,8 @@
 
                                                 </tr>
                                             </thead>
-                                            <tbody id="carritoEntrada">
+                                            <tbody>
+                                                {{-- Recorremos el carrito --}}
                                                 @if (!count($carritos))
                                                     <tr class="text-center">
                                                         <td colspan="6">No hay Productos en el carrito</td>
@@ -247,7 +334,7 @@
                                                         <td>{{ $carrito->descripcion }}</td>
                                                         <td>{{ $carrito->costoBs }}</td>
                                                         <td>{{ $carrito->cantidad }}</td>
-                                                        <td>
+                                                        <td class="tdSubtotales">
                                                             {{ $carrito->subtotalBs }}
                                                             <span class="subtotalProductos" style="display: none;">
                                                                 {{ $carrito->subtotal }}
@@ -259,9 +346,10 @@
                                                             @include('admin.pos.partials.modalEliminar')
                                                         </td>
                                                     </tr>
-                                                @endforeach
+                                                @endforeach  {{-- Cierre Recorremos el carrito --}}
 
 
+                                                {{-- DATOS FACTURA --}}
                                                 <tr>
                                                     <td colspan="3" class="bg-primary"></td>
                                                     <td>Descuento %</td>
@@ -282,6 +370,7 @@
                                                     </td>
                                                     <td></td>
                                                 </tr>
+
                                                 <tr>
                                                     <td colspan="3" class="bg-primary">
                                                     <td>Sub-Total Divisas</td>
@@ -292,6 +381,7 @@
                                                     </td>
                                                     <td></td>
                                                 </tr>
+
                                                 <tr>
                                                     <td colspan="3" class="bg-primary">
                                                     <td>Iva %</td>
@@ -302,6 +392,7 @@
                                                     </td>
                                                     <td></td>
                                                 </tr>
+
                                                 <tr>
                                                     <td colspan="3" class="bg-primary">
                                                     <td>Total</td>
@@ -311,6 +402,7 @@
                                                     </td>
                                                     <td></td>
                                                 </tr>
+
                                                 <tr>
                                                     <td colspan="3" class="bg-primary">
                                                     <td>Total en Divisdas</td>
@@ -319,8 +411,8 @@
                                                             readonly class="form-control factura" step="any">
                                                     </td>
                                                     <td></td>
-                                                </tr>
-
+                                                </tr>{{--  Cierre de datos de factura --}}
+                                                
 
 
                                             </tbody>
@@ -328,8 +420,8 @@
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="6">
-                                                        <span class="btn btn-primary w-100" id="btnProcesarEntrada">Procesar
-                                                            Entrada de inventario</span>
+                                                        <span class="btn btn-primary w-100" id="btnProcesar">Procesar
+                                                            movimiento de inventario</span>
                                                     </td>
                                                 </tr>
                                             </tfoot>

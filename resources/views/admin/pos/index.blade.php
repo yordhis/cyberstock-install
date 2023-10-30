@@ -33,7 +33,7 @@
                             @include('admin.pos.partials.modalEliminarFactura')
 
                             @include('admin.pos.partials.modalCrearCliente')
-                            {{-- <button class="btn btn-primary h-25 mt-4 mb-2 me-2">Agregar Producto</button> --}}
+                            
                         </div>
                     </div> <!-- Cierre Botones de agregar clientes y productos -->
 
@@ -77,12 +77,12 @@
                                                     <input type="number" name="identificacion"
                                                         class="form-control fs-5 input-entrada factura identificacion"
                                                         id="cedula"
-                                                        value="{{ $_GET['identificacion'] ?? $carritos[0]->identificacion }}"
+                                                        value="{{ $carritos[0]->identificacion ?? '' }}"
                                                         {{ $carritos[0]->identificacion ? 'readonly' : '' }} required>
                                                 @else
                                                     <input type="number" name="identificacion"
                                                         class="form-control fs-5 input-entrada factura identificacion"
-                                                        id="cedula" value="" placeholder="Ingrese Cédula" required>
+                                                        id="cedula" value="{{ $_GET['identificacion'] ?? '' }}" placeholder="Ingrese Cédula" required>
                                                 @endif
                                                 <div class="invalid-feedback">Por favor, ingrese código de factura! </div>
                                             </div>
@@ -300,29 +300,31 @@
                                                 <tr>
                                                     <td colspan="3" class="bg-primary">
                                                     <td>Métodos de pago</td>
-                                                    <td class="text-center fs-4 row g-3">
-                                                        <div class="col-md-6">
-                                                            <select class="form-select metodoPago">
-                                                              <option selected>Método de pago</option>
-                                                              <option value="EFECTIVO">EFECTIVO</option>
-                                                              <option value="PAGO MOVIL">PAGO MOVIL</option>
-                                                              <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                              <option value="TD">TD | PUNTO</option>
-                                                              <option value="TC">TC | PUNTO</option>
-                                                             
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <input type="number" step="any" class="form-control metodoPago">
-                                                        </div>
-
-                                                        <div class="col-md-2 ">
-                                                            <a href="#" id="agregarMetodo" type="buttom" class="metodoPago">
-                                                                <i class='bx bx-plus-medical text-primary fs-5' id="agregarMetodo"></i>
-                                                            </a>
+                                                    <td class="text-center fs-4">
+                                                        <div class="metodoAdd row g-3">
+                                                            <div class="col-md-6">
+                                                                <select class="form-select metodoPago">
+                                                                  <option selected>Método de pago</option>
+                                                                  <option value="EFECTIVO">EFECTIVO</option>
+                                                                  <option value="PAGO MOVIL">PAGO MOVIL</option>
+                                                                  <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                                  <option value="TD">TD | PUNTO</option>
+                                                                  <option value="TC">TC | PUNTO</option>
+                                                                 
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <input type="number" id='pagoCliente' step="any" class="form-control metodoPago pagoCliente">
+                                                            </div>
+    
+                                                            <div class="col-md-2 ">
+                                                                <a href="#" id="agregarMetodo" type="buttom" class="metodoPago">
+                                                                    <i class='bx bx-plus-medical text-primary fs-5' id="agregarMetodo"></i>
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     
-                                                        <div id="otroMetodoPago" class="row g-3"></div>
+                                                        <div id="otroMetodoPago"></div>
                                                         
                                                     </td>
                                                     <td></td>

@@ -53,32 +53,50 @@ class FacturaController extends Controller
     }
 
     public function imprimirFactura($codigoFactura){
-        $factura = Factura::where('codigo', $codigoFactura)->get()[0];
+        try {
+            $factura = Factura::where('codigo', $codigoFactura)->get();
+           
+            $carritos = Carrito::where('codigo', $factura->codigo)->get();
+            $factura[0]['carrito'] = $carritos;
+            $factura[0]['pos'] = Po::all()[0];
+            $factura[0]['hora']  =  date_format(date_create(explode(' ', $factura[0]->created_at)[1]), 'h:i:s');               
+            $factura[0]['fecha']  =  date_format(date_create(explode(' ', $factura[0]->created_at)[0]), 'd-m-Y');   
+         
+            $mensaje = count($factura) ? "Consulta de factura exitosa." : "No se hallo un registro de la factura";
+            $estatus =  Response::HTTP_OK;
+    
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" =>  $factura, 
+                "estatus" => $estatus  
+            ], $estatus ); 
+            
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al consultar factura, ");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" =>  [], 
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR  
+            ], Response::HTTP_INTERNAL_SERVER_ERROR ); 
+        }
+
+            // $pathname = Request::path();
+            //  return view('admin.facturas.ticket', 
+            //      compact(
+            //         'factura', 
+            //         'pos',
+            //         'utilidades'
+            //  ));
        
-        $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
-        $factura->total_articulos = Carrito::where('codigo', $factura->codigo)->count();
-        $pos = Po::all();
-        $utilidades = $this->data->utilidades;
-
-
-
-            $pathname = Request::path();
-             return view('admin.facturas.ticket', 
-                 compact(
-                    'factura', 
-                    'pos',
-                    'utilidades'
-             ));
-       
-            $pdf = PDF::loadView(
-                'admin.facturas.ticket',
-                compact(
-                    'factura', 
-                    'pos',
-                    'utilidades'
-                )
-            );
-            return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
+            // $pdf = PDF::loadView(
+            //     'admin.facturas.ticket',
+            //     compact(
+            //         'factura', 
+            //         'pos',
+            //         'utilidades'
+            //     )
+            // );
+            // return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
     
     }
     /**

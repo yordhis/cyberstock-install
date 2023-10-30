@@ -26,25 +26,34 @@
   @endif
 
   @if ($pathname == 'pos/facturas')
-  <script src="./js/main.js" defer></script>
-  <script src="./js/facturas/facturaController.js" defer></script>
-  <script src="./js/facturas/index.js" defer></script>
+      <script src="./js/main.js" defer></script>
+      <script src="./js/facturas/facturaController.js" defer></script>
+      <script src="./js/facturas/index.js" defer></script>
   @endif
 
   @if ($pathname == 'inventarios/crearEntrada')
-  <script src="./js/main.js" defer></script>
-  <script src="./js/proveedores/proveedorController.js" defer></script>
-  <script src="./js/productos/productoController.js" defer></script>
-  <script src="./js/productosEntradas/entradaController.js" defer></script>
-  <script src="./js/productosEntradas/index.js" defer></script>
+      <script src="./js/main.js" defer></script>
+      <script src="./js/proveedores/proveedorController.js" defer></script>
+      <script src="./js/productos/productoController.js" defer></script>
+      <script src="./js/facturas/facturaController.js" defer></script>
+      <script src="./js/productosEntradas/index.js" defer></script>
+  @endif
+
+
+  @if ($pathname == 'inventarios/crearSalida')
+      <script src="./js/main.js" defer></script>
+      <script src="./js/clientes/clienteController.js" defer></script>
+      <script src="./js/productos/productoController.js" defer></script>
+      <script src="./js/facturas/facturaController.js" defer></script>
+      <script src="./js/productosSalidas/index.js" defer></script>
   @endif
 
   @if ($pathname == 'pos')
       <script src="./js/main.js" defer></script>
-      <script src="./js/pos/index.js" defer></script>
       <script src="./js/clientes/clienteController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
       <script src="./js/facturas/facturaController.js" defer></script>
+      <script src="./js/pos/index.js" defer></script>
   @endif
   {{-- <script src="./js/productosEntradas/index.js"></script> --}}
 

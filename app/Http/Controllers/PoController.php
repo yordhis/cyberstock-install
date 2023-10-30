@@ -43,7 +43,6 @@ class PoController extends Controller
                 $iva = 0;
             }
 
-            
             if (count($carritos)) {
                 foreach ($carritos as $key => $producto) {
                     $producto['cliente'] = Cliente::where('identificacion', $producto->identificacion)->get()[0];
@@ -51,6 +50,8 @@ class PoController extends Controller
                     $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
                 }
             }
+
+            
             
             return view('admin.pos.index', compact('menuSuperior', 'codigo', 'carritos', 'tasa', 'iva', 'pathname', 'pos', 'utilidades'));
         } catch (\Throwable $th) {

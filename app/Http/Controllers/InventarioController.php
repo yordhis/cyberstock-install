@@ -6,8 +6,11 @@ use App\Models\Inventario;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Http\Requests\UpdateInventarioRequest;
 use App\Models\Carrito;
+use App\Models\CarritoInventario;
+use App\Models\Cliente;
 use App\Models\DataDev;
 use App\Models\Factura;
+use App\Models\FacturaInventario;
 use App\Models\Helpers;
 use App\Models\Po;
 use App\Models\Proveedore;
@@ -58,16 +61,23 @@ class InventarioController extends Controller
         $utilidades = $this->data->utilidades;
         $menuSuperior = $this->data->menuSuperior;
         $pathname = FacadesRequest::path();
-        $pos = Po::all()[0];
         
-            $entradas = Factura::where([
-                "tipo" => 5
+            $entradas = FacturaInventario::where([
+                "tipo" => "ENTRADA"
             ])->get();
-            foreach ($entradas as $key => $salida) {
-                $salida->carrito = Carrito::where("codigo", $salida->codigo)->get();
+
+            foreach ($entradas as $key => $entrada) {
+                $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
+               
+                $totalArticulos = 0;
+                foreach ($entrada->carrito as $key => $articulos) {
+                    $totalArticulos = $totalArticulos + $articulos->cantidad;
+                }
+                $entrada->totalArticulos = $totalArticulos;
+                $entrada->proveedor = Proveedore::where("codigo", $entrada->identificacion)->get();
             }
-            // return $entradas;
-            return view('admin.entradas.lista', compact('menuSuperior', 'utilidades', 'entradas', 'pos', 'pathname'));
+            
+            return view('admin.entradas.lista', compact('menuSuperior', 'utilidades', 'entradas', 'pathname'));
     }
 
     /**
@@ -84,13 +94,21 @@ class InventarioController extends Controller
         $pathname = FacadesRequest::path();
         $pos = Po::all()[0];
         
-            $salidas = Factura::where([
-                "tipo" => 1
-            ])->get();
-            foreach ($salidas as $key => $salida) {
-                $salida->carrito = Carrito::where("codigo", $salida->codigo)->get();
+        $salidas = FacturaInventario::where([
+            "tipo" => "SALIDA"
+        ])->get();
+
+        foreach ($salidas as $key => $salida) {
+            $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
+           
+            $totalArticulos = 0;
+            foreach ($salida->carrito as $key => $articulos) {
+                $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
-            // return $salidas;
+            $salida->totalArticulos = $totalArticulos;
+            $salida->cliente = Cliente::where("identificacion", $salida->identificacion)->get();
+        }
+          
             return view('admin.salidas.lista', compact('menuSuperior', 'utilidades', 'salidas', 'pos', 'pathname'));
         
     }
@@ -105,9 +123,8 @@ class InventarioController extends Controller
             $codigo = Helpers::getCodigo('factura_inventarios');
             $pathname = $request->path();
 
-            $carritos = Carrito::where([
-                'codigo' => $request->codigo, 
-                'identificacion' => $request->identificacion, 
+            $carritos = CarritoInventario::where([
+                'codigo' => $codigo
             ])->get();
 
             if (count($carritos)) {
@@ -117,6 +134,7 @@ class InventarioController extends Controller
                     $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
                 }
             }
+            
 
             return view('admin.entradas.index', compact('request', 'codigo', 'carritos', 'tiposEntradas', 'menuSuperior', 'pathname', 'tasa', 'iva'));
         } catch (\Throwable $th) {
@@ -130,8 +148,25 @@ class InventarioController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $tiposEntradas = $this->data->tiposEntradas;
+            $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);
+            $iva = $this->data->utilidades[0]->iva;
+            $codigo = Helpers::getCodigo('factura_inventarios');
+            $codigoFactura = Helpers::getCodigo('facturas');
             $pathname = $request->path();
-            return view('admin.salidas.index', compact('request', 'tiposEntradas', 'menuSuperior', 'pathname'));
+
+            $carritos = CarritoInventario::where([
+                'codigo' => $codigo
+            ])->get();
+
+            if (count($carritos)) {
+                foreach ($carritos as $key => $producto) {
+                    $producto['cliente'] = Cliente::where('identificacion', $producto->identificacion)->get();
+                    $producto->costoBs = number_format(floatval($producto->costo) * $tasa, 2, ',', '.') . " Bs";
+                    $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
+                }
+            }
+
+            return view('admin.salidas.index', compact('request', 'carritos', 'tasa', 'iva', 'codigo', 'codigoFactura', 'tiposEntradas', 'menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de salidas, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

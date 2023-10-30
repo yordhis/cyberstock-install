@@ -17,8 +17,9 @@ let inputDescuento = d.querySelector("#descuento"),
     inputTotalDivisas = d.querySelector("#totalDivias"),
     mensajeInventario = d.querySelector("#mensajeInventario"),
     // Cierre de input del carrito
-    subtotal = 0,
+    
     // Sub-totales de la tabla carritos
+    subtotal = 0,
     tdSubtotales = d.querySelectorAll(".subtotalProductos"),
     procesarVenta = d.querySelector("#procesarVenta"),
     elementoDataCliente = d.querySelector("#dataCliente"),
@@ -36,32 +37,32 @@ let inputDescuento = d.querySelector("#descuento"),
     },
     facturaTemporal = {},
     // Elementos de Metodos de pago
+    inputVuelto = d.querySelector("#restante"),
     metodoPago = d.querySelectorAll(".metodoPago"),
+    eliminarMetodo = d.querySelectorAll("#eliminarMetodo"),
     divOtroMetodoPago = d.querySelector("#otroMetodoPago"),
     btnAgregarMetodo = d.querySelector("#agregarMetodo");
 
 log(metodoPago);
 
-const htmlMetodoPago = `
-    <div class="col-md-6">
-        <select class="form-select metodoPago">
-            <option selected>Método de pago</option>
-            <option value="EFECTIVO">EFECTIVO</option>
-            <option value="PAGO MOVIL">PAGO MOVIL</option>
-            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-            <option value="TD">TD | PUNTO</option>
-            <option value="TC">TC | PUNTO</option>
-        </select>
-    </div>
-    <div class="col-md-4">
-        <input type="number" step="any" class="form-control metodoPago" >
-    </div>
-    <div class="col-md-2 ">
-        <a href="#" id="agregarMetodo" type="buttom" class="metodoPago">
-            <i class='bx bx-trash text-danger fs-5' id="agregarMetodo"></i>
-        </a>
-    </div>
-`;
+const htmlMetodoPago = `<div class="metodoAdd mt-2 row g-3">
+        <div class="col-md-6">
+            <select class="form-select metodoPago">
+                <option selected>Método de pago</option>
+                <option value="EFECTIVO">EFECTIVO</option>
+                <option value="PAGO MOVIL">PAGO MOVIL</option>
+                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                <option value="TD">TD | PUNTO</option>
+                <option value="TC">TC | PUNTO</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="number" id='pagoCliente' step="any" class="form-control metodoPago pagoCliente" >
+        </div>
+        <div class="col-md-2 ">
+            <i class='bx bx-trash text-danger fs-5 metodoPago' id="eliminarMetodo"></i>
+        </div>
+    </div>`;
 
 const hanledInputIdentificacion = async (e) => {
     // log(e.target.value);
@@ -121,33 +122,32 @@ const hanledInputCodigoBarra = async (e) => {
 
         producto = await resultado.result;
 
-        log(producto.data);
+        log(producto);
         if (producto.status == 200) {
+
             if (producto.data.id > 0) {
                 inputDescripcion.value = producto.data.descripcion;
                 inputCostoUnitario.value = producto.data.pvp; // usd
-                inputCostoUnitarioBs.value =
-                    producto.data.pvp * inputTasa.value; // Bs
-
+                inputCostoUnitarioBs.value = producto.data.pvp * inputTasa.value; // Bs
+                inputCantidad.value = 1;
+                calcularSubtotalDelProducto(parseFloat(inputCantidad.value), parseFloat(inputCostoUnitario.value))
                 mensajeInventario.innerText = "";
             } else {
+                inputDescripcion.value = null;
+                inputCostoUnitario.value = ""; // usd
+                inputCostoUnitarioBs.value = ""; // Bs
+                inputCantidad.value = 0;
+                calcularSubtotalDelProducto(parseFloat(inputCantidad.value), parseFloat(inputCostoUnitario.value))
                 mensajeInventario.innerText = `${producto.message} `;
             }
+            
         }
     }
 };
 
 const hanledInputSubtotal = (e) => {
     if (e.target.value) {
-        let cantidad = parseFloat(e.target.value),
-            costo = parseFloat(inputCostoUnitario.value);
-        if (cantidad && costo) {
-            inputSubtotal.value = cantidad * costo;
-            inputSubtotalBS.value =
-                cantidad * costo * parseFloat(inputTasa.value);
-        } else {
-            log("Los datos ingresados no son números!");
-        }
+        calcularSubtotalDelProducto(e.target.value, parseFloat(inputCostoUnitario.value))
     }
 };
 
@@ -165,7 +165,10 @@ const hanledInputSubtotalCosto = (e) => {
 
 const hanledBotonProcesarVenta = async (e) => {
     if (tdSubtotales.length) {
-        let inputsFactura = d.querySelectorAll(".factura");
+        let inputsFactura = d.querySelectorAll(".factura"),
+        metodosDePagos = '';
+
+
 
         inputsFactura.forEach((element, key) => {
             if (element.id == "dataCliente") {
@@ -175,6 +178,14 @@ const hanledBotonProcesarVenta = async (e) => {
                 facturaTemporal[element.id] = element.value;
             }
         });
+        metodoPago = d.querySelectorAll(".metodoAdd")
+        // log(metodoPago[0].children)
+        metodoPago.forEach((metodoMonto)=>{
+            metodosDePagos += metodoMonto.children[0].children[0].value + '|' +  metodoMonto.children[1].children[0].value + ',';
+        })
+
+        metodosDePagos = metodosDePagos.substring(0, metodosDePagos.length-1);
+        // log(metodosDePagos.substring(0, metodosDePagos.length-1));
         // log(facturaTemporal);
         // adactamos para enviar a guardar e imprimir ticket
         factura.codigo = facturaTemporal.codigo;
@@ -188,8 +199,15 @@ const hanledBotonProcesarVenta = async (e) => {
         factura.concepto = VENTA.name;
         factura.descuento = facturaTemporal.descuento;
         factura.fecha = facturaTemporal.fecha;
-
-        await facturaStore(factura);
+        factura.metodos = metodosDePagos; // metodo | monto,
+       
+        log(factura);
+        if (inputVuelto.value > 0) {
+            alert('Debe ingresar los metodos de pagos con sus montos y cumplir con la totalidad del pago!')
+        }else{
+            log('procesando factura');
+            await facturaStore(factura);
+        }
     } else {
         alert("Debe agregar productos a la factura para poder ser procesada");
     }
@@ -197,23 +215,66 @@ const hanledBotonProcesarVenta = async (e) => {
 
 const hanledBtnAgregarMetodoPago = (e) => {
     e.preventDefault();
-    log(e.target.id);
+    // log(e.target.id);
 
+    // Agregamos un nuevo metodo de pago
     divOtroMetodoPago.innerHTML += htmlMetodoPago;
 
-    metodoPago = d.querySelectorAll(".metodoPago");
-    log(metodoPago);
+    // Obtenemos todos los metodos de pagos añadidos
+    metodoPago = d.querySelectorAll(".metodoAdd");
+    // log(metodoPago);
 
-    //     metodoPago.forEach((element, i) => {
-    //         log(element + " - " + i)
-    //         if (i >=3 && i < 6) {
+    // Eliminamos el metodo de pago
+    metodoPago.forEach((elemento)=>{
+        elemento.addEventListener('click', (e)=>{
+            // log(e.target.id)
+            // log(e.target.localName)
+            if(e.target.id == 'eliminarMetodo'){
+                e.target.parentElement.parentElement.innerHTML="";
+                let resultadoDePagoCliente = 0;
+                pagosCliente = d.querySelectorAll('.pagoCliente');
+                pagosCliente.forEach((pago)=>{
+                    log(pago)
+                    resultadoDePagoCliente = resultadoDePagoCliente + parseFloat(pago.value);
+                })
+                // Cargamos el monto a pagar pendiente al vuelto
+                inputVuelto.value = (inputTotal.value - resultadoDePagoCliente).toFixed(2);
 
-    //         }
-    //    });
+                // Agregamos estilos
+                if ( inputVuelto.value > 0) {
+                    inputVuelto.classList.add('text-danger');
+                    inputVuelto.classList.remove('text-success');
+                    inputVuelto.classList.add('fs-4');
+                }
+            }
+        })
+
+        elemento.addEventListener('change', (e)=>{
+            if (e.target.id == 'pagoCliente') {
+                // obtenemos los pagos del cliente
+                let resultadoDePagoCliente = 0;
+                pagosCliente = d.querySelectorAll('.pagoCliente');
+                pagosCliente.forEach((pago)=>{
+                    log(pago)
+                    resultadoDePagoCliente = resultadoDePagoCliente + parseFloat(pago.value);
+                })
+                // Cargamos el monto a pagar pendiente al vuelto
+                inputVuelto.value = inputTotal.value - resultadoDePagoCliente;
+                if ( inputVuelto.value <= 0) {
+                    inputVuelto.classList.remove('text-danger');
+                    inputVuelto.classList.add('text-success');
+                    inputVuelto.classList.add('fs-4');
+                }
+            }    
+        })
+    });
+
+  
 };
 
 // Cada ves que cargue la pagina se ejecuta
 addEventListener("load", (ev) => {
+
     // ocultar la carta de cliente
     elementoDataCliente.hidden = false;
     if (elementoDataCliente.children.length == 0) {
@@ -240,10 +301,31 @@ addEventListener("load", (ev) => {
         inputTotal.value = (subtotal *inputTasa.value *(inputIva.value / 100 + 1)).toFixed(2);
         inputTotalDivisas.value = ((subtotal * inputTasa.value * (inputIva.value / 100 + 1)) /inputTasa.value).toFixed(2);
 
+         // Cargamos el monto a pagar pendiente al vuelto
+        inputVuelto.value = inputTotal.value;
+        inputVuelto.classList.add('text-danger');
+
         procesarVenta.hidden = false;
     } else {
         log("No hay sutotales");
     }
+
+
+      // Detectar los montos ingresados de los metodos de pago
+      metodoPago = d.querySelectorAll(".metodoAdd");
+
+      metodoPago.forEach((elemento)=>{
+          elemento.addEventListener('change', (e)=>{
+            if (e.target.id == 'pagoCliente') {
+                // Cargamos el monto a pagar pendiente al vuelto
+                inputVuelto.value = (inputTotal.value - e.target.value).toFixed(2);
+                if ( inputVuelto.value <= 0) {
+                    inputVuelto.classList.add('text-primary');
+                }
+            }
+              
+          })
+      });
 });
 
 inputDescuento.addEventListener("change", hanledInputDescuento);
@@ -261,3 +343,15 @@ procesarVenta.addEventListener("click", hanledBotonProcesarVenta);
 inputIdentificacionCliente.addEventListener("keyup", hanledInputIdentificacion);
 
 btnAgregarMetodo.addEventListener("click", hanledBtnAgregarMetodoPago);
+
+
+function calcularSubtotalDelProducto(cantidad, costo) {
+        if (cantidad && costo) {
+            inputSubtotal.value = cantidad * costo;
+            inputSubtotalBS.value = cantidad * costo * parseFloat(inputTasa.value);
+        } else {
+            // alert("Los datos ingresados no son números!");
+            inputSubtotal.value = 0;
+            inputSubtotalBS.value = 0;
+        }
+}

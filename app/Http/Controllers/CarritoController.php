@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carrito;
 use App\Http\Requests\StoreCarritoRequest;
 use App\Http\Requests\UpdateCarritoRequest;
+use App\Models\Cliente;
 use App\Models\DataDev;
 use App\Models\Helpers;
 use App\Models\Inventario;
@@ -21,10 +22,15 @@ class CarritoController extends Controller
 
     public function eliminarCarritoCompleto($codigo){
         try {
-            // Carrito::where('codigo', $codigo)->delete();
-            $estatusEliminar = Carrito::where('codigo', $codigo)->delete();
-            $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
-            $estatus = $estatusEliminar ? 201 : 404;
+            $carritoExiste = Carrito::where('codigo', $codigo)->get();
+            if(count($carritoExiste)){
+                $estatusEliminar = Carrito::where('codigo', $codigo)->delete();
+                $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
+                $estatus = $estatusEliminar ? 201 : 404;
+            }else{
+                $mensaje = "La factura no se ha registrado, no se encontro factura que eliminar.";
+                $estatus = 404;
+            }
       
             return redirect()->route('admin.pos.index', compact('mensaje', 'estatus') );
     
@@ -81,13 +87,26 @@ class CarritoController extends Controller
                 }   
             }
 
+            // Validamos que el Cliente esten registrados
+            $razonSocial = Cliente::where('identificacion', $request->identificacion)->get();
+            if(count($razonSocial) == 0){
+
+                    return redirect()->route('admin.pos.index', [
+                    "identificacion" => $request->identificacion,
+                    "codigo_producto" => $request->codigo_producto,
+                    "mensaje"=>"El cliente de la identificacion {$request->identificacion} no esta registrado, por favor registrelo.",
+                    "mensajeInventario"=>"No se pudo agregar producto a la factura el cliente no esta registrado.",
+                    "estatus" => 404
+                    ]);
+            }
+
             Carrito::create($request->all());
 
             $carritos = Carrito::where('codigo', $request->codigo)->get();
             $codigo = $request->codigo;
             return redirect()->route('admin.pos.index');
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear la marca, ");
+            $mensajeError = Helpers::getMensajeError($th, "Error Al agregar producto al carrito factura, ");
             return view('errors.404', compact('mensajeError'));
         }
     }
@@ -135,13 +154,13 @@ class CarritoController extends Controller
     public function destroy(Carrito $carrito)
     {
         try {
-           
+            $identificacion = $carrito->identificacion;
             $menuSuperior = $this->data->menuSuperior;
             $carrito->delete();
 
             $carritos = Carrito::where('codigo', $carrito->codigo)->get();
             $codigo = $carrito->codigo;
-            return redirect()->route('admin.pos.index');
+            return redirect()->route('admin.pos.index', compact('identificacion'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al eliminar la producto del carrito, ");
             return view('errors.404', compact('mensajeError'));

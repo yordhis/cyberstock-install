@@ -23,7 +23,13 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">N° factura</th>
+                                        <th scope="col">N° Transacción</th>
+                                        <th scope="col">N° Factura</th>
+                                        <th scope="col">Razon Social</th>
+                                        <th scope="col">Total</th>
+                                        <th scope="col">Total Articulos</th>
+                                        <th scope="col">Concepto</th>
+                                        <th scope="col">Fecha</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
@@ -33,6 +39,12 @@
                                         <tr>
                                             <td scope="row">{{ $contador }}</td>
                                             <td>{{ $factura->codigo }}</td>
+                                            <td>{{ $factura->codigo_factura }}</td>
+                                            <td>{{ $factura->cliente[0]->nombre }}</td>
+                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ $factura->totalArticulos }}</td>
+                                            <td>{{ $factura->concepto }}</td>
+                                            <td>{{ $factura->fecha }}</td>
                                             <td>
 
                                                 {{-- @include('admin.salidas.partials.modalEditar') --}}

@@ -16,6 +16,8 @@ class Inventario extends Model
         "cantidad", 
         "costo", 
         "pvp", 
+        "pvp_2", 
+        "pvp_3", 
         "imagen", 
         "fecha_entrada", 
         "estatus"
