@@ -3,6 +3,13 @@
     $categoria = strtoupper($url[1]);
     $categoria = explode('?', $categoria)[0] ?? $categoria;
 
+    if ($categoria == 'LISTAFACTURAPORPAGAR') {
+      $categoria = 'FACTURAS POR PAGAR';
+    }
+    if ($categoria == 'LISTAFACTURAPORCOBRAR') {
+      $categoria = 'FACTURAS POR COBRAR';
+    }
+
     if (isset($url[2])) {
         $subcategoria = $url[2];
         $subcategoria = explode('?', $subcategoria)[0] ?? $subcategoria;

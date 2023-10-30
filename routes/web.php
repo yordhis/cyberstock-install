@@ -49,6 +49,9 @@ Route::middleware(['auth'])->group(function () {
     // Panel Principal
     Route::get('/panel', [DashboardController::class, 'index']);
     
+    // lista de cuenta por pagar y cobrar
+    Route::get('/listaFacturaPorPagar', [FacturaController::class, "listaFacturaPorPagar"])->name('admin.listaFacturaPorPagar');
+    Route::get('/listaFacturaPorCobrar', [FacturaController::class, "listaFacturaPorCobrar"])->name('admin.listaFacturaPorCobrar');
     //  Usuarios
     Route::resource('/usuarios', UserController::class)->names('admin.users');
     Route::put('/updateTasa/{idTasa}', [UtilidadeController::class, 'updateTasa'])->name('admin.utilidades.updateTasa');

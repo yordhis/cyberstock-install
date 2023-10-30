@@ -8,7 +8,10 @@ use App\Models\{
     Cliente,
     Dashboard,
     DataDev,
+    Factura,
+    FacturaInventario,
     Helpers,
+    Inventario,
     Producto,
     Proveedore,
 };
@@ -35,10 +38,21 @@ class DashboardController extends Controller
             $pathname = Request::path();
             // Datos de las estadisticas
             $datosDash = [
-                "totalProductos" => Producto::all()->count(),
+                "totalProductos" => Inventario::all()->count(),
                 "totalClientes" => Cliente::all()->count(),
                 "totalProveedores" => Proveedore::all()->count(),
+                "totalFacturasPorPagar" => FacturaInventario::where([
+                    "tipo" => 'ENTRADA',
+                    "concepto" => 'CREDITO',
+                ])->count(),
+
+                "totalFacturasPorCobrar" => Factura::where([
+                    "tipo" => 'SALIDA',
+                    "concepto" => 'CREDITO',
+                ])->count(),
+               
             ];
+            // return $datosDash;
             return view('admin.dashboard', compact('menuSuperior', 'pathname', 'datosDash'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar datos del dashboard, ");

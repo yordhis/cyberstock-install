@@ -91,9 +91,9 @@
                                             <i class="bi bi-palette2 text-warning"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{"15"}}</h6>
+                                            <h6>{{  $datosDash['totalFacturasPorCobrar']  }}</h6>
                                             <span class="text-muted small pt-2 ps-1">
-                                                <a href="/cuotas" target="_self">
+                                                <a href="/listaFacturaPorCobrar" target="_self">
                                                     Ver lista
                                                 </a>    
                                             </span>
@@ -111,15 +111,19 @@
                             <div class="card info-card sales-card rounded-3">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Cuentas por pagar | {{date('m/Y')}}</span></h5>
+                                    <h5 class="card-title">Cuentas por pagar</span></h5>
 
                                     <div class="d-flex align-items-center">
                                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center ">
                                             <i class="bi bi-cash text-success"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{"2"}}</h6>
-                                            <span class="text-muted small pt-2 ps-1">Activos</span>
+                                            <h6>{{ $datosDash['totalFacturasPorPagar'] }}</h6>
+                                            <span class="text-muted small pt-2 ps-1">
+                                                <a href="/listaFacturaPorPagar" target="_self">
+                                                    Ver lista
+                                                </a>    
+                                            </span>
                                             {{-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> --}}
 
                                         </div>

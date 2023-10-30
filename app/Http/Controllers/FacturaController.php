@@ -6,10 +6,14 @@ use App\Models\Factura;
 use App\Http\Requests\StoreFacturaRequest;
 use App\Http\Requests\UpdateFacturaRequest;
 use App\Models\Carrito;
+use App\Models\CarritoInventario;
+use App\Models\Cliente;
 use App\Models\DataDev;
+use App\Models\FacturaInventario;
 use App\Models\Helpers;
 use App\Models\Inventario;
 use App\Models\Po;
+use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
@@ -50,6 +54,47 @@ class FacturaController extends Controller
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
+    }
+
+    public function listaFacturaPorPagar(){
+        $pathname = Request::path();
+        $menuSuperior = $this->data->menuSuperior;
+
+        $pagar = FacturaInventario::where([
+            "tipo" => 'ENTRADA',
+            "concepto" => 'CREDITO',
+        ])->get();
+
+        foreach ($pagar as $key => $value) {
+           $value['proveedor']= Proveedore::where('codigo', $value->identificacion)->get();
+           $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
+            $contador = 0;
+           foreach($value['carrito'] as $cantidade){
+            $value['totalArticulos'] += $cantidade->cantidad; 
+           }
+        }
+        // return $pagar;
+        return view('admin.pagar.lista', compact('pagar', 'menuSuperior', 'pathname'));
+    }
+    public function listaFacturaPorCobrar(){
+        $pathname = Request::path();
+        $menuSuperior = $this->data->menuSuperior;
+
+        $cobrar = Factura::where([
+            "tipo" => 'SALIDA',
+            "concepto" => 'CREDITO',
+        ])->get();
+
+        foreach ($cobrar as $key => $value) {
+           $value['cliente']= Cliente::where('identificacion', $value->identificacion)->get();
+           $value['carrito'] = Carrito::where('codigo', $value->codigo)->get();
+            $contador = 0;
+           foreach($value['carrito'] as $cantidade){
+            $value['totalArticulos'] += $cantidade->cantidad; 
+           }
+        }
+        // return $cobrar;
+        return view('admin.cobrar.lista', compact('cobrar', 'menuSuperior', 'pathname'));
     }
 
     public function imprimirFactura($codigoFactura){
