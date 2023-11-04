@@ -14,7 +14,7 @@ class CategoriaSeeder extends Seeder
      */
     public function run()
     {
-        $categorias = ["CADENAS", "BUJIAS", "REPUESTOS", "LUCES", "ELECTRONICO", "MOTOR", "ACEITES"];
+        $categorias = ["N/A"];
 
         foreach ($categorias as $key => $value) {
             $newCategoria = new Categoria();

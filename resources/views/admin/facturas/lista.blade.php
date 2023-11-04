@@ -45,9 +45,11 @@
                                                 <td>Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</td>
                                                 <td>REF: {{ number_format($factura->total, 2, ',', '.') }}</td>
                                                 <td> 
-
+                                                    <a href="facturas/{{ $factura->id }}" target="_self">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
                                                     {{-- @include('admin.facturas.partials.modalEditar') --}}
-                                                    @include('admin.facturas.partials.modaldialog')
+                                                    {{-- @include('admin.facturas.partials.modaldialog') --}}
                                                     {{-- @include('admin.facturas.partials.modal') --}}
 
                                                 </td>

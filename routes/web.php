@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/panel', [DashboardController::class, 'index']);
     
     // lista de cuenta por pagar y cobrar
+    Route::get('/facturas/{id}', [FacturaController::class, "show"])->name('admin.factura.ver');
     Route::get('/listaFacturaPorPagar', [FacturaController::class, "listaFacturaPorPagar"])->name('admin.listaFacturaPorPagar');
     Route::get('/listaFacturaPorCobrar', [FacturaController::class, "listaFacturaPorCobrar"])->name('admin.listaFacturaPorCobrar');
     //  Usuarios

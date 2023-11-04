@@ -284,6 +284,7 @@ const htmlTicket = (factura) => {
     let carritoHtml = '', 
     descuentoHtml = '',
     metodosPagosHtml = '',
+    logo = '',
     metodosPagos = factura.metodos.split(','),
     ivaHtml = '';
 
@@ -330,11 +331,17 @@ const htmlTicket = (factura) => {
         `;
     });
 
+    // VERIFIVCAMOS SI SE DESEA IMPRIMIR CON EL LOGO
+    if (factura.pos.estatusImagen) {
+        logo = `<img src="${factura.pos.imagen}" alt="Logotipo">`;
+    } else {
+        logo= '';
+    }
+
     return `
         <div class="ticket" id="ticket">
         
-            <img src="${factura.pos.imagen}" alt="Logotipo">
-        
+        ${logo}
         
         <p class="centrado">
             <br>${factura.pos.empresa}
@@ -344,10 +351,12 @@ const htmlTicket = (factura) => {
         </p>
         <table>
             <thead>
+               
                 <tr>
-                    <th class="producto">FACTURA</th>
-        
-                    <th class="precio">${factura.codigo}</th>
+                    <th class="producto">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
+                </tr>
+                <tr>
+                    <th class="producto">RIF: ${factura.cliente.tipo}${factura.cliente.identificacion}</th>
                 </tr>
                 <tr>
                     <th class="producto">FECHA</th>
@@ -386,6 +395,11 @@ const htmlTicket = (factura) => {
                     <td class="producto">TOTAL</td>
         
                     <td class="precio">Bs ${ parseFloat(factura.total * factura.tasa).toFixed(2)  }</td>
+                </tr>
+                <tr>
+                    <td class="producto">TOTAL REF</td>
+        
+                    <td class="precio">Bs ${ parseFloat(factura.total).toFixed(2)  }</td>
                 </tr>
               
                 ${metodosPagosHtml}

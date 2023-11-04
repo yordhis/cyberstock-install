@@ -34,7 +34,6 @@ class FacturaController extends Controller
     public function index()
     {
         try {
-        
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
             $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->get();
@@ -42,13 +41,14 @@ class FacturaController extends Controller
             if(count($facturas)){
                 foreach ($facturas as $key => $factura) {
                     $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
-                    $factura->total_articulos = Carrito::where('codigo', $factura->codigo)->count();
+                    // $factura->total_articulos = Carrito::where('codigo', $factura->codigo)->count();
                 }
             }
            
             $pos = count(Po::all()) ? Po::all()[0]: [];
            
             $pathname = Request::path();
+            
             return view('admin.facturas.lista', compact( 'facturas','menuSuperior', 'pathname', 'pos', 'utilidades'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
@@ -76,6 +76,7 @@ class FacturaController extends Controller
         // return $pagar;
         return view('admin.pagar.lista', compact('pagar', 'menuSuperior', 'pathname'));
     }
+
     public function listaFacturaPorCobrar(){
         $pathname = Request::path();
         $menuSuperior = $this->data->menuSuperior;
@@ -164,6 +165,17 @@ class FacturaController extends Controller
     {
         
         try {
+
+            $clientes = Cliente::where('identificacion', $request->identificacion)->get();
+            if (count($clientes) == 0) {
+                return response()->json([
+                    "mensaje" => "El cliente no esta registrado.",
+                    "data" =>  [], 
+                    "estatus" =>Response::HTTP_NOT_FOUND 
+                ],Response::HTTP_NOT_FOUND);
+            }else{
+                $cliente = $clientes[0]; 
+            }
             $carrito = Carrito::where('codigo', $request->codigo)->get();
             if(count($carrito)){
                 $resultado = Factura::create($request->all());
@@ -190,6 +202,7 @@ class FacturaController extends Controller
                 } 
 
                 $resultado['carrito'] = $carritos;
+                $resultado['cliente'] = $cliente;
                 $resultado['pos'] = Po::all()[0];
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
@@ -227,9 +240,54 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function show(Factura $factura)
+    public function show($id)
     {
-        //
+        try {
+            $menuSuperior = $this->data->menuSuperior;
+            $utilidades = $this->data->utilidades;
+            $facturas= Factura::where('id',$id)->get();
+           
+            if(count($facturas)){
+                foreach ($facturas as $key => $factura) {
+                    $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
+                    $contador = 0;
+                    foreach ($factura->carrito as $key => $producto) {
+                        $contador += $producto->cantidad;
+                    }
+                    $factura->totalArticulos = $contador;
+                    // configuramos los metodos
+                    $metodosArr = explode(',', $factura->metodos);
+                    $arrayMetodos = [];
+                    foreach ($metodosArr as $key => $metodo) {
+                         array_push(
+                            $arrayMetodos,
+                            [
+                                "tipo" => explode('|', $metodo)[0],
+                                "monto" => explode('|', $metodo)[1]
+                            ]
+                        );
+                    }
+
+                    $factura->metodos = $arrayMetodos;
+                }
+
+                $factura = $facturas[0];
+              
+            }else{
+                $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
+                $estatus = 404;
+                return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
+            }
+          
+            $pos = count(Po::all()) ? Po::all()[0]: [];
+            $pathname = Request::path();
+         
+            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior', 'pathname' ) );
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
+            return response()->view('errors.404', compact("errorInfo"), 404);
+        }
+
     }
 
     /**

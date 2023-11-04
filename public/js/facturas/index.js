@@ -1,4 +1,4 @@
-let btnImprimirFactura = document.querySelectorAll('.facturaMaster');
+let btnImprimirFactura = document.querySelectorAll('.btnImprimirFactura');
 
 log('conectado con facturas')
 // log(btnImprimirFactura)

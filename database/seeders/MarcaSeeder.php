@@ -14,7 +14,7 @@ class MarcaSeeder extends Seeder
      */
     public function run()
     {
-        $marcas = ["BERA", "TORO", "EMPIRE", "YAMAHA", "SKIWORD", "ALEMANAS", "CHINAS"];
+        $marcas = ["N/A"];
 
         foreach ($marcas as $key => $value) {
             $newMarca = new Marca();
