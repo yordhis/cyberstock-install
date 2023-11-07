@@ -343,7 +343,7 @@
                                                         </td>
 
                                                         <td>
-                                                            @include('admin.pos.partials.modalEliminar')
+                                                            @include('admin.entradas.partials.modalEliminar')
                                                         </td>
                                                     </tr>
                                                 @endforeach  {{-- Cierre Recorremos el carrito --}}

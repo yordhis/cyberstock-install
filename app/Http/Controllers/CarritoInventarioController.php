@@ -192,19 +192,136 @@ class CarritoInventarioController extends Controller
      * @param  \App\Models\CarritoInventario  $carritoInventario
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CarritoInventario $carritoInventario)
+    public function destroySalida($codigoFactura, $codigoProducto)
     {
         try {
-            $identificacion = $carritoInventario->identificacion;
-            $menuSuperior = $this->data->menuSuperior;
-            $carritoInventario->delete();
+            $identificacion = 0;
+            // Validadr si existe en el caritto de inventario
+            $extisteCarritoInventario = CarritoInventario::where([
+                'codigo' => $codigoFactura,
+                'codigo_producto' => $codigoProducto
+            ])->get();
 
             
+            if (count($extisteCarritoInventario)) {
+                $identificacion =  $extisteCarritoInventario[0]->identificacion;
+                CarritoInventario::where([
+                    'codigo' => $codigoFactura,
+                    'codigo_producto' => $codigoProducto
+                ])->delete();
+            }
+
+            // Validadr si existe en el caritto de factura
+            $extisteCarritoFactura = Carrito::where([
+                'codigo' => $codigoFactura,
+                'codigo_producto' => $codigoProducto
+            ])->get();
+
+            if (count($extisteCarritoFactura)) {
+                Carrito::where([
+                    'codigo' => $codigoFactura,
+                    'codigo_producto' => $codigoProducto
+                ])->delete();
+            }
            
+            $menuSuperior = $this->data->menuSuperior;
+        
+            return redirect()->route('admin.inventarios.crearSalida', compact('identificacion'));
+        } catch (\Throwable $th) {
+            $mensajeError = Helpers::getMensajeError($th, "Error Al eliminar la producto del carrito, ");
+            return view('errors.404', compact('mensajeError'));
+        }
+    }
+    public function destroy($codigoFactura, $codigoProducto)
+    {
+        try {
+            $identificacion = 0;
+            // Validadr si existe en el caritto de inventario
+            $extisteCarritoInventario = CarritoInventario::where([
+                'codigo' => $codigoFactura,
+                'codigo_producto' => $codigoProducto
+            ])->get();
+
+            
+            if (count($extisteCarritoInventario)) {
+                $identificacion =  $extisteCarritoInventario[0]->identificacion;
+                CarritoInventario::where([
+                    'codigo' => $codigoFactura,
+                    'codigo_producto' => $codigoProducto
+                ])->delete();
+            }
+
+            // Validadr si existe en el caritto de factura
+            $extisteCarritoFactura = Carrito::where([
+                'codigo' => $codigoFactura,
+                'codigo_producto' => $codigoProducto
+            ])->get();
+
+            if (count($extisteCarritoFactura)) {
+                Carrito::where([
+                    'codigo' => $codigoFactura,
+                    'codigo_producto' => $codigoProducto
+                ])->delete();
+            }
+           
+            $menuSuperior = $this->data->menuSuperior;
+        
             return redirect()->route('admin.inventarios.crearEntrada', compact('identificacion'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al eliminar la producto del carrito, ");
             return view('errors.404', compact('mensajeError'));
         }
     }
+
+    /**
+     * Elimina todo el carrito de compra
+     * @param codigo
+     */
+    public function eliminarCarritoInventarioCompletoSalida($codigo){
+        try {
+            $carritoExiste = CarritoInventario::where('codigo', $codigo)->get();
+            if(count($carritoExiste)){
+                $estatusEliminar = CarritoInventario::where('codigo', $codigo)->delete();
+                // Obtenemos los products del carrito POS
+                $carritoFacturaExiste = Carrito::where('codigo', $codigo)->get();
+                if(count($carritoFacturaExiste)){
+                    $estatusEliminar = Carrito::where('codigo', $codigo)->delete();
+                }
+                $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
+                $estatus = $estatusEliminar ? 201 : 404;
+            }else{
+                $mensaje = "La factura no se ha registrado, no se encontro factura que eliminar.";
+                $estatus = 404;
+            }
+      
+            return redirect()->route('admin.inventarios.crearSalida', compact('mensaje', 'estatus') );
+    
+        } catch (\Throwable $th) {
+            $mensajeError = Helpers::getMensajeError($th, "Error Al Elimianr factura de entrada, ");
+            return view('errors.404', compact('mensajeError'));
+        }
+    }
+
+    public function eliminarCarritoInventarioCompleto($codigo){
+        try {
+            $carritoExiste = CarritoInventario::where('codigo', $codigo)->get();
+            if(count($carritoExiste)){
+                $estatusEliminar = CarritoInventario::where('codigo', $codigo)->delete();
+                $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
+                $estatus = $estatusEliminar ? 201 : 404;
+            }else{
+                $mensaje = "La factura no se ha registrado, no se encontro factura que eliminar.";
+                $estatus = 404;
+            }
+      
+            return redirect()->route('admin.inventarios.crearEntrada', compact('mensaje', 'estatus') );
+    
+        } catch (\Throwable $th) {
+            $mensajeError = Helpers::getMensajeError($th, "Error Al Elimianr factura de entrada, ");
+            return view('errors.404', compact('mensajeError'));
+        }
+    }
+
+
+
 }

@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar el producto del carrito <span class="text-danger fs-5">{{$carrito->descripcion}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="carritoInventario/{{$carrito->id}}" method="post" target="_self">
+            <form action="carritoInventario/{{$carrito->codigo}}/{{$carrito->codigo_producto}}" method="post" target="_self">
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

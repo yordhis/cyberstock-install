@@ -6,6 +6,7 @@ use App\Models\FacturaInventario;
 use App\Http\Requests\StoreFacturaInventarioRequest;
 use App\Http\Requests\UpdateFacturaInventarioRequest;
 use App\Models\CarritoInventario;
+use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Helpers;
 use App\Models\Inventario;
@@ -138,7 +139,17 @@ class FacturaInventarioController extends Controller
     public function storeSalida(Request $request)
     {
         try {
-            
+            $clientes = Cliente::where('identificacion', $request->identificacion)->get();
+            if (count($clientes) == 0) {
+                return response()->json([
+                    "mensaje" => "El cliente no esta registrado.",
+                    "data" =>  [], 
+                    "estatus" =>Response::HTTP_NOT_FOUND 
+                ],Response::HTTP_NOT_FOUND);
+            }else{
+                $cliente = $clientes[0]; 
+            }
+
             $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
             if(count($carrito)){
 
@@ -186,6 +197,7 @@ class FacturaInventarioController extends Controller
                 
 
                 $resultado['carrito'] = $carritos;
+                $resultado['cliente'] = $cliente;
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
                 

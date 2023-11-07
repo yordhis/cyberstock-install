@@ -16,7 +16,6 @@ use App\Http\Controllers\{
     ProductoController,
     ProveedoreController,
     UtilidadeController,
-    UtilityController,
 };
 
 
@@ -66,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/inventarios/crearSalida', [InventarioController::class, "crearSalida"])->name('admin.inventarios.crearSalida');
     Route::post('/storeSalida', [CarritoInventarioController::class, "storeSalida"])->name('admin.carrito.inventario.salida');
     Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
+    Route::delete('/carritoInventario/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroy"])->name('admin.carrito.inventario.destroy');
+    Route::delete('/carritoInventarioSalida/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroySalida"])->name('admin.carrito.inventario.destroy');
     Route::resource('/inventarios', InventarioController::class)->names('admin.inventarios');
     
     /** Rutas de productos */
@@ -92,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     
     /** Carrito */
     Route::delete('/eliminarCarritoCompleto/{codigo}', [CarritoController::class, 'eliminarCarritoCompleto'])->name('admin.eliminarCarritoCompleto');
+    Route::delete('/eliminarCarritoInventarioCompletoSalida/{codigo}', [CarritoInventarioController::class, 'eliminarCarritoInventarioCompletoSalida'])->name('admin.eliminarCarritoInventarioCompletoSalida');
+    Route::delete('/eliminarCarritoInventarioCompleto/{codigo}', [CarritoInventarioController::class, 'eliminarCarritoInventarioCompleto'])->name('admin.eliminarCarritoInventarioCompleto');
     Route::resource('/carritos', CarritoController::class)->names('admin.carritos');
   
 

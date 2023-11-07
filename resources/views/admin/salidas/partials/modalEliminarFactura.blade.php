@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar la factura <span class="text-danger fs-5">{{$carritos[0]->codigo ?? ''}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="eliminarCarritoInventarioCompleto/{{$carritos[0]->codigo ?? 0}}" method="post" target="_self">
+            <form action="eliminarCarritoInventarioCompletoSalida/{{$carritos[0]->codigo ?? 0}}" method="post" target="_self">
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
