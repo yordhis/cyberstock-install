@@ -17,6 +17,7 @@ use App\Models\Proveedore;
 use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Facades\Response;
 
 class InventarioController extends Controller
 {
@@ -36,7 +37,8 @@ class InventarioController extends Controller
     public function index()
     {
         try {
-            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->get(), 'id,nombre', 'categorias,marcas');
+            // $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->get(), 'id,nombre', 'categorias,marcas');
+           
             // return $inventarios;
             $utilidades = $this->data->utilidades;
             $menuSuperior = $this->data->menuSuperior;
@@ -49,6 +51,25 @@ class InventarioController extends Controller
         }
       
     }
+
+    /** Api */
+    public function getInventarios(){
+
+        try {
+            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
+            
+            return $inventarios;
+            return response()->json([
+                "mensaje" => "Busqueda Exitosa",
+                "data" => $inventarios,
+                "estatus" => Response::HTTP_OK
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+    }
+
     /**
      * Se consideran entradas los siguientes ID Y CONCEPTOS
      * "COMPRA", // 5

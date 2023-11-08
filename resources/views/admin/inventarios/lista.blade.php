@@ -26,7 +26,7 @@
 
                         <!-- Table with stripped rows -->
 
-                        <table class="table datatable" >
+                        <table class="table" >
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -43,35 +43,25 @@
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @php $contador = 1; @endphp
-                                @foreach ($inventarios as $inventario)
-                                    <tr >
-                                        <th scope="row">{{ $contador }}</th>
-                                        <td>{{ $inventario->codigo }}</td>
-                                        <td>{{ $inventario->descripcion }}</td>
-                                        {{-- <td>{{ date_format(date_create($inventario->fecha_entrada), 'd-m-Y') }}</td> --}}
-                                        <td>{{ $inventario->cantidad }}</td>
-                                        <td>{{ number_format(doubleval($inventario->costo), 2, ',', '.') }}</td>
-                                        <td>{{ number_format($inventario->pvp * $utilidades[0]->tasa, 2, ',', '.') }}</td>
-                                        <td>{{ number_format($inventario->pvp, 2, ',', '.') }}</td>
-                                        <td>{{ $inventario->id_marca->nombre }}</td>
-                                        <td>{{ $inventario->id_categoria->nombre }}</td>
-                                        
-
-
-                                        <td>
-                                          
-                                            @include('admin.inventarios.partials.modalVer')
-
-                                            @include('admin.inventarios.partials.modalEliminar')
-
-                                            {{-- @include('admin.inventarios.partials.modalEditar') --}}
-
-                                        </td>
-                                    </tr>
-                                    @php $contador++; @endphp
-                                @endforeach
+                            <tbody id="lista">
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                 
+                                        <button type="button" class="btn btn-success"><i class="bi bi-eye"></i></button>
+                                        <button type="button" class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                                        <button type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></button>
+     
+                                    </td>
+                                </tr>
 
                             </tbody>
                         </table>

@@ -6,4 +6,8 @@ VENTA = {
     id:1,
     name: "VENTA"
 },
-precarga = ``;
+spinner = `
+    <div class="spinner-border text-success" role="status">
+    <span class="visually-hidden">Loading...</span>
+    </div>
+`;

@@ -9,6 +9,7 @@ use App\Http\Controllers\{
     ClienteController,
     FacturaController,
     FacturaInventarioController,
+    InventarioController,
     ProductoController,
     ProveedoreController
 };
@@ -32,6 +33,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('getProducto/{barcode}', [ProductoController::class, 'getProducto'])->name('api.productos');
     Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.productos');
     Route::resource('productos', ProductoController::class)->names('api.productos');
+    Route::resource('inventarios', InventarioController::class)->names('api.inventarios');
     
     Route::post('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
