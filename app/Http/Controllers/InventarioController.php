@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Inventario;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Http\Requests\UpdateInventarioRequest;
-use App\Models\Carrito;
-use App\Models\CarritoInventario;
-use App\Models\Cliente;
-use App\Models\DataDev;
-use App\Models\Factura;
-use App\Models\FacturaInventario;
-use App\Models\Helpers;
-use App\Models\Po;
-use App\Models\Proveedore;
-use App\Models\Utility;
-use Illuminate\Http\Request;
+use App\Models\{
+    Carrito,
+    CarritoInventario,
+    Cliente,
+    DataDev,
+    Factura,
+    FacturaInventario,
+    Helpers,
+    Po,
+    Proveedore,
+    Utility
+};
+
 use Illuminate\Support\Facades\Request as FacadesRequest;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class InventarioController extends Controller
 {
@@ -37,37 +40,161 @@ class InventarioController extends Controller
     public function index()
     {
         try {
-            // $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->get(), 'id,nombre', 'categorias,marcas');
-           
-            // return $inventarios;
-            $utilidades = $this->data->utilidades;
             $menuSuperior = $this->data->menuSuperior;
             $pathname = FacadesRequest::path();
+            return view("admin.inventarios.lista", compact('menuSuperior', 'pathname'));
 
-            return view("admin.inventarios.lista", compact('menuSuperior', 'inventarios', 'utilidades', 'pathname'));
         } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar inventario, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
       
     }
 
     /** Api */
-    public function getInventarios(){
-
+    public function getInventariosFiltro(Request $request){
         try {
-            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
-            
-            return $inventarios;
-            return response()->json([
-                "mensaje" => "Busqueda Exitosa",
-                "data" => $inventarios,
-                "estatus" => Response::HTTP_OK
-            ], Response::HTTP_OK);
+            $tasa = $this->data->utilidades[0]->tasa;
+
+            // filtramos por la descripcion
+            if(request('filtro')){
+                    $resultados = Inventario::where("{$request->campo}", 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->paginate(100);
+                    if (count($resultados)) {
+                       $inventarios = Helpers::setNameElementId( $resultados , 'id,nombre', 'categorias,marcas' );
+                       return response()->json([
+                           "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE",
+                           "data" => $inventarios,
+                           "tasa" => $tasa,
+                           "estatus" => Response::HTTP_OK
+                       ], Response::HTTP_OK);
+                    }else{
+                        return response()->json([
+                            "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                            "data" => $resultados,
+                            "tasa" => $tasa,
+                            "estatus" => Response::HTTP_OK
+                        ], Response::HTTP_OK);
+                    }
+            }
+
+            // PAGINAMOS LOS PRODUCTOS DEL INVENTARIO
+            // $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
+            // return response()->json([
+            //     "mensaje" => "CONSULTA AL INVENTARIO EXITOSA",
+            //     "data" => $inventarios,
+            //     "tasa" => $tasa,
+            //     "estatus" => Response::HTTP_OK
+            // ], Response::HTTP_OK);
+
         } catch (\Throwable $th) {
-            //throw $th;
+            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar los datos del Proveedor en el método getProveedor,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+    }
+    
+    public function getInventarios(Request $request){
+        try {
+            $tasa = $this->data->utilidades[0]->tasa;
+
+            // filtramos por la descripcion
+            if(request('filtro')){
+                    $resultados = Inventario::where('descripcion', 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->paginate(15);
+                    if (count($resultados)) {
+                       $inventarios = Helpers::setNameElementId( $resultados , 'id,nombre', 'categorias,marcas' );
+                       return response()->json([
+                           "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE",
+                           "data" => $inventarios,
+                           "tasa" => $tasa,
+                           "estatus" => Response::HTTP_OK
+                       ], Response::HTTP_OK);
+                    }else{
+                        return response()->json([
+                            "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                            "data" => $resultados,
+                            "tasa" => $tasa,
+                            "estatus" => Response::HTTP_OK
+                        ], Response::HTTP_OK);
+                    }
+            }
+
+            // PAGINAMOS LOS PRODUCTOS DEL INVENTARIO
+            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
+            return response()->json([
+                "mensaje" => "CONSULTA AL INVENTARIO EXITOSA",
+                "data" => $inventarios,
+                "tasa" => $tasa,
+                "estatus" => Response::HTTP_OK
+            ], Response::HTTP_OK);
+
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar los datos del Proveedor en el método getProveedor,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => $inventarios,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public function editarProductoDelInventario( Request $request ){
+        try {
+
+            $estatus = Inventario::where( 'id', $request->id )->update($request->all());
+            if($estatus){
+                return response()->json([
+                    "mensaje" => "LOS DATOS DE INVENTARIO DEL PRODUCTO SE ACTUALIZÓ EXITOSAMENTE",
+                    "data" => $estatus,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }else{
+                return response()->json([
+                    "mensaje" => "LOS DATOS NO SE GUARDARON!",
+                    "data" => $estatus,
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar ACTUALIZAR un producto del inventario, ");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function deleteProductoDelInventario( $id ){
+        try {
+
+            $estatus = Inventario::where( 'id', $id )->delete();
+            if($estatus){
+                return response()->json([
+                    "mensaje" => "PRODUCTO ELIMINADO DEL INVENTARIO EXITOSAMENTE",
+                    "data" => [],
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }else{
+                return response()->json([
+                    "mensaje" => "EL PRODUCTO NO SE PUDO ELIMINAR DEL INVENTARIO!",
+                    "data" => [],
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar elimianr un producto del inventario, ");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

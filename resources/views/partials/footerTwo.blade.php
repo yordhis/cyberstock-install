@@ -42,6 +42,7 @@
   @if ($pathname == 'inventarios')
       <script src="./js/main.js" defer></script>
       <script src="./js/inventarios/index.js" defer></script>
+      <script src="./js/inventarios/inventarioController.js" defer></script>
 
       {{-- <script src="./js/proveedores/proveedorController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
