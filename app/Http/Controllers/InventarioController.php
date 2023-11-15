@@ -77,14 +77,7 @@ class InventarioController extends Controller
                     }
             }
 
-            // PAGINAMOS LOS PRODUCTOS DEL INVENTARIO
-            // $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
-            // return response()->json([
-            //     "mensaje" => "CONSULTA AL INVENTARIO EXITOSA",
-            //     "data" => $inventarios,
-            //     "tasa" => $tasa,
-            //     "estatus" => Response::HTTP_OK
-            // ], Response::HTTP_OK);
+      
 
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar los datos del Proveedor en el método getProveedor,");

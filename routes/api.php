@@ -42,12 +42,17 @@ Route::group(['middleware' => ['cors']], function () {
     
     /** FACTURAS */
     Route::post('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+    Route::get('getCodigoFactura', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
+    
+    /** FACTURAS INVENTARIO */
     Route::post('storeSalida', [FacturaInventarioController::class, 'storeSalida'])->name('api.facturasInventarios.storeSalida');
     Route::resource('facturasInventarios', FacturaInventarioController::class)->names('api.facturasInventarios');
     
     /** CLIENTES */
-    Route::get('getCliente/{idCliente}', [ClienteController::class, 'getCliente'])->name('api.clientes');
+    Route::get('getCliente/{idCliente}', [ClienteController::class, 'getCliente'])->name('api.getCliente');
+    Route::post('storeCliente', [ClienteController::class, 'storeCliente'])->name('api.storeCliente');
+    Route::put('updateCliente/{id}', [ClienteController::class, 'updateCliente'])->name('api.updateCliente');
     
     /** PROVEEDORES */
     Route::get('getProveedor/{idProveedor}', [ApiController::class, 'getProveedor'])->name('api.getProveedor');

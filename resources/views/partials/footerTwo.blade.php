@@ -18,21 +18,19 @@
 
 
   <!-- Template Main JS File -->
+  <script src="./js/main.js" ></script>
   <script src="./js/partials/alert.js" defer></script>
 
   @if ($pathname == 'productos')
-      <script src="./js/main.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
   @endif
 
   @if ($pathname == 'pos/facturas')
-      <script src="./js/main.js" defer></script>
       <script src="./js/facturas/facturaController.js" defer></script>
       <script src="./js/facturas/index.js" defer></script>
   @endif
 
   @if ($pathname == 'inventarios/crearEntrada')
-      <script src="./js/main.js" defer></script>
       <script src="./js/proveedores/proveedorController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
       <script src="./js/facturas/facturaController.js" defer></script>
@@ -40,10 +38,8 @@
   @endif
 
   @if ($pathname == 'inventarios')
-      <script src="./js/main.js" defer></script>
       <script src="./js/inventarios/index.js" defer></script>
       <script src="./js/inventarios/inventarioController.js" defer></script>
-
       {{-- <script src="./js/proveedores/proveedorController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
       <script src="./js/facturas/facturaController.js" defer></script>
@@ -52,7 +48,7 @@
 
 
   @if ($pathname == 'inventarios/crearSalida')
-      <script src="./js/main.js" defer></script>
+      
       <script src="./js/clientes/clienteController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>
       <script src="./js/facturas/facturaController.js" defer></script>
@@ -60,11 +56,12 @@
   @endif
 
   @if ($pathname == 'pos')
-      <script src="./js/main.js" defer></script>
-      <script src="./js/clientes/clienteController.js" defer></script>
-      <script src="./js/productos/productoController.js" defer></script>
-      <script src="./js/facturas/facturaController.js" defer></script>
-      <script src="./js/pos/index.js" defer></script>
+  {{-- <script src="./js/productos/productoController.js" defer></script> --}}
+  
+  <script src="./js/inventarios/inventarioController.js" defer></script>
+  <script src="./js/facturas/facturaController.js" defer></script>
+  <script src="./js/clientes/clienteController.js" defer></script>
+        <script src="./js/pos/index.js" defer></script>
   @endif
   {{-- <script src="./js/productosEntradas/index.js"></script> --}}
 
@@ -81,3 +78,4 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js" defer></script>
+  

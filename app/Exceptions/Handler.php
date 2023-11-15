@@ -58,7 +58,8 @@ class Handler extends ExceptionHandler
       
         $this->renderable(function (QueryException $e, $request) {
             // dd($e);
-            $errorInfo = Helpers::getMensajeError($e, "No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión,");
+            // $errorInfo = Helpers::getMensajeError($e, "No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión,");
+            $errorInfo =  "No se puede establecer conexión con la base de datos, por favor verificar que XAMPP este iniciado.";
             return response()->view('errors.500', compact("errorInfo"), 500);
         });
 

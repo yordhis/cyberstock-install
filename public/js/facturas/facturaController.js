@@ -1,3 +1,21 @@
+const getCodigoFactura = async (url) => {
+    return await fetch(`${url}`, {      
+        method: "GET", // or 'PUT'
+        // body: JSON.stringify(filtro), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+        },
+    })
+    .then(response => response.json())
+    .catch(err => err)
+    .then(data => data)
+};
+
+
+const facturarCarrito = async (url, carrito) => {
+
+};
+
 const facturaStore = async (factura) => {
     await fetch(`${URL_BASE}/facturas`, {
         method: "POST", // or 'PUT'
@@ -10,22 +28,22 @@ const facturaStore = async (factura) => {
         .catch((error) => console.error("Error:", error))
         .then((response) => {
             log(response)
-            if (response.estatus == 200) {
-                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                if (resultado) {
-                    imprimirElemento(htmlTicket(response.data));
+            // if (response.estatus == 200) {
+            //     resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+            //     if (resultado) {
+            //         imprimirElemento(htmlTicket(response.data));
                     
-                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                    if (resultadoOtraCapia) {
-                        imprimirElemento(htmlTicket(response.data));
-                    }
-                    window.location.href = "http://cyberstock.com/pos";
-                } else {
-                    window.location.href = "http://cyberstock.com/pos";
-                }
-            } else {
-                alert(response.mensaje)
-            }
+            //         resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+            //         if (resultadoOtraCapia) {
+            //             imprimirElemento(htmlTicket(response.data));
+            //         }
+            //         window.location.href = "http://cyberstock.com/pos";
+            //     } else {
+            //         window.location.href = "http://cyberstock.com/pos";
+            //     }
+            // } else {
+            //     alert(response.mensaje)
+            // }
         })
 };
 

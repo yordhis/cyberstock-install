@@ -15,6 +15,7 @@ use App\Models\Inventario;
 use App\Models\Po;
 use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
@@ -26,6 +27,30 @@ class FacturaController extends Controller
     {
         $this->data = new DataDev();
     }
+
+
+    /** API */
+
+    public function getCodigoFactura(){
+        try {
+            $codigo = Helpers::getCodigo('facturas');
+            return response()->json([
+                "mensaje" => "Consulta de codigo de factura exitoso",
+                "estatus" => Response::HTTP_OK,
+                "data" => $codigo
+            ], Response::HTTP_OK);
+            
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar el codigo de la factura,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -161,11 +186,21 @@ class FacturaController extends Controller
      * @param  \App\Http\Requests\StoreFacturaRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreFacturaRequest $request)
+
+    public function store(HttpRequest $request){
+
+        
+        return response()->json([
+            "mensaje" => "data recibida.",
+            "data" =>  $request->all(), 
+            "estatus" =>Response::HTTP_OK 
+        ],Response::HTTP_OK);
+    }   
+
+    public function storeDemo(StoreFacturaRequest $request)
     {
         
         try {
-
             $clientes = Cliente::where('identificacion', $request->identificacion)->get();
             if (count($clientes) == 0) {
                 return response()->json([
@@ -176,6 +211,7 @@ class FacturaController extends Controller
             }else{
                 $cliente = $clientes[0]; 
             }
+
             $carrito = Carrito::where('codigo', $request->codigo)->get();
             if(count($carrito)){
                 $resultado = Factura::create($request->all());

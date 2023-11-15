@@ -281,7 +281,7 @@ const hanledBotonEliminar = async (e) => {
     let resultado = await deleteProductoDelInventario(e.target.id);
 
     // retornamos una respuesta
-    // e.target.parentElement.parentElement.children[1].innerHTML = repuesta( resultado.mensaje, resultado.estatus );
+    // e.target.parentElement.parentElement.children[1].innerHTML = respuesta( resultado.mensaje, resultado.estatus );
     
     setTimeout(() => {
         window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
@@ -327,52 +327,54 @@ const hanledPaginacion = async (e) => {
 
 const hanledFiltro = async (e) => {
     // validamos los keyup para no filtrar 
-    if (e.key == "Backspace" || e.key == " ") return false;
-
-    if(!e.target.value.trim().length){
-        hanledLoad();
-        return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
-    }
-
-    if(e.target.id.split('-')[1] == 'limpiar'){
-        elementoSpanInvalido.forEach(element => element.textContent = null);
-        elementoInputFiltroDescripcion.value = null;
-        elementoInputFiltroCodigo.value = null;
-        await getLista();
-        /** Activamos los eventos del boton eliminar */
-        await cargarEventosDelBotonEliminar();
-        await cargarEventosDelBotonEditar();
-
-    }else{
-        elementoSpanInvalido.forEach(element => element.textContent = null);
-        let filtro = {
-            filtro: `${e.target.value.trim()}`,
-            campo: `${e.target.id.split('-')[1]}`,
-        };
+    if (e.key == "Enter" ){
+        if(!e.target.value.trim().length){
+            hanledLoad();
+            return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
+        }
     
-        if(e.target.value){
-            elementoTablaPaginacion.innerHTML = '';
-            elementoTablaCuerpo.innerHTML = spinner;
-            let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-            
-            if(!inventarios.data.data.length){
-                elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
-            }else{
-                elementoTablaCuerpo.innerHTML='';
-                
-                await inventarios.data.data.forEach( element => {
-                    element.tasa = inventarios.tasa;
-                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
-                });
+        if(e.target.id.split('-')[1] == 'limpiar'){
+            elementoSpanInvalido.forEach(element => element.textContent = null);
+            elementoInputFiltroDescripcion.value = null;
+            elementoInputFiltroCodigo.value = null;
+            await getLista();
+            /** Activamos los eventos del boton eliminar */
+            await cargarEventosDelBotonEliminar();
+            await cargarEventosDelBotonEditar();
+    
+        }else{
+            elementoSpanInvalido.forEach(element => element.textContent = null);
+            let filtro = {
+                filtro: `${e.target.value.trim()}`,
+                campo: `${e.target.id.split('-')[1]}`,
+            };
         
-                elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
-
-                /** Activamos los eventos del boton eliminar */
-                await cargarEventosDelBotonEliminar();
-                await cargarEventosDelBotonEditar();
+            if(e.target.value){
+                elementoTablaPaginacion.innerHTML = '';
+                elementoTablaCuerpo.innerHTML = spinner;
+                let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
+                
+                if(!inventarios.data.data.length){
+                    elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
+                }else{
+                    elementoTablaCuerpo.innerHTML='';
+                    
+                    await inventarios.data.data.forEach( element => {
+                        element.tasa = inventarios.tasa;
+                        elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
+                    });
+            
+                    elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+    
+                    /** Activamos los eventos del boton eliminar */
+                    await cargarEventosDelBotonEliminar();
+                    await cargarEventosDelBotonEditar();
+                }
             }
         }
+
     }
+
 
 };
 

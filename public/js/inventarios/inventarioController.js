@@ -22,7 +22,7 @@ const getInventariosFiltro = async ( url, filtro ) => {
         },
     })
     .then(response => response.json())
-    .catch(err => log(err))
+    .catch(err => err)
     .then(data => data)
 };
 

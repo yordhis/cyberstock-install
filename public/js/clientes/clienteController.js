@@ -1,26 +1,38 @@
-const getCliente = (idCliente) => {
+const getCliente = async (idCliente) => {
+    return await fetch(`${URL_BASE}/getCliente/${idCliente}`, {
+        method: "GET", // or 'PUT'
+        // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then( (response) =>  response.json() )
+        .catch( (err) => err )
+        .then( (data) => data );
+};
 
-    return new Promise(  (resolve, reject)=>{
-         
-        setTimeout(()=>{
-            resolve({
-                value: idCliente,
-                result:  fetch(`${URL_BASE}/getCliente/${idCliente}`, {
-                    method: "GET", // or 'PUT'
-                    // body: JSON.stringify(idProduct), // data can be `string` or {object}!
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                })
-                .then(response => response.json())
-                .catch(err => log(err))
-                .then(data => data)
-        
-                })
-            });
-        }, 1500);
+const storeCliente = async (cliente) => {
+    return await fetch(`${URL_BASE}/storeCliente`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(cliente), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .catch((err) => err)
+        .then((data) => data);
+};
 
-    // .then((res) => res.json())
-    // .catch((error) => console.error("Error:", error))
-    // .then((response) =>  response);
+const updateCliente = async (url, cliente) => {
+    return await fetch(`${url}`, {
+        method: "PUT", // or 'PUT'
+        body: JSON.stringify(cliente), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .catch((err) => err)
+        .then((data) => data);
 };

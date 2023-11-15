@@ -97,3 +97,4 @@ const showProducto = async (idProduct) => {
     .catch((error) => console.error("Error:", error))
     .then((response) =>  response);
 }
+
