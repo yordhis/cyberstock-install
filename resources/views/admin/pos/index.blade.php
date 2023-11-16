@@ -130,7 +130,7 @@
                
             </div> {{-- CIERRE Factura --}}
 
-            <div class="col-sm-8" id="elementoMetodoDePago">
+            <div class="col-sm-8" id="elementoMetodoDePagoModal">
                 <!-- Button trigger modal -->
                 {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                     Launch static backdrop modal

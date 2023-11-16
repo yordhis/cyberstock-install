@@ -13,21 +13,29 @@ const getCodigoFactura = async (url) => {
 
 
 const facturarCarrito = async (url, carrito) => {
-
+    return await fetch(`${url}`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(carrito), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then( (res) => res.json() )
+    .catch( (error) => error )
+    .then( (response) => response ) 
 };
 
 const facturaStore = async (factura) => {
-    await fetch(`${URL_BASE}/facturas`, {
+    return await fetch(`${URL_BASE}/facturas`, {
         method: "POST", // or 'PUT'
         body: JSON.stringify(factura), // data can be `string` or {object}!
         headers: {
             "Content-Type": "application/json",
         },
     })
-        .then((res) => res.json())
-        .catch((error) => console.error("Error:", error))
-        .then((response) => {
-            log(response)
+        .then( (res) => res.json() )
+        .catch( (error) => error )
+        .then( (response) => response )
             // if (response.estatus == 200) {
             //     resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
             //     if (resultado) {
@@ -44,7 +52,7 @@ const facturaStore = async (factura) => {
             // } else {
             //     alert(response.mensaje)
             // }
-        })
+       
 };
 
 

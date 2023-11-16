@@ -27,8 +27,8 @@ const componenteAlerta = (mensaje, estatus) => {
             icono = '#exclamation-triangle-fill';
             break;
         case 401:
-            estatusText = "alert-danger";
-            icono = '#info-fill';
+            estatusText = "alert-warning";
+            icono = '#exclamation-triangle-fill';
             break;
         case 500:
             estatusText = "alert-danger";
@@ -42,7 +42,7 @@ const componenteAlerta = (mensaje, estatus) => {
 
 
     return `
-        <div class="alert ${estatusText} d-flex align-items-center" role="alert">
+        <div class="alert ${estatusText} d-flex align-items-center alertaGlobal" role="alert" id="alertaGlobal">
             <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
                 <use xlink:href="${icono}"/></svg>
             <div>

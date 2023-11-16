@@ -189,12 +189,17 @@ class FacturaController extends Controller
 
     public function store(HttpRequest $request){
 
-        
-        return response()->json([
-            "mensaje" => "data recibida.",
-            "data" =>  $request->all(), 
-            "estatus" =>Response::HTTP_OK 
-        ],Response::HTTP_OK);
+        try {
+           
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" =>  $request->request, 
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR 
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+       
     }   
 
     public function storeDemo(StoreFacturaRequest $request)

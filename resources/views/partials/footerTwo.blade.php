@@ -21,6 +21,7 @@
   <script src="./js/main.js" ></script>
   <script src="./js/partials/alert.js" defer></script>
 
+
   @if ($pathname == 'productos')
       <script src="./js/productos/productoController.js" defer></script>
   @endif
@@ -57,7 +58,7 @@
 
   @if ($pathname == 'pos')
   {{-- <script src="./js/productos/productoController.js" defer></script> --}}
-  
+  <script src="./js/partials/customModal.js" defer></script>
   <script src="./js/inventarios/inventarioController.js" defer></script>
   <script src="./js/facturas/facturaController.js" defer></script>
   <script src="./js/clientes/clienteController.js" defer></script>
