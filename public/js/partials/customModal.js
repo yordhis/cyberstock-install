@@ -2,9 +2,10 @@ log('conectado al custon modal');
 
 const hanledOpenModal = (e) => {
     e.preventDefault();
-    log(e.target.parentElement.children[1].classList)
+    log(e.target.parentElement.children[1].children[0].children[2].children[0])
+    e.target.parentElement.children[1].children[0].children[2].children[0].focus();
     e.target.parentElement.children[1].classList.add('modal--show')
-    log(e.target.parentElement.children[1].classList)
+   
     // element.classList.add('modal--show');
 };
 
@@ -18,16 +19,9 @@ const hanledCloseModal = (e) => {
 
 const cargarAccionesDelCustomModal = async () => {
     const openModal = d.querySelectorAll('.hero__cta');
-    // modal = d.querySelectorAll('.modal__custom');
-    // closeModal = d.querySelectorAll('.modal__close');
-    // log(modal)
-
 
     openModal.forEach(element => {
         element.addEventListener('click', hanledOpenModal); 
     });
     
-    // closeModal.forEach(element => {
-    //     element.addEventListener('click', hanledCloseModal);
-    // });
 };

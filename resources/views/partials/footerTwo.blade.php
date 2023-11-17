@@ -31,6 +31,11 @@
       <script src="./js/facturas/index.js" defer></script>
   @endif
 
+  @if ($pathname == 'facturas/ver')
+      <script src="./js/facturas/facturaController.js" defer></script>
+      <script src="./js/facturas/ver.js" defer></script>
+  @endif
+
   @if ($pathname == 'inventarios/crearEntrada')
       <script src="./js/proveedores/proveedorController.js" defer></script>
       <script src="./js/productos/productoController.js" defer></script>

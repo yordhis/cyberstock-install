@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     UsuarioController,
     ApiController,
+    CarritoController,
     ClienteController,
     FacturaController,
     FacturaInventarioController,
@@ -41,7 +42,9 @@ Route::group(['middleware' => ['cors']], function () {
     Route::put('editarProductoDelInventario/{id}', [InventarioController::class, 'editarProductoDelInventario'])->name('api.editarProductoDelInventario');
     
     /** FACTURAS */
-    Route::post('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+    Route::get('getCarrito/{codigoFactura}', [CarritoController::class, 'getCarrito'])->name('admin.getCarrito');
+    Route::post('facturarCarrito', [CarritoController::class, 'facturarCarrito'])->name('admin.facturarCarrito');
+    Route::get('getFactura/{codigoFactura}', [FacturaController::class, 'getFactura'])->name('admin.getFactura');
     Route::get('getCodigoFactura', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
     

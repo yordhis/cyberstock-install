@@ -8,7 +8,7 @@ VENTA = {
     name: "VENTA"
 },
 spinner = `
-    <div class="spinner-border text-success" role="status">
+    <div class="spinner-border text-success" role="status" id="spinnerGlobal">
     <span class="visually-hidden">Loading...</span>
     </div>
 `;

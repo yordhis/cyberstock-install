@@ -225,6 +225,7 @@ const componenteAgregarCantidadDeProductoModal = (producto) =>{
                     <label for="floatingInput">Cantidad</label>
                 </div>
                 <p class="text-muted fs-4"> Enter para agregar </p>
+                <p class="btn btn-none text-danger fs-5 cerrar__ModalCustom" id="cerrarModalCustom"> SALIR </p>
             </div>
         </section>
     `;
@@ -266,27 +267,37 @@ const componenteNumeroDeFactura = (data) =>{
 const componenteFactura = async (factura) => {
     return `
         <div class="col-sm-6 form-floating mb-3">
-            <input type="number" class="form-control acciones-factura" id="editarDescuento" placeholder="Ingrese descuento">
+            <input type="number" class="form-control acciones-factura" id="editarDescuento" >
             <label for="floatingInput">Descuento %</label>
         </div>
-        <div class="col-sm-3 form-floating mb-3">
+    
+        <!--<div class="col-sm-3 form-floating mb-3">
             <input type="number" class="form-control bg-secondary-light" readonly id="floatingInput" placeholder="16" value="16">
             <label for="floatingInput">IVA %</label>
-        </div>
-        <div class="col-sm-3 ">
-            <label for="">No fiscal</label>
-            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" >
+        </div>-->
+        <div class="col-sm-6 ">
+            <label for="">F. Fiscal</label> <br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked': ''}>
+                <label class="form-check-label" for="inlineRadio1">SI</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="desactivarFacturaFiscal" value="no" ${factura.iva == 0 ? 'checked': ''}>
+                <label class="form-check-label" for="inlineRadio2">NO</label>
+            </div>
+            <!--<label for="">Fiscal</label>
+            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '': 'checked'}>-->
         </div>
 
         <div class="col-sm-2 text-black">
             <p>SUBTOTAL</p>
             <p>IVA ${ factura.iva == "" ? 16 : (factura.iva * 100).toFixed(2) }%</p>
-            <p>DESCUENT.</p>
+            <p>DESCT.  ${factura.descuento == "" ? 0 : factura.descuento}%</p>
         </div>
         <div class="col-sm-4 ">
             <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero(factura.subtotal * factura.tasa) } BS</p>
             <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero(factura.subtotal * factura.iva * factura.tasa) } BS</p>
-            <p>${ factura.descuento == "" ? 0 : darFormatoDeNumero(factura.descuento) } BS</p>
+            <p>${ factura.descuento == "" ? 0 : darFormatoDeNumero( factura.subtotal * (factura.descuento/100) * factura.tasa ) } BS</p>
         </div>
         <div class="col-sm-6">
             <p>TOTAL</p>
@@ -523,6 +534,7 @@ const hanledLoad = async (e) => {
         factura.codigo = resultado.data;
         factura.concepto = VENTA.name;
         factura.tipo = 'SALIDA';
+        factura.iva = 0.16;
         let fecha = new Date();
         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`;
         localStorage.setItem('factura', JSON.stringify(factura));
@@ -531,7 +543,7 @@ const hanledLoad = async (e) => {
 
     /** Cargamos el componente factura */
     elementoFactura.innerHTML = spinner;
-    elementoFactura.innerHTML = await componenteFactura(factura);
+    // elementoFactura.innerHTML = await componenteFactura(factura);
 
     /** Validamos si el carrito tiene productos para cargarlos a la factura */
  
@@ -539,12 +551,9 @@ const hanledLoad = async (e) => {
    
     if( carritoStorage.length ){
         listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
-        
-         
 
         /** Cargamos los datos de la factura */
-        log(factura)
-        await cargarDatosDeFactura(carritoStorage, factura);
+        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
 
     }else{
         listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito([]);
@@ -552,7 +561,7 @@ const hanledLoad = async (e) => {
 
         /** Cargamos los datos de la factura */
         log(factura)
-        await cargarDatosDeFactura(carritoStorage, factura);
+        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
 
     let elementoVuelto = d.querySelector('#elementoVuelto');
@@ -667,7 +676,6 @@ const hanledFormulario = async (e) => {
                     }
 
         break;
-
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
@@ -696,7 +704,13 @@ const hanledFormulario = async (e) => {
 
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
-    
+    log(e.target.id)
+
+    if(e.target.id == "cerrarModalCustom"){
+           /** CERRAMOS EL MODAL */
+           e.target.parentElement.parentElement.classList.remove('modal--show');
+    }
+
     if(e.key == "Enter"){
         log('envio la cantidad')
         let carritoActualizado = [],
@@ -789,10 +803,6 @@ const hanledAgregarAFactura = async (e) => {
         }
 
     }
-  
-    
-
-    
 };
 
 const hanledBuscarProducto = async (e) => {    
@@ -846,10 +856,14 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     }else if(e.target.localName == 'i'){
         codigoProducto = e.target.parentElement.name;
         accion = e.target.parentElement.id;
+    }else if(e.target.localName == 'input'){
+        accion = e.target.id;
     }
 
   
     log(accion);
+    log(e.target.localName);
+    // log(e.target.id);
     switch (accion) {
         case 'editarCantidadFactura':
                 cantidad = prompt('Ingrese nueva cantidad:');
@@ -964,7 +978,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'vender':
             /** declaracion de variables */
-            let abonado = 0;
+            let abonado = 0,
+            resultadoDefacturarCarrito = '';
+
             /** validamos si el cliente esta gregado a la factura  */
             if(factura.identificacion == "") {
                 e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
@@ -1002,16 +1018,44 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     localStorage.setItem('factura', JSON.stringify(factura));
     
                     /** Obtenemos el carrito y la factura actualizados */
-                    let facturaVender = localStorage.getItem('factura'),
-                    carritoVender = localStorage.getItem('carrito');
+                    let facturaVender = JSON.parse(localStorage.getItem('factura')),
+                    carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    resultadoDeFacturarCarrito = await facturarCarrito(JSON.parse(carritoVender));
-                    log(resultadoDefacturarCarrito);
+                    carritoVender.forEach(async producto => {
+                        producto.identificacion = facturaActual.identificacion;
+                        await facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                    });
 
                     /** Procesamos la factura y generamos el ticket */
-                    resultadoDeFacturar = await facturaStore(JSON.parse(facturaVender));
+                    resultadoDeFacturar = await facturaStore(facturaVender);
                     log(resultadoDeFacturar);
+
+                    /** Mostramos el dialogo de facturar */
+                     if (resultadoDeFacturar.estatus == 201) {
+                        log('entro aqui en la impresion de la factura')
+                        resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                        if (resultado) {
+                            imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                            
+                            resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                            if (resultadoOtraCapia) {
+                                imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                            }
+                            /** Eliminamos la factura del Storagr */
+                            localStorage.removeItem('carrito');
+                            localStorage.removeItem('factura');
+                            window.location.href = "http://cyberstock.com/pos";
+
+                        } else {
+                             /** Eliminamos la factura del Storagr */
+                             localStorage.removeItem('carrito');
+                             localStorage.removeItem('factura');
+                            window.location.href = "http://cyberstock.com/pos";
+                        }
+                    } else {
+                        alert(resultadoDeFacturar.mensaje)
+                    }
 
                 }else{
                     e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
@@ -1026,7 +1070,18 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
 
             break;
-        
+        case 'desactivarFacturaFiscal':
+            log(e.target.value)
+            cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
+            break;
+        case 'activarFacturaFiscal':
+            log(e.target.value)
+            cargarDatosDeFactura(carritoActual, factura, 0.16, factura.descuento);
+            break;
+        case 'editarDescuento':
+            log(e.target.value)
+            cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
+            break;
         default:
             break;
     }
@@ -1209,7 +1264,13 @@ function adaptadorDeProducto(data){
 };
 
 async function cargarEventosDeAgregarProductoAFactura(){
-    let elementoAgregarAFactura = d.querySelectorAll('.agregar-producto');
+    let elementoAgregarAFactura = d.querySelectorAll('.agregar-producto'),
+    elementoCerrarModalCustom = d.querySelectorAll('.cerrar__ModalCustom');
+
+    elementoCerrarModalCustom.forEach(btnCerrarModal => {
+        btnCerrarModal.addEventListener('click', hanledAgregarAFactura);
+    });
+
     elementoAgregarAFactura.forEach(inputAgregarCantidad => {
         inputAgregarCantidad.addEventListener('keyup', hanledAgregarAFactura);
     })
@@ -1264,16 +1325,16 @@ async function cargarListaDeProductoDelCarrito(carrito){
     }
 };
 
-async function cargarDatosDeFactura(carritoActual, factura){
+async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuento = 0){
     let acumuladorSubtotal = 0;
     carritoActual.forEach(producto => {
         acumuladorSubtotal = parseFloat(acumuladorSubtotal) + quitarFormato(producto.subtotal); 
     });
     log(acumuladorSubtotal)
-    factura.iva = 0.16; 
+    factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
-    factura.descuento = 0;
-    factura.total = (parseFloat(acumuladorSubtotal * factura.iva) + acumuladorSubtotal);
+    factura.descuento = descuento;
+    factura.total = (parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento/100)));
     
     localStorage.setItem('factura', JSON.stringify(factura));
 

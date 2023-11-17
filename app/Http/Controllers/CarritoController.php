@@ -9,6 +9,8 @@ use App\Models\Cliente;
 use App\Models\DataDev;
 use App\Models\Helpers;
 use App\Models\Inventario;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class CarritoController extends Controller
@@ -20,20 +22,20 @@ class CarritoController extends Controller
         $this->data = new DataDev;
     }
 
-    public function eliminarCarritoCompleto($codigo){
+    public function eliminarCarritoCompleto($codigo)
+    {
         try {
             $carritoExiste = Carrito::where('codigo', $codigo)->get();
-            if(count($carritoExiste)){
+            if (count($carritoExiste)) {
                 $estatusEliminar = Carrito::where('codigo', $codigo)->delete();
                 $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
                 $estatus = $estatusEliminar ? 201 : 404;
-            }else{
+            } else {
                 $mensaje = "La factura no se ha registrado, no se encontro factura que eliminar.";
                 $estatus = 404;
             }
-      
-            return redirect()->route('admin.pos.index', compact('mensaje', 'estatus') );
-    
+
+            return redirect()->route('admin.pos.index', compact('mensaje', 'estatus'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al Elimianr factura, ");
             return view('errors.404', compact('mensajeError'));
@@ -61,55 +63,74 @@ class CarritoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCarritoRequest  $request
-     * @return \Illuminate\Http\Response
+     * API CARRITO
      */
-    public function store(StoreCarritoRequest $request)
+    /** Listar carrito */
+    public function getCarrito($codigoFactura)
     {
         try {
-           
-            $menuSuperior = $this->data->menuSuperior;
-
-            // Validadmos que la cantida no sobre pase la del inventario
-            $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
-            if(count($productoEnInventario)){
-                if($request->cantidad > $productoEnInventario[0]->cantidad){
-                   
-                    return redirect()->route('admin.pos.index', [
-                    "identificacion" => $request->identificacion,
-                    "codigo_producto" => $request->codigo_producto,
-                    "mensaje"=>"La Existencia es insuficiente para agregar el producto {$request->descripcion}.",
-                    "mensajeInventario"=>"La Existencia del producto {$productoEnInventario[0]->descripcion} es de ({$productoEnInventario[0]->cantidad} Unidades).",
-                    "estatus" => 404
-                    ]);
-                }   
+            $carrito = Carrito::where('codigo', $codigoFactura)->get();
+            if (count($carrito)) {
+                return response()->json([
+                    "mensaje" => "Consulta exitosa del carrito",
+                    "data" => $carrito,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    "mensaje" => "No hay carrito facturado con el codigo de factura ingresado",
+                    "data" => $carrito,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
-
-            // Validamos que el Cliente esten registrados
-            $razonSocial = Cliente::where('identificacion', $request->identificacion)->get();
-            if(count($razonSocial) == 0){
-
-                    return redirect()->route('admin.pos.index', [
-                    "identificacion" => $request->identificacion,
-                    "codigo_producto" => $request->codigo_producto,
-                    "mensaje"=>"El cliente de la identificacion {$request->identificacion} no esta registrado, por favor registrelo.",
-                    "mensajeInventario"=>"No se pudo agregar producto a la factura el cliente no esta registrado.",
-                    "estatus" => 404
-                    ]);
-            }
-
-            Carrito::create($request->all());
-
-            $carritos = Carrito::where('codigo', $request->codigo)->get();
-            $codigo = $request->codigo;
-            return redirect()->route('admin.pos.index');
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al agregar producto al carrito factura, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = Helpers::getMensajeError($th, "Error al consultar carrito de compra");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /** Registrar producto en el carrito */
+    public function facturarCarrito(HttpRequest $request)
+    {
+        try {
+       
+            /** Validadmos que la cantida no sobre pase la del inventario */
+            $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
+            if (count($productoEnInventario)) {
+                if ($request->cantidad > $productoEnInventario[0]->cantidad) {
+                    return response()->json([
+                        "mensaje" => "La Existencia es insuficiente para facturar el producto {$request->descripcion} | Disponibles: {$request->cantidad} .",
+                        "data" => $productoEnInventario,
+                        "estatus" => Response::HTTP_UNAUTHORIZED
+                    ], Response::HTTP_UNAUTHORIZED);
+                }
+            }
+
+            /** Registramos el producto en el carrito DB */
+            $resultado = Carrito::create($request->all());
+            return response()->json([
+                "mensaje" => "El carrito se facturó correctamente",
+                "data" => $resultado,
+                "estatus" => Response::HTTP_OK,
+            ], Response::HTTP_OK);
+
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" =>  $request->request,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /** Editar el producto del carrito */
+    /** Eliminar producto del carritos */
+    /** Eliminar todo el carrito */
 
     /**
      * Display the specified resource.

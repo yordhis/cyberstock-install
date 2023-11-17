@@ -19,7 +19,8 @@
                     <div class="card">
                       <div class="card-header text-black">
                         <div class="text-center">
-                          <p class="p-0 fs-5">{{ $factura->iva > 0 ? "SENIAT" : '' }}</p>
+                          <img src="{{ $pos->imagen }}" class="img w-50 h-50"  alt="">
+                          {{-- <p class="p-0 fs-5">{{ $factura->iva > 0 ? "SENIAT" : '' }}</p> --}}
                           <p class="p-0 m-0 fs-6">{{ $pos->rif ?? '' }}</p>
                           <p class="p-0 m-0 fs-6">{{ $pos->empresa ?? '' }}</p>
                           <p class="p-0 m-0 fs-6">{{ $pos->direccion ?? '' }}</p>
@@ -35,7 +36,7 @@
                           <p class="text-center p-0 m-0">FACTURA</p>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight"><b>N° Factura: </b></div>
-                            <div class="p-2 bd-highlight">{{ $factura->codigo }}</div>
+                            <div class="p-2 bd-highlight" id="codigoFactura">{{ $factura->codigo }}</div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">Fecha: {{ date_format(date_create( explode( " ",$factura->created_at)[0] ), "d-m-Y")  }}</div>
@@ -43,7 +44,7 @@
                             
                           </div>
     
-                          <p>------------------------------------------------------------------------------</p>
+                          <div class="bg-black m-1 w-100" style="height: 2px;"></div>
                           <!-- Productos -->
                           {{-- @php
                                 $subtotalAcumulador = 0;
@@ -58,48 +59,70 @@
                             @endphp --}}
                           @endforeach
     
-                          <p>------------------------------------------------------------------------------</p>
+                          <div class="bg-black m-1 w-100" style="height: 2px;"></div>
+
+                         
     
+                          <div class="d-flex justify-content-between w-100 m-0 p-0">
+                            <div class="p-2 bd-highlight">
+                              SUBTOTAL: <br>
+                              |Total de Articulos: {{ $factura->totalArticulos }} |
+                            </div>
+                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                          </div>
+    
+
+                          {{-- <div class="d-flex justify-content-between w-100 m-0 p-0">
+                            <div class="p-2 bd-highlight">TOTAL SIN IVA:</div>
+                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                          </div> --}}
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">
                               Descuento: {{ $factura->descuento }}%
                              
                             </div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
-                          </div>
-    
-                          <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            <div class="p-2 bd-highlight">
-                              SUBTIL: <br>
-                              |Total de Articulos: {{ $factura->total_articulos }} |
-                            </div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
-                          </div>
-    
-                          <p>------------------------------------------------------------------------------</p>
-    
-                          <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            <div class="p-2 bd-highlight">TOTAL SIN IVA:</div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->descuento *  $factura->tasa, 2, ',', '.') }}</div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">IVA:</div>
                             <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal * $factura->tasa * $utilidades[0]->iva['restar'], 2, ',', '.') }}</div>
                           </div>
+                          
     
-                          <p>------------------------------------------------------------------------------</p>
+                          <div class="bg-black m-1 w-100" style="height: 2px;"></div>
+
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">TOTAL:</div>
                             <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
                           </div>
-                          <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            @foreach ($factura->metodos as $metodo)
-                                <div class="p-2 bd-highlight">{{ $metodo['tipo'] }}</div>
-                                <div class="p-2 bd-highlight">Bs {{ number_format($metodo['monto'], 2, ',', '.') }}</div>
-                            @endforeach
+
+                          <div class="w-100" id="metodosPagos">
+                              {{-- <div class="p-2 bd-highlight">tipo de pago</div>
+                              <div class="p-2 bd-highlight">Bs 100</div> --}}
                           </div>
-    
-                      
+
+                          <div class="d-flex justify-content-between w-100 m-0 p-0" id="vuelto">
+                              {{-- <div class="p-2 bd-highlight">tipo de pago</div>
+                              <div class="p-2 bd-highlight">Bs 100</div> --}}
+                          </div>
+                          
+                          <div class="d-flex justify-content-between w-100 m-2 p-0">
+                            <a href="pos/facturas" class="col-sm-6 col-xs-12  btn btn-outline-danger pt-2" target="_self">VOLVER A LISTA</a>
+                            {{-- <button type="button" class="col-sm-4 col-xs-12 ms-2 btn btn-outline-warning">
+                              <i class="bx bx-pencil"></i>
+                              REALIZAR DEVOLUCIÓN
+                            </button> --}}
+                            {{-- <button type="button" class="col-sm-3 col-xs-12 ms-2 btn btn-outline-danger">
+                              <i class="bx bx-trash"></i>
+                              ELIMINAR
+                            </button> --}}
+                            <button type="button" class="col-sm-6 col-xs-12 ms-2 btn btn-outline-success acciones-factura" id="{{ $factura->codigo }}">
+                              <i class="bx bx-printer"></i>
+                              IMPRIMIR
+
+                             <span id="cargando"></span>
+                            </button>
+                          <div>
                       </div>
                     </div>
           
@@ -107,8 +130,6 @@
                 </div>
               </section>
            
-
-          
 
 
 
