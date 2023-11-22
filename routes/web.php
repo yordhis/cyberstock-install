@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     /** Rutas de productos */
     Route::get('/productos/categorias', [CategoriaController::class, 'index'] )->name('admin.productos.categorias');
     Route::get('/productos/marcas', [MarcaController::class, "index" ])->name('admin.productos.marcas');
+    Route::get('/formularioEditarProducto/{codigo}', [ProductoController::class, "formularioEditarProducto" ])->name('admin.formularioEditarProducto');
     Route::resource('/productos', ProductoController::class)->names('admin.productos');
  
     /** Rutas de proveedores */

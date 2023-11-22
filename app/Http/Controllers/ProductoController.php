@@ -146,29 +146,39 @@ class ProductoController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    // public function getProductos(){
-    //     try {
-    //         $products = Producto::where("id",">=", 1)->OrderBy('id', 'desc')->simplePaginate(5);
-    //         $data = json_decode(json_encode($products));
 
-    //         // $data->data = Helpers::setNameElementId($data->data, ['id','name'], ['marcas', 'categorias']);
-        
+    public function getProductos(){
+        try {
+            $resultados = Producto::where('id', '>', 0)->orderBy('id','desc')->paginate(15);
+           
+            $productos = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
             
-    //         return response()->json([
-    //             "message" => count($data->data) ? "Consulta Exitosa" : "No hay Datos",
-    //             "data"=> $data, 
-    //             "estatus" => Response::HTTP_OK
-    //         ], Response::HTTP_OK);
-    //     } catch (\Throwable $th) {
-    //         //throw $th;
-    //         return response()->json([
-    //             "message" => "Error en el consultar productos, " . $th->getMessage(),
-    //             "data"=> [], 
-    //             "estatus" => Response::HTTP_NOT_FOUND
-    //         ], Response::HTTP_NOT_FOUND);
-    //     }
+            if($productos){
+                return response()->json([
+                    "mensaje" => "Consulta de productos Exitosa",
+                    "data"=>  $productos, 
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }else{
+                return response()->json([
+                    "mensaje" => "No hay resultados",
+                    "data"=>  $productos, 
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+            
+
+
+        } catch (\Throwable $th) {
+           $mensaje = Helpers::getMensajeError($th, "Error al consultar productos");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data"=> [], 
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
        
-    // }
+    }
 
     // public function getProductoData($barcode){
     //     try {
@@ -228,14 +238,32 @@ class ProductoController extends Controller
     // }
     /**  CIERRE API REST FULL */
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+   
+    /** FORMULARIO EDITAR PRODUCTO */
+    public function formularioEditarProducto($codigo){
+        try {
+            $menuSuperior = $this->data->menuSuperior;
+            $utilidades = $this->data->utilidades;
+            $inventarioPorDefecto = ['costo'=>0,'cantidad'=>0, 'pvp'=>0];
+            // return Producto::paginate(15);
+            $productos = Helpers::setNameElementId(Producto::where('codigo', $codigo)->get(), 'id,nombre', 'categorias,marcas');
+            
+            foreach ($productos as $key => $producto) {
+                $resultado = Inventario::where('codigo', $producto->codigo)->select('costo', 'cantidad', 'pvp')->get();
+                $producto['inventario'] = count($resultado) ? $resultado[0] :  $inventarioPorDefecto;
+            }
+            
+            $pathname = Request::path();
+            $categorias = Categoria::all();
+            $marcas = Marca::all();
+        
+        
+            
+            return view('admin.productos.formulario', compact('producto', 'categorias', 'marcas', 'menuSuperior', 'pathname','utilidades'));
+        } catch (\Throwable $th) {
+            return $th;
+        }
+        
     }
 
     /**
@@ -315,28 +343,6 @@ class ProductoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Producto  $producto
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Producto $producto)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Producto  $producto
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Producto $producto)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateProductoRequest  $request
@@ -350,6 +356,7 @@ class ProductoController extends Controller
             $productos = Producto::all();
             $categorias = Categoria::all();
             $marcas = Marca::all();
+            $pathname = '';
     
            
              // Seteamos la imagen
@@ -370,21 +377,34 @@ class ProductoController extends Controller
     
             
             if ($estatusActualizar) {
-                  
-                // Procesar una entrada sin facturar
-                Inventario::updateOrCreate(
-                    [
-                        "codigo" => $codigo,
-                    ],
-                    [
-                        "descripcion" => $producto->descripcion,
-                        "id_marca" => $producto->id_marca,
-                        "id_categoria" => $producto->id_categoria,
-                        "imagen" => $producto->imagen,
-                        "cantidad" => $request->cantidad_inicial,
-                        "costo" => $request->costo,
-                        "pvp" => $request->pvp
-                ]);
+                if($request->cantidad_inicial > 0){
+                    if($request->cantidad_inicial > 0 && $request->costo > 0 && $request->pvp > 0){
+                        // Procesar una entrada sin facturar
+                        Inventario::updateOrCreate(
+                            [
+                                "codigo" => $codigo,
+                            ],
+                            [
+                                "descripcion" => $producto->descripcion,
+                                "id_marca" => $producto->id_marca,
+                                "id_categoria" => $producto->id_categoria,
+                                "imagen" => $producto->imagen,
+                                "cantidad" => $request->cantidad_inicial ?? 0,
+                                "costo" => number_format($request->costo, 2, '.', ',') ?? 0,
+                                "pvp" => number_format($request->pvp, 2, '.', ',') ?? 0,
+                                "pvp_2" =>  0,
+                                "pvp_3" =>  0
+                        ]);
+                    }else{
+                        $estatus = 401;
+                        $mensaje = "Si ingresas la cantidad debes ingresar COSTO Y PVP del producto";
+                        return view('admin.productos.formulario', 
+                        compact(
+                            'producto', 'categorias', 'marcas', 'menuSuperior', 'pathname',
+                            'mensaje', 'estatus'
+                        ));
+                    }
+                }
             }
             
             $mensaje = $estatusActualizar ? "El producto se Actualizó correctamente." : "El producto No se Actualizo";
@@ -410,17 +430,26 @@ class ProductoController extends Controller
             $productoEnInventario = Inventario::where("codigo", $producto->codigo)->get();
             if(count($productoEnInventario)){
                 $mensaje = "El Producto Tiene inventario no puede ser eliminado.";
-                $estatus = 401;
-                return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
+                $estatus = Response::HTTP_UNAUTHORIZED;
+            }else{
+                $producto->delete();
+                $mensaje = "El Producto se Eliminó correctamente.";
+                $estatus = Response::HTTP_OK;
             }
 
-            $producto->delete();
-            $mensaje = "El Producto se Eliminó correctamente.";
-            $estatus = 200;
-            return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => $producto,
+                "estatus" => $estatus
+            ], $estatus);
+
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error de al intentar Eliminar un nivel,");
-            return response()->view('errors.404', compact("errorInfo"), 404);
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -1,4 +1,15 @@
-
+/** Obtener todas las Marcas */
+const getMarcas = async (url) => {
+    return await fetch(url,{
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then( res => res.json() )
+    .catch( err => err )
+    .then( response => response );
+}
 
 /** Crear Marcas */
 const storeMark = (mark)=>{

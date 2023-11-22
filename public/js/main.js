@@ -65,11 +65,17 @@ const formatoUSD = (numero) => {
 };
 
 const quitarFormato = (numeroString) =>{
+    let arraysinformato = '',
     arregloDeNumeros = numeroString.split('');
-    let arraysinformato = arregloDeNumeros.map(item => {
-        if(item == ".") return "";
-        if(item == ",") return ".";
-        return item;
-    });
+    
+    if(numeroString.includes(',')){
+        arraysinformato = arregloDeNumeros.map(item => {
+            if(item == ".") return "";
+            if(item == ",") return ".";
+            return item;
+        });
+    }else{
+        arraysinformato = arregloDeNumeros;
+    }
     return parseFloat(arraysinformato.join(''));
 }

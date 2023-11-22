@@ -1022,8 +1022,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    carritoVender.forEach(async producto => {
-                        producto.identificacion = facturaActual.identificacion;
+                    await carritoVender.forEach(async producto => {
+                        producto.identificacion = facturaVender.identificacion;
+                        producto.subtotal = quitarFormato(producto.subtotal);
                         await facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
                     });
 

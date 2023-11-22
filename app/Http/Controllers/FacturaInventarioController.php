@@ -24,19 +24,23 @@ class FacturaInventarioController extends Controller
     {
         try {
             
-            $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
-            if(count($carrito)){
-                $resultado = FacturaInventario::create($request->all());
-                $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
-                $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
-            }else{
-                return response()->json([
-                    "mensaje" => "La factura no puede ser procesa porque no poseé productos facturados",
-                    "data" =>  [], 
-                    "estatus" =>Response::HTTP_NOT_FOUND 
-                ],Response::HTTP_NOT_FOUND);
-            }
+            // $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
+            // if(count($carrito)){
+            //     $resultado = FacturaInventario::create($request->all());
+            //     $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
+            //     $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+            // }else{
+            //     return response()->json([
+            //         "mensaje" => "La factura no puede ser procesa porque no poseé productos facturados",
+            //         "data" =>  [], 
+            //         "estatus" =>Response::HTTP_NOT_FOUND 
+            //     ],Response::HTTP_NOT_FOUND);
+            // }
 
+            $resultado = FacturaInventario::create($request->all());
+            $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
+            $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+            
             if($resultado){
                 // Procedemos a descontar del inventario
                 $carritos = CarritoInventario::where("codigo", $request->codigo)->get();
@@ -112,46 +116,26 @@ class FacturaInventarioController extends Controller
     public function setFacturaSalida(Request $request)
     {
         try {
-            $clientes = Cliente::where('identificacion', $request->identificacion)->get();
-            if (count($clientes) == 0) {
-                return response()->json([
-                    "mensaje" => "El cliente no esta registrado.",
-                    "data" =>  [], 
-                    "estatus" =>Response::HTTP_NOT_FOUND 
-                ],Response::HTTP_NOT_FOUND);
-            }else{
-                $cliente = $clientes[0]; 
-            }
-
-            $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
-            if(count($carrito)){
-
-                // Se factura dos veces 
-                $resultado = FacturaInventario::create($request->all());
-                $resultado = Factura::create([
-                    "codigo" => $request->codigo_factura,
-                    "razon_social" => $request->razon_social, // nombre de cliente o proveedor
-                    "identificacion" => $request->identificacion, // numero de documento
-                    "subtotal" => $request->subtotal, // se guarda en divisas
-                    "total" => $request->total,
-                    "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
-                    "iva" => $request->iva, // impuesto
-                    "tipo" => $request->tipo, // fiscal o no fialcal
-                    "concepto" => $request->concepto, // venta, compra ...
-                    "descuento" => $request->descuento, // descuento
-                    "fecha" => $request->fecha, // fecha venta, compra ...
-                    "metodos" => $request->metodos
-                ]);
-
-                $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";
-                $estatus = $resultado ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
-            }else{
-                return response()->json([
-                    "mensaje" => "La factura no puede ser procesa porque no poseé productos facturados",
-                    "data" =>  [], 
-                    "estatus" =>Response::HTTP_NOT_FOUND 
-                ],Response::HTTP_NOT_FOUND);
-            }
+            
+            // Se factura dos veces 
+            $resultado = FacturaInventario::create($request->all());
+            $resultado = Factura::create([
+                "codigo" => $request->codigo_factura,
+                "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                "identificacion" => $request->identificacion, // numero de documento
+                "subtotal" => $request->subtotal, // se guarda en divisas
+                "total" => $request->total,
+                           "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                           "iva" => $request->iva, // impuesto
+                           "tipo" => $request->tipo, // fiscal o no fialcal
+                           "concepto" => $request->concepto, // venta, compra ...
+                           "descuento" => $request->descuento, // descuento
+                           "fecha" => $request->fecha, // fecha venta, compra ...
+                           "metodos" => $request->metodos
+            ]);
+       
+            $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";
+            $estatus = $resultado ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
 
             if($resultado){
                 // Procedemos a descontar del inventario
@@ -168,7 +152,7 @@ class FacturaInventarioController extends Controller
 
                 $resultado['pos'] = Po::all()[0];
                 $resultado['carrito'] = $carritos;
-                $resultado['cliente'] = $cliente;
+                $resultado['cliente'] = Cliente::where('identificacion', $request->identificacion)->get()[0];
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
                 

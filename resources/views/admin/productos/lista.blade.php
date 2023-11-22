@@ -14,6 +14,22 @@
                 @include('admin.productos.partials.modalCrear')
             </div>
 
+            
+            <div class="col-sm-6 col-xs-12">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="filtro-descripcion" placeholder="Buscar producto por Código o Descripcion" aria-label="Buscar producto" aria-describedby="basic-addon1">
+                    <span class="text-danger invalido"></span>
+                </div>
+            </div>
+            
+
+            <div class="col-sm-4 col-xs-12">
+                <div class="input-group mb-3">
+                    <input type="submit" class="btn btn-success form-control" id="filtro-limpiar" value="Limpiar Filtro" >
+                </div>
+            </div>
+
             <div class="col-lg-12 mt-4 ">
 
                 <div class="card">
@@ -21,8 +37,8 @@
                     
                         <!-- Table with stripped rows -->
                         
-                        {{-- <table class="table"> --}}
-                            <table class="table datatable ">
+                        {{-- <table class="table datatable "> --}}
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -33,8 +49,8 @@
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @php $contador = 1; @endphp
+                                <tbody id="lista">
+                                    {{-- @php $contador = 1; @endphp
                                     @foreach ($productos as $producto)
                                         <tr>
                                             <th scope="row">{{ $contador }}</th>
@@ -53,11 +69,12 @@
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp
-                                    @endforeach
+                                    @endforeach --}}
                                     
                                 </tbody>
                             </table>
-
+                            <!-- End Table with stripped rows -->
+                            <nav class="paginacion" aria-label="Page navigation example"></nav>
                          
                             {{-- <div class="d-flex justify-content-center">
                                     {!! $productos->links() !!}         

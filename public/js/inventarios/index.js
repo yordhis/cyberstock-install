@@ -327,6 +327,14 @@ const hanledPaginacion = async (e) => {
 };
 
 const hanledFiltro = async (e) => {
+    // Limpiar filtro
+    if(e.target.id == "filtro-limpiar"){
+        elementoInputFiltroDescripcion.value = '';
+        await getLista();
+        await cargarEventosDelBotonEliminar();
+        await cargarEventosDelBotonEditar();
+    } 
+    
     // validamos los keyup para no filtrar 
     if (e.key == "Enter" ){
         if(!e.target.value.trim().length){

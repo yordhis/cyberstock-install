@@ -24,6 +24,9 @@
 
   @if ($pathname == 'productos')
       <script src="./js/productos/productoController.js" defer></script>
+      <script src="./js/productos/categorias/CategoriaController.js" defer></script>
+      <script src="./js/productos/marcas/MarcaController.js" defer></script>
+      <script src="./js/productos/index.js" defer></script>
   @endif
 
   @if ($pathname == 'pos/facturas')

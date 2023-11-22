@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateMarcaRequest;
 use App\Models\DataDev;
 use App\Models\Helpers;
 use App\Models\Producto;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class MarcaController extends Controller
@@ -18,6 +19,37 @@ class MarcaController extends Controller
     {
         $this->data = new DataDev;
     }
+
+        /** API REST FULL MARCAS */
+        public function getMarcas(){
+            try {
+                $resultados = Marca::all();
+
+                if(count($resultados)){
+                    $mensaje = "Consula de marcas exitosa.";
+                    $estatus = Response::HTTP_OK;
+                }else{
+                    $mensaje = "No hay marcas registradas.";
+                    $estatus = Response::HTTP_OK;
+                }
+
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => $resultados,
+                    "estatus" => $estatus
+                ], $estatus);
+
+            } catch (\Throwable $th) {
+                $mensaje = Helpers::getMensajeError($th, "Error al consultar las marcas");
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => [],
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -38,15 +70,6 @@ class MarcaController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -68,28 +91,6 @@ class MarcaController extends Controller
             $mensajeError = Helpers::getMensajeError($th, "Error Al crear la marca, ");
             return view('errors.404', compact('mensajeError'));
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Marca  $marca
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Marca $marca)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Marca  $marca
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Marca $marca)
-    {
-        //
     }
 
     /**

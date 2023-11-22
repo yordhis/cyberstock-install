@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCategoriaRequest;
 use App\Models\DataDev;
 use App\Models\Helpers;
 use App\Models\Producto;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class CategoriaController extends Controller
@@ -18,6 +19,36 @@ class CategoriaController extends Controller
     {
         $this->data = new DataDev;
     }
+
+    /** API REST FULL CATEGORIAS */
+    public function getCategorias(){
+        try {
+            $resultados = Categoria::all();
+
+            if(count($resultados)){
+                $mensaje = "Consula de categorias exitosa.";
+                $estatus = Response::HTTP_OK;
+            }else{
+                $mensaje = "No hay categorias registradas.";
+                $estatus = Response::HTTP_OK;
+            }
+
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => $resultados,
+                "estatus" => $estatus
+            ], $estatus);
+
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al consultar las categorias");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *

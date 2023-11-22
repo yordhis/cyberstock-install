@@ -52,7 +52,7 @@
                           @foreach ($factura->carrito as $producto)
                             <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                               <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
-                              <div class="p-2 bd-highlight" >Bs {{ number_format($producto->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                              <div class="p-2 bd-highlight" >Bs {{ floatVal($producto->subtotal) *  $factura->tasa }}</div>
                             </div>
                             {{-- @php
                                 $subtotalAcumulador = $producto->subtotal *  $factura->tasa + $subtotalAcumulador;

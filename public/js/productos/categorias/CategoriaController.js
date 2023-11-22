@@ -1,3 +1,15 @@
+/** Obtener todas las categorias */
+const getCategorias = async (url) => {
+    return await fetch(url,{
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then( res => res.json() )
+    .catch( err => err )
+    .then( response => response );
+}
 
 /** Crear Categoria */
 const storeCategoria = async (categoria)=>{

@@ -8,10 +8,12 @@ use App\Http\Controllers\{
     ApiController,
     CarritoController,
     CarritoInventarioController,
+    CategoriaController,
     ClienteController,
     FacturaController,
     FacturaInventarioController,
     InventarioController,
+    MarcaController,
     ProductoController,
     ProveedoreController
 };
@@ -36,7 +38,13 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('getProducto/{barcode}', [ProductoController::class, 'getProducto'])->name('api.productos');
     Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.productos');
     Route::resource('productos', ProductoController::class)->names('api.productos');
-   
+    
+    /** CATEGORIAS */
+    Route::get('getCategorias', [CategoriaController::class, 'getCategorias'])->name('api.getCategorias');
+    
+    /** MARCAS */
+    Route::get('getMarcas', [MarcaController::class, 'getMarcas'])->name('api.getMarcas');
+    
     /** INVENTARIOS */
     Route::get('getInventarios', [InventarioController::class, 'getInventarios'])->name('api.getInventarios');
     Route::post('getInventariosFiltro', [InventarioController::class, 'getInventariosFiltro'])->name('api.getInventariosFiltro');
