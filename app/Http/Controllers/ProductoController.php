@@ -390,8 +390,8 @@ class ProductoController extends Controller
                                 "id_categoria" => $producto->id_categoria,
                                 "imagen" => $producto->imagen,
                                 "cantidad" => $request->cantidad_inicial ?? 0,
-                                "costo" => number_format($request->costo, 2, '.', ',') ?? 0,
-                                "pvp" => number_format($request->pvp, 2, '.', ',') ?? 0,
+                                "costo" =>$request->costo ?? 0,
+                                "pvp" => $request->pvp ?? 0,
                                 "pvp_2" =>  0,
                                 "pvp_3" =>  0
                         ]);
