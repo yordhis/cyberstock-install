@@ -119,7 +119,7 @@ class FacturaInventarioController extends Controller
             
             // Se factura dos veces 
             $resultado = FacturaInventario::create($request->all());
-            $resultado = Factura::create([
+            $resultadoFacturaVenta = Factura::create([
                 "codigo" => $request->codigo_factura,
                 "razon_social" => $request->razon_social, // nombre de cliente o proveedor
                 "identificacion" => $request->identificacion, // numero de documento

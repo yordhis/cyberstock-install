@@ -103,7 +103,7 @@ const htmlTicketSalidaV1 = (factura) => {
         
         <p class="centrado">
             <br>${factura.pos.empresa}
-            <br>${factura.pos.codigo}
+            <br>${factura.pos.rif}
             <br>${factura.pos.direccion}
             
         </p>

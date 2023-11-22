@@ -236,6 +236,7 @@ const componenteAgregarCantidadDeProductoModal = (producto) =>{
                 
 
                 <div class="form-floating mb-3 acciones-pvp">
+                    <p class="fs-6"> Existencia disponible: ${producto.cantidad} </p>
                     <p class="fs-6"> Costo: ${producto.costo} </p>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="pvp" id="pvp" value="${producto.pvp}" >
@@ -1054,12 +1055,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     cargarEventosAccionesDeFactura();
                 }, 2500);
             } 
-            
-            /** Previsualizacion de los datos */
-            log(factura)
-            log(factura.total);
-            log(metodosPagos);
-
          
             /** Sumamos todos los metodos de pago */
             metodosPagos.forEach(elementoAbono => {
@@ -1067,8 +1062,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 else abonado += ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) ;
             });
 
-            /** Previsualizamos el monto abonado */
-            log(abonado)
+    
 
                 /** Validamos si el monto es mayor o igual al total a pagar */
                 if( quitarFormato(darFormatoDeNumero(abonado)) >= quitarFormato(darFormatoDeNumero(factura.total)) ){
@@ -1082,7 +1076,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     /** Obtenemos el carrito y la factura actualizados */
                     let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
                     carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
-
+                   
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
                     carritoVender.forEach(async producto => {
                         producto.identificacion = facturaVender.identificacion;
@@ -1092,7 +1086,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                   
                     /** Procesamos la factura y generamos el ticket */
                     resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
-                    log(resultadoDeFacturar);
+                    return log(resultadoDeFacturar);
 
                     /** Mostramos el dialogo de facturar */
                      if (resultadoDeFacturar.estatus == 201) {
