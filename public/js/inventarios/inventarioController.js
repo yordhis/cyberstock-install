@@ -35,7 +35,7 @@ const editarProductoDelInventario = async (url, data) => {
         },
     })
     .then( (response) => response.json() )
-    .catch( (error) => console.error("Error:", error) )
+    .catch( (error) =>  error)
     .then( (data) => data );
 }
 
@@ -48,6 +48,6 @@ const deleteProductoDelInventario = async (idProducto) => {
         },
     })
     .then((response) => response.json())
-    .catch((error) => console.error("Error:", error))
+    .catch((error) =>  error)
     .then((data) => data);
 }

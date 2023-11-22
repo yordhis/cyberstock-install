@@ -30,30 +30,8 @@ class PoController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = Request::path();
-            $codigo = Helpers::getCodigo('facturas');
-            $carritos = Carrito::where('codigo', $codigo)->get();
-            $pos = Po::all();
-            $utilidades = $this->data->utilidades;
-            
-            if(count($this->data->utilidades)){
-                $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);   
-                $iva = floatval($this->data->utilidades[0]->iva['iva']);
-            }else{
-                $tasa = 0;
-                $iva = 0;
-            }
-
-            if (count($carritos)) {
-                foreach ($carritos as $key => $producto) {
-                    $producto['cliente'] = Cliente::where('identificacion', $producto->identificacion)->get()[0];
-                    $producto->costoBs = number_format(floatval($producto->costo) * $tasa, 2, ',', '.') . " Bs";
-                    $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
-                }
-            }
-
-            
-            
-            return view('admin.pos.index', compact('menuSuperior', 'codigo', 'carritos', 'tasa', 'iva', 'pathname', 'pos', 'utilidades'));
+           
+            return view('admin.pos.index', compact('menuSuperior',  'pathname'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error al entrar al pos de venta index, ");
             return view('errors.404', compact('mensajeError'));

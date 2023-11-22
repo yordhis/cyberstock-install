@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 
 <head>
@@ -19,9 +19,10 @@
 </head>
 
 <body>
-  @include('partials.header')
+  {{-- @include('partials.header') --}}
+  @include('partials.headerpos')
   
-  <main id="main" class="main">
+  <main id="mainPos" class="mainPos">
 
       @yield('content')
    

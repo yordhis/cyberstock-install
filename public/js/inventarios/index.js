@@ -11,6 +11,7 @@ elementoTablaPaginacion = d.querySelector('.paginacion');
 
 /** COMPONENTES */
 const componenteFila = (data) => {
+    log(data)
     if (data.estatus == 0) {
         return `
         <tr>
@@ -25,7 +26,7 @@ const componenteFila = (data) => {
                 <td>${data.descripcion}</td>
                 <td>${data.cantidad}</td>
                 <td>${data.costo}</td>
-                <td>${data.pvp} Bs</td>
+                <td>${darFormatoDeNumero(quitarFormato(data.pvp))} Bs</td>
                 <td>${data.pvpUsd} $</td>
                 <td>${data.marca}</td>
                 <td>${data.categoria}</td>
@@ -346,15 +347,15 @@ const hanledFiltro = async (e) => {
             elementoSpanInvalido.forEach(element => element.textContent = null);
             let filtro = {
                 filtro: `${e.target.value.trim()}`,
-                campo: `${e.target.id.split('-')[1]}`,
+                campo: ['codigo', ' descripcion'],
             };
         
             if(e.target.value){
                 elementoTablaPaginacion.innerHTML = '';
                 elementoTablaCuerpo.innerHTML = spinner;
                 let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-                
-                if(!inventarios.data.data.length){
+                log(inventarios);
+                if(!inventarios.data){
                     elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
                 }else{
                     elementoTablaCuerpo.innerHTML='';
@@ -363,12 +364,14 @@ const hanledFiltro = async (e) => {
                         element.tasa = inventarios.tasa;
                         elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
                     });
-            
-                    elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
-    
+                    
                     /** Activamos los eventos del boton eliminar */
                     await cargarEventosDelBotonEliminar();
                     await cargarEventosDelBotonEditar();
+            
+                    if(inventarios.data.links){
+                        elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+                    }
                 }
             }
         }
@@ -379,27 +382,31 @@ const hanledFiltro = async (e) => {
 };
 
 const hanledFormulario = async (e) => {
-    e.preventDefault();
-    // log(e.target.innerHTML)
+    if(e.target.id != "cerrarSesion"){
+        e.preventDefault();
 
-    let esquema = {},
-    banderaDeALertar = 0;
-    for (const iterator of e.target) {
-        if(iterator.localName == "input"){
-            if(iterator.value < 0) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent="No se permiten valoeres negativos"; 
-            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent="", iterator.classList.add(['border-success']);
-            esquema[iterator.id] = parseFloat(iterator.value);
+        let esquema = {},
+        banderaDeALertar = 0;
+        for (const iterator of e.target) {
+            if(iterator.localName == "input"){
+                if(iterator.value < 0) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent="No se permiten valoeres negativos"; 
+                else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent="", iterator.classList.add(['border-success']);
+                esquema[iterator.id] = parseFloat(iterator.value);
+            }
         }
-    }
-    if(banderaDeALertar) return;
-  
-    e.target.innerHTML = spinner;
-  
-    let resultado = await editarProductoDelInventario(e.target.action, esquema);
+        if(banderaDeALertar) return;
     
-    setTimeout(() => {
-        window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
-    }, 500);
+    
+
+        e.target.innerHTML = spinner;
+    
+        let resultado = await editarProductoDelInventario(e.target.action, esquema);
+        
+        // await getLista();
+        setTimeout(() => {
+            window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
+        }, 500);
+    }
 
 };
 
@@ -408,7 +415,7 @@ addEventListener('load', hanledLoad);
 elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
 elementoInputFiltroLimpiar.addEventListener('click', hanledFiltro);
 elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
-elementoInputFiltroCodigo.addEventListener('keyup', hanledFiltro);
+// elementoInputFiltroCodigo.addEventListener('keyup', hanledFiltro);
 
 
 
@@ -416,20 +423,21 @@ elementoInputFiltroCodigo.addEventListener('keyup', hanledFiltro);
 
 /** FUNCIONES O UTILIDADES EXTRAS */
 function adaptadorDeProducto(data){
+    log(data)
     return {
         id: data.id,
         numero: data.id,
         codigo: data.codigo,
         descripcion: data.descripcion,
         cantidad: data.cantidad,
-        costo: parseFloat( data.costo ).toFixed(2),
-        costoBs: parseFloat( data.costo * data.tasa ).toFixed(2),
-        pvp: parseFloat( (data.tasa * data.pvp) ).toFixed(2),
-        pvpUsd:  parseFloat(data.pvp).toFixed(2),
-        pvp_2: parseFloat( (data.tasa * data.pvp_2) ).toFixed(2),
-        pvpUsd_2:  parseFloat(data.pvp_2).toFixed(2),
-        pvp_3: parseFloat( (data.tasa * data.pvp_3) ).toFixed(2),
-        pvpUsd_3:  parseFloat(data.pvp_3).toFixed(2),
+        costo: darFormatoDeNumero(quitarFormato( data.costo )),
+        costoBs: darFormatoDeNumero( quitarFormato(data.costo) * data.tasa ),
+        pvp: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp)) ),
+        pvpUsd:  darFormatoDeNumero(quitarFormato(data.pvp)),
+        pvp_2: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_2)) ),
+        pvpUsd_2:  darFormatoDeNumero( quitarFormato(data.pvp_2) ),
+        pvp_3: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_3)) ),
+        pvpUsd_3:  darFormatoDeNumero(quitarFormato(data.pvp_3)),
         marca: data.id_marca.nombre,
         imagen: data.imagen,
         fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),

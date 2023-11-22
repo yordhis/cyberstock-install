@@ -82,10 +82,10 @@
 
 
                     <li>
-                        <form action="logout" method="post" class="text-center" target="_self">
+                        <form action="logout" method="post" class="text-center" target="_self" id="cerrarSesion">
                             @csrf
                             @method('post')
-                            <button type="submit" class="btn btn-node ">
+                            <button type="bottom" class="btn btn-node" >
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Salir</span>
                             </button>

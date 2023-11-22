@@ -12,6 +12,7 @@ use App\Models\Helpers;
 use App\Models\Inventario;
 use App\Models\Proveedore;
 use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class CarritoInventarioController extends Controller
@@ -23,111 +24,41 @@ class CarritoInventarioController extends Controller
     {
         $this->data = new DataDev;
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+   
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCarritoInventarioRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    // ENTRADAS
-    public function store(StoreCarritoInventarioRequest $request)
+    /** API REST FULL*/
+    public function facturarCarritoEntrada(HttpRequest $request)
     {
         try {
-          
-            $menuSuperior = $this->data->menuSuperior;
-
-            // Validadmos que el proveedor exista
-            $proveedorExiste = Proveedore::where('codigo', $request->identificacion)->get();
-            if (count($proveedorExiste) == 0) {
-                 return redirect()->route('admin.inventarios.crearEntrada', [
-                    "identificacion" => $request->identificacion,
-                    "codigo_producto" => $request->codigo_producto,
-                    "conceptoDeMovimiento" => $request->conceptoDeMovimiento,
-                    "mensaje"=>"El Rif o Documento de identidad del proveedor no esta registrado.",
-                    "mensajeInventario"=> "Proveedor no esta registrado, registreló para procesar la entrada.",
-                    "estatus" => 404
-                ]);
-            }
-
-            // Validamos que la factura no este repetida
-            $facturaRepetidadDelProveedor = FacturaInventario::where([
-                "codigo" => $request->codigo, 
-                "identificacion" => $request->identificacion, 
-            ])->get();
-        
-            if(count($facturaRepetidadDelProveedor)){
-                return redirect()->route('admin.inventarios.crearEntrada', [
-                    "identificacion" => $request->identificacion,
-                    "codigo_producto" => $request->codigo_producto,
-                    "conceptoDeMovimiento" => $request->conceptoDeMovimiento,
-                    "mensaje"=>"Esta factura ya esta registrada, verifique que halla ingresado el numero de factura correctamente.",
-                    "mensajeInventario"=> "Número de factura del proveedor ya esta registrado.",
-                    "estatus" => 404
-                ]);
-            }
-
             // Añadimos al carrito el producto
-            CarritoInventario::create($request->all());
-
-            // $carritos = CarritoInventario::where('codigo', $request->codigo)->get();
-            // $codigo = $request->codigo;
-            return redirect()->route('admin.inventarios.crearEntrada', [ 
-                "conceptoDeMovimiento" => $request->conceptoDeMovimiento
-            ]);
+            /** Registramos el producto en el carrito DB */
+                $resultado = CarritoInventario::create($request->all());
+                return response()->json([
+                    "mensaje" => "El carrito se facturó correctamente",
+                    "data" => $resultado,
+                    "estatus" => Response::HTTP_OK,
+                ], Response::HTTP_OK);
+   
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear la marca, ");
-            return view('errors.404', compact('mensajeError'));
+               $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
+               return response()->json([
+                   "mensaje" => $mensaje,
+                   "data" =>  $request->request,
+                   "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+               ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+           
 
     }
 
-    public function storeSalida(HttpRequest $request)
+    public function facturarCarritoSalida(HttpRequest $request)
     {
         try {
-          
-            $menuSuperior = $this->data->menuSuperior;
-
-            // Validadmos que la cantida no sobre pase la del inventario
-            if($request->tipoTransaccion == "SALIDA"){
-                $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
-                if(count($productoEnInventario)){
-                    if($request->cantidad > $productoEnInventario[0]->cantidad){
-                        return redirect()->route('admin.inventarios.crearSalida', [
-                        "identificacion" => $request->identificacion,
-                        "codigo_producto" => $request->codigo_producto,
-                        "mensaje"=>"La Existencia es insuficiente para agregar el producto {$request->descripcion}.",
-                        "mensajeInventario"=>"La Existencia del producto {$productoEnInventario[0]->descripcion} es de ({$productoEnInventario[0]->cantidad} Unidades).",
-                        "estatus" => 404
-                        ]);
-                    }   
-                }
-            }
-
-            if ($request->conceptoDeMovimiento == 'CONSUMO') {
-                CarritoInventario::create($request->all());
-                
-            }else{
-                // Creamos el carrito de ventas
+        
+                /** Creamos el carrito de la factura en caso de que sea 
+                 * @param VENTA
+                 * @param CREDITO
+                 */
                 Carrito::create([
                     "codigo" => $request->codigo_factura, 
                     "codigo_producto" => $request->codigo_producto,
@@ -137,55 +68,35 @@ class CarritoInventarioController extends Controller
                     "subtotal"  => $request->subtotal,
                     "descripcion"  => $request->descripcion
                 ]);
+                $estatusCrear = CarritoInventario::create($request->all());
 
-                CarritoInventario::create($request->all());
+                if($estatusCrear){
+                    return response()->json([
+                        "mensaje" => "Producto del carrito facturado correctamente",
+                        "data" => $estatusCrear,
+                        "estatus" =>  Response::HTTP_CREATED
+                    ], Response::HTTP_CREATED);
+                }else {
+                    return response()->json([
+                        "mensaje" => "Producto del carrito NO se facturó.",
+                        "data" => $estatusCrear,
+                        "estatus" =>  Response::HTTP_NOT_FOUND
+                    ], Response::HTTP_NOT_FOUND);
+                }
 
-            }
-
-            $conceptoDeMovimiento = $request->conceptoDeMovimiento;
-
-            return redirect()->route('admin.inventarios.crearSalida', compact('conceptoDeMovimiento'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al crear la carrito de salida, ");
-            return view('errors.404', compact('mensajeError'));
+            return response()->json([
+                "mensaje" => $mensajeError,
+                "data" => [],
+                "estatus" =>  Response::HTTP_INTERNAL_SERVER_ERROR
+            ], 
+            Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CarritoInventario  $carritoInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CarritoInventario $carritoInventario)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CarritoInventario  $carritoInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CarritoInventario $carritoInventario)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateCarritoInventarioRequest  $request
-     * @param  \App\Models\CarritoInventario  $carritoInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateCarritoInventarioRequest $request, CarritoInventario $carritoInventario)
-    {
-        //
-    }
-
+   
     /**
      * Remove the specified resource from storage.
      *
@@ -232,6 +143,7 @@ class CarritoInventarioController extends Controller
             return view('errors.404', compact('mensajeError'));
         }
     }
+    
     public function destroy($codigoFactura, $codigoProducto)
     {
         try {

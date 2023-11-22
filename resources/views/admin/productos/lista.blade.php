@@ -21,6 +21,7 @@
                     
                         <!-- Table with stripped rows -->
                         
+                        {{-- <table class="table"> --}}
                             <table class="table datatable ">
                                 <thead>
                                     <tr>
@@ -56,10 +57,10 @@
                                     
                                 </tbody>
                             </table>
+
+                         
                             {{-- <div class="d-flex justify-content-center">
-                                
-                                    {!! $productos->links() !!}
-                              
+                                    {!! $productos->links() !!}         
                             </div> --}}
                      
                         <!-- End Table with stripped rows -->

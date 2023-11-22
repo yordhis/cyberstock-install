@@ -30,71 +30,84 @@ const deleteProducto = async (idProduct) => {
     });
 }
 
-const getProductoData = (barcode) => {
-
-    return new Promise(  (resolve, reject)=>{
-         
-        setTimeout(()=>{
-            resolve({
-                value: barcode,
-                result:  fetch(`${URL_BASE}/getProductoData/${barcode}`, {
-                    method: "GET", // or 'PUT'
-                    // body: JSON.stringify(idProduct), // data can be `string` or {object}!
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                })
-                .then(response => response.json())
-                .catch(err => log(err))
-                .then(data => data)
-        
-                })
-            });
-        }, 1500);
-
-    // .then((res) => res.json())
-    // .catch((error) => console.error("Error:", error))
-    // .then((response) =>  response);
-}
-
-
-const getProducto = (barcode) => {
-
-    return new Promise(  (resolve, reject)=>{
-         
-        setTimeout(()=>{
-            resolve({
-                value: barcode,
-                result:  fetch(`${URL_BASE}/getProducto/${barcode}`, {
-                    method: "GET", // or 'PUT'
-                    // body: JSON.stringify(idProduct), // data can be `string` or {object}!
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                })
-                .then(response => response.json())
-                .catch(err => log(err))
-                .then(data => data)
-        
-                })
-            });
-        }, 1500);
-
-    // .then((res) => res.json())
-    // .catch((error) => console.error("Error:", error))
-    // .then((response) =>  response);
-}
-
-const showProducto = async (idProduct) => {
-    await fetch(`${URL_BASE}/productos/${idProduct}`, {
-        method: "GET", // or 'PUT'
-        // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+const getProductosFiltro = async ( url, filtro ) => {
+    return await fetch(`${url}`, {      
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(filtro), // data can be `string` or {object}!
         headers: {
           "Content-Type": "application/json",
         },
     })
-    .then((res) => res.json())
-    .catch((error) => console.error("Error:", error))
-    .then((response) =>  response);
-}
+    .then(response => response.json())
+    .catch(err => err)
+    .then(data => data)
+};
+
+// const getProductoData = (barcode) => {
+
+//     return new Promise(  (resolve, reject)=>{
+         
+//         setTimeout(()=>{
+//             resolve({
+//                 value: barcode,
+//                 result:  fetch(`${URL_BASE}/getProductoData/${barcode}`, {
+//                     method: "GET", // or 'PUT'
+//                     // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+//                     headers: {
+//                       "Content-Type": "application/json",
+//                     },
+//                 })
+//                 .then(response => response.json())
+//                 .catch(err => log(err))
+//                 .then(data => data)
+        
+//                 })
+//             });
+//         }, 1500);
+
+//     // .then((res) => res.json())
+//     // .catch((error) => console.error("Error:", error))
+//     // .then((response) =>  response);
+// }
+
+
+// const getProducto = (barcode) => {
+
+//     return new Promise(  (resolve, reject)=>{
+         
+//         setTimeout(()=>{
+//             resolve({
+//                 value: barcode,
+//                 result:  fetch(`${URL_BASE}/getProducto/${barcode}`, {
+//                     method: "GET", // or 'PUT'
+//                     // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+//                     headers: {
+//                       "Content-Type": "application/json",
+//                     },
+//                 })
+//                 .then(response => response.json())
+//                 .catch(err => log(err))
+//                 .then(data => data)
+        
+//                 })
+//             });
+//         }, 1500);
+
+//     // .then((res) => res.json())
+//     // .catch((error) => console.error("Error:", error))
+//     // .then((response) =>  response);
+// }
+
+// const showProducto = async (idProduct) => {
+//     await fetch(`${URL_BASE}/productos/${idProduct}`, {
+//         method: "GET", // or 'PUT'
+//         // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//     })
+//     .then((res) => res.json())
+//     .catch((error) => console.error("Error:", error))
+//     .then((response) =>  response);
+// }
 

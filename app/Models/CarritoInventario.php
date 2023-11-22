@@ -10,7 +10,7 @@ class CarritoInventario extends Model
     use HasFactory;
 
     protected $fillable = [
-        "codigo", // Codigo de la factura
+        "codigo", // Codigo del movimiento
         "codigo_factura",
         "codigo_producto",
         "identificacion",

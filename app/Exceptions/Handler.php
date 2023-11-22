@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
     public function register()
     {
       
-      
+      dd();
         $this->renderable(function (QueryException $e, $request) {
             // dd($e);
             // $errorInfo = Helpers::getMensajeError($e, "No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión,");

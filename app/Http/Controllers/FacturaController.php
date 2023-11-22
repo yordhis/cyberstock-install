@@ -31,9 +31,9 @@ class FacturaController extends Controller
 
     /** API */
 
-    public function getCodigoFactura(){
+    public function getCodigoFactura($tabla){
         try {
-            $codigo = Helpers::getCodigo('facturas');
+            $codigo = Helpers::getCodigo($tabla);
             return response()->json([
                 "mensaje" => "Consulta de codigo de factura exitoso",
                 "estatus" => Response::HTTP_OK,

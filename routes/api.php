@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     UsuarioController,
     ApiController,
     CarritoController,
+    CarritoInventarioController,
     ClienteController,
     FacturaController,
     FacturaInventarioController,
@@ -30,6 +31,7 @@ use App\Http\Controllers\{
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
     /** PRODUCTOS */
+    Route::post('getProductosFiltro', [ProductoController::class, 'getProductosFiltro'])->name('api.getProductosFiltro');
     Route::get('getProductoData/{barcode}', [ProductoController::class, 'getProductoData'])->name('api.productos');
     Route::get('getProducto/{barcode}', [ProductoController::class, 'getProducto'])->name('api.productos');
     Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.productos');
@@ -41,11 +43,21 @@ Route::group(['middleware' => ['cors']], function () {
     Route::delete('deleteProductoDelInventario/{id}', [InventarioController::class, 'deleteProductoDelInventario'])->name('api.deleteProductoDelInventario');
     Route::put('editarProductoDelInventario/{id}', [InventarioController::class, 'editarProductoDelInventario'])->name('api.editarProductoDelInventario');
     
+    /** FACTURAS DE INVENTARIO ENTRADA*/
+    Route::post('facturarCarritoEntrada', [CarritoInventarioController::class, 'facturarCarritoEntrada'])->name('admin.facturarCarritoEntrada');
+    Route::post('setFacturaEntrada', [FacturaInventarioController::class, 'setFacturaEntrada'])->name('admin.setFacturaEntrada');
+    Route::post('getFacturaES', [FacturaInventarioController::class, 'getFacturaES'])->name('admin.getFacturaES');
+    
+    /** FACTURAS DE INVENTARIO SALIDAS*/
+    Route::post('facturarCarritoSalida', [CarritoInventarioController::class, 'facturarCarritoSalida'])->name('admin.facturarCarritoSalida');
+    Route::post('setFacturaSalida', [FacturaInventarioController::class, 'setFacturaSalida'])->name('admin.setFacturaSalida');
+
+    
     /** FACTURAS */
     Route::get('getCarrito/{codigoFactura}', [CarritoController::class, 'getCarrito'])->name('admin.getCarrito');
     Route::post('facturarCarrito', [CarritoController::class, 'facturarCarrito'])->name('admin.facturarCarrito');
     Route::get('getFactura/{codigoFactura}', [FacturaController::class, 'getFactura'])->name('admin.getFactura');
-    Route::get('getCodigoFactura', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
+    Route::get('getCodigoFactura/{tabla}', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
     
     /** FACTURAS INVENTARIO */
@@ -58,5 +70,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::put('updateCliente/{id}', [ClienteController::class, 'updateCliente'])->name('api.updateCliente');
     
     /** PROVEEDORES */
-    Route::get('getProveedor/{idProveedor}', [ApiController::class, 'getProveedor'])->name('api.getProveedor');
+    Route::get('getProveedor/{idProveedor}', [ProveedoreController::class, 'getProveedor'])->name('api.getProveedor');
+    Route::post('storeProveedor', [ProveedoreController::class, 'storeProveedor'])->name('api.storeProveedor');
+    Route::put('updateProveedor/{id}', [ProveedoreController::class, 'updateProveedor'])->name('api.updateProveedor');
 });

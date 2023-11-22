@@ -12,6 +12,7 @@ use App\Models\{
 };
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Requests\UpdateProductoRequest;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
@@ -34,100 +35,198 @@ class ProductoController extends Controller
         $menuSuperior = $this->data->menuSuperior;
         $utilidades = $this->data->utilidades;
         $inventarioPorDefecto = ['costo'=>0,'cantidad'=>0, 'pvp'=>0];
+        // return Producto::paginate(15);
+        $productos = Helpers::setNameElementId(Producto::all(), 'id,nombre', 'categorias,marcas');
         
-        $productos = Helpers::setNameElementId(Producto::where('id', '>', 0)->orderBy('id', 'desc')->get( ), 'id,nombre', 'categorias,marcas');
- 
         foreach ($productos as $key => $producto) {
             $resultado = Inventario::where('codigo', $producto->codigo)->select('costo', 'cantidad', 'pvp')->get();
             $producto['inventario'] = count($resultado) ? $resultado[0] :  $inventarioPorDefecto;
         }
 
+        
         $pathname = Request::path();
         $categorias = Categoria::all();
         $marcas = Marca::all();
         return view('admin.productos.lista', compact('productos', 'menuSuperior', 'categorias', 'marcas', 'pathname', 'utilidades') );
     }
 
-    public function getProductos(){
+    /** API REST FULL */
+    /** 
+     * Esta funcion filtra los producto por descripcion y codigo de barra
+     * si consigue el producto por codigo de barra primero solo retorna ese producto 1
+     * de lo contrario retorna los producto por descripcion
+     * 
+     * @param resquest[ filtro, campo ]
+     * @param filtro (contiene el argumento de tipo OBJECT descripcion o codigo)
+     * @param campo (es un atributodel filtro de argumento de tipo array con las columna por donde se va a comprar el argumento)
+     * @param ordenDelArra CAMPO [codigo, descripcion]
+     * 
+     */
+    public function getProductosFiltro(HttpRequest $request)
+    {
         try {
-            $products = Producto::where("id",">=", 1)->OrderBy('id', 'desc')->simplePaginate(5);
-            $data = json_decode(json_encode($products));
+            $tasa = $this->data->utilidades[0]->tasa;
 
-            // $data->data = Helpers::setNameElementId($data->data, ['id','name'], ['marcas', 'categorias']);
+            // filtramos por la descripcion
+            if (request('filtro')) {
+                /** Buscamos por codigo de barra y descripcion */
+                foreach ($request->campo as $key => $campo) {
+                    switch ($campo) {
+                        case 'codigo':
+                            $resultados = Producto::where("{$campo}", $request->filtro)->get();
+                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                            /** Le agregamos la informacion de STOCK al producto */
+                            foreach ($resultados as $key => $producto) {
+                                if( count(Inventario::where('codigo', $producto->codigo)->get()) ) {
+                                    $producto['inventario'] = Inventario::where('codigo', $producto->codigo)->get();
+                                }else{
+                                    $producto['inventario'] = [];
+                                }
+                            }
+
+                            if (count($resultados)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" =>  [
+                                        "data" => $resultados,
+                                        "total" => count($resultados)
+                                    ],
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+                        case 'descripcion':
+                            $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->get();
+                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                            
+                            /** Le agregamos la informacion de STOCK al producto */
+                            foreach ($resultados as $key => $producto) {
+                                if( count(Inventario::where('codigo', $producto->codigo)->get()) ) {
+                                    $producto['inventario'] = Inventario::where('codigo', $producto->codigo)->get();
+                                }else{
+                                    $producto['inventario'] = [];
+                                }
+                            }
+                            
+                            if (count($resultados)) {
+
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => [
+                                        "data" => $resultados,
+                                        "total" => count($resultados)
+                                    ],
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+
+                        default:
+                            return response()->json([
+                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                                "data" => [
+                                    "data" => [],
+                                    "total" => 0
+                                ],
+                                "tasa" => $tasa,
+                                "estatus" => Response::HTTP_OK
+                            ], Response::HTTP_OK);
+                            break;
+                    }
+                }
+            }
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "ERROR AL FILTRAR LA BUSQUEDA DEL PRODUCTO,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    // public function getProductos(){
+    //     try {
+    //         $products = Producto::where("id",">=", 1)->OrderBy('id', 'desc')->simplePaginate(5);
+    //         $data = json_decode(json_encode($products));
+
+    //         // $data->data = Helpers::setNameElementId($data->data, ['id','name'], ['marcas', 'categorias']);
         
             
-            return response()->json([
-                "message" => count($data->data) ? "Consulta Exitosa" : "No hay Datos",
-                "data"=> $data, 
-                "estatus" => Response::HTTP_OK
-            ], Response::HTTP_OK);
-        } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json([
-                "message" => "Error en el consultar productos, " . $th->getMessage(),
-                "data"=> [], 
-                "estatus" => Response::HTTP_NOT_FOUND
-            ], Response::HTTP_NOT_FOUND);
-        }
+    //         return response()->json([
+    //             "message" => count($data->data) ? "Consulta Exitosa" : "No hay Datos",
+    //             "data"=> $data, 
+    //             "estatus" => Response::HTTP_OK
+    //         ], Response::HTTP_OK);
+    //     } catch (\Throwable $th) {
+    //         //throw $th;
+    //         return response()->json([
+    //             "message" => "Error en el consultar productos, " . $th->getMessage(),
+    //             "data"=> [], 
+    //             "estatus" => Response::HTTP_NOT_FOUND
+    //         ], Response::HTTP_NOT_FOUND);
+    //     }
        
-    }
+    // }
 
-    public function getProductoData($barcode){
-        try {
+    // public function getProductoData($barcode){
+    //     try {
           
-            $product = Producto::where(['codigo'=> $barcode])->get();
-            if (count($product)) {
-                return response()->json([
-                    "message" => "Consulta exitosa",
-                    "data" => $product[0],
-                    "status" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }else{
-                return response()->json([
-                    "message" => "No hay resultados",
-                    "data" => [],
-                    "status" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }
-        } catch (\Throwable $th) {
-            return response()->json([
-                "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
-                "data" => [],
-                "status" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
+    //         $product = Producto::where(['codigo'=> $barcode])->get();
+    //         if (count($product)) {
+    //             return response()->json([
+    //                 "message" => "Consulta exitosa",
+    //                 "data" => $product[0],
+    //                 "status" => Response::HTTP_OK
+    //             ], Response::HTTP_OK);
+    //         }else{
+    //             return response()->json([
+    //                 "message" => "No hay resultados",
+    //                 "data" => [],
+    //                 "status" => Response::HTTP_OK
+    //             ], Response::HTTP_OK);
+    //         }
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
+    //             "data" => [],
+    //             "status" => Response::HTTP_INTERNAL_SERVER_ERROR
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
 
-    public function getProducto($barcode){
-        try {
-            // $utilidades = $this->data->utilidades;
-            $product = Inventario::where(['codigo'=> $barcode])->get();
-            // return $utilidades->pvp_1['sumar'];
-            // if($product[0]->pvp == 0){
-            //     $product[0]->pvp =  $product[0]->costo * $utilidades->pvp_1['sumar'];
-            // }
-            if (count($product)) {
-                return response()->json([
-                    "message" => "Consulta exitosa",
-                    "data" => $product[0],
-                    "status" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }else{
-                return response()->json([
-                    "message" => "El código de barra no corresponde a ningún producto en nuestros registros, por favor ingrese otro código o registre el producto.",
-                    "data" => [],
-                    "status" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }
-        } catch (\Throwable $th) {
-            return response()->json([
-                "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
-                "data" => [],
-                "status" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
+    // public function getProducto($barcode){
+    //     try {
+    //         // $utilidades = $this->data->utilidades;
+    //         $product = Inventario::where(['codigo'=> $barcode])->get();
+    //         // return $utilidades->pvp_1['sumar'];
+    //         // if($product[0]->pvp == 0){
+    //         //     $product[0]->pvp =  $product[0]->costo * $utilidades->pvp_1['sumar'];
+    //         // }
+    //         if (count($product)) {
+    //             return response()->json([
+    //                 "message" => "Consulta exitosa",
+    //                 "data" => $product[0],
+    //                 "status" => Response::HTTP_OK
+    //             ], Response::HTTP_OK);
+    //         }else{
+    //             return response()->json([
+    //                 "message" => "El código de barra no corresponde a ningún producto en nuestros registros, por favor ingrese otro código o registre el producto.",
+    //                 "data" => [],
+    //                 "status" => Response::HTTP_OK
+    //             ], Response::HTTP_OK);
+    //         }
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
+    //             "data" => [],
+    //             "status" => Response::HTTP_INTERNAL_SERVER_ERROR
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+    /**  CIERRE API REST FULL */
 
     /**
      * Show the form for creating a new resource.

@@ -18,43 +18,16 @@ use Illuminate\Http\Response;
 
 class FacturaInventarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreFacturaInventarioRequest  $request
-     * @return \Illuminate\Http\Response
-     * 
-     * API
-     */
+    /** API REST FULL */
     // Aqui se Factura  y procesan las entradas de los producto del inventario
-    public function store(StoreFacturaInventarioRequest $request)
+    public function setFacturaEntrada(Request $request)
     {
         try {
             
             $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
             if(count($carrito)){
                 $resultado = FacturaInventario::create($request->all());
-                $mensaje = $resultado ? "Se proceso la venta correctamente correctamente." : "No se registro la factura";
+                $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
                 $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             }else{
                 return response()->json([
@@ -95,8 +68,8 @@ class FacturaInventarioController extends Controller
                             "cantidad" => $cantidad,
                             "costo" => $producto->costo,
                             "pvp" => $producto->pvp,
-                            "pvp_2" => $producto->pvp_2,
-                            "pvp_3" => $producto->pvp_3,
+                            "pvp_2" => $producto->pvp_2 ?? $cantidadActualProducto[0]->pvp_2,
+                            "pvp_3" => $producto->pvp_3 ?? $cantidadActualProducto[0]->pvp_3,
                             "fecha_entrada" => $request->fecha,
                     ]);
 
@@ -114,8 +87,8 @@ class FacturaInventarioController extends Controller
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 
-                    "estatus" => Response::HTTP_OK  
-                ], Response::HTTP_OK ); 
+                    "estatus" => Response::HTTP_CREATED  
+                ], Response::HTTP_CREATED ); 
             }else{
                 return response()->json([
                     "mensaje" => $mensaje,
@@ -136,7 +109,7 @@ class FacturaInventarioController extends Controller
     }
 
     // Aqui se Factura y procesan las salidas de los producto del inventario
-    public function storeSalida(Request $request)
+    public function setFacturaSalida(Request $request)
     {
         try {
             $clientes = Cliente::where('identificacion', $request->identificacion)->get();
@@ -171,7 +144,7 @@ class FacturaInventarioController extends Controller
                 ]);
 
                 $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";
-                $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+                $estatus = $resultado ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
             }else{
                 return response()->json([
                     "mensaje" => "La factura no puede ser procesa porque no poseé productos facturados",
@@ -192,10 +165,8 @@ class FacturaInventarioController extends Controller
                     ]);
                     $totalArticulos = $totalArticulos  + $producto->cantidad;
                 } 
+
                 $resultado['pos'] = Po::all()[0];
-
-                
-
                 $resultado['carrito'] = $carritos;
                 $resultado['cliente'] = $cliente;
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
@@ -205,14 +176,14 @@ class FacturaInventarioController extends Controller
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 
-                    "estatus" => Response::HTTP_OK  
-                ], Response::HTTP_OK ); 
+                    "estatus" =>  $estatus   
+                ],  $estatus  ); 
             }else{
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $request->request, 
-                    "estatus" => Response::HTTP_OK  
-                ], Response::HTTP_OK );
+                    "estatus" =>  $estatus   
+                ],  $estatus  );
             }
     
         } catch (\Throwable $th) {
@@ -226,48 +197,38 @@ class FacturaInventarioController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\FacturaInventario  $facturaInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function show(FacturaInventario $facturaInventario)
-    {
-        //
+    // Validamos que el codigo de factura del proveedor no se repita
+    public function getFacturaES(Request $request){
+
+        try {
+            $facturaExiste = FacturaInventario::where([
+                "identificacion" => $request->identificacion,
+                "codigo_factura" => $request->codigo_factura,
+            ])->get();
+    
+            if(count($facturaExiste)){
+                return response()->json([
+                    "mensaje" => "El código de la factura del proveedor ya esta registrado verifique la factura.",
+                    "data" => $facturaExiste,
+                    "estatus" => Response::HTTP_CONFLICT
+                ], Response::HTTP_CONFLICT);
+            }else{
+                return response()->json([
+                    "mensaje" => "No hay resultado",
+                    "data" => $facturaExiste,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al validar código de facturas ES");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\FacturaInventario  $facturaInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(FacturaInventario $facturaInventario)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateFacturaInventarioRequest  $request
-     * @param  \App\Models\FacturaInventario  $facturaInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateFacturaInventarioRequest $request, FacturaInventario $facturaInventario)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\FacturaInventario  $facturaInventario
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(FacturaInventario $facturaInventario)
-    {
-        //
-    }
 }

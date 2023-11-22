@@ -2,9 +2,11 @@ log('conectado al custon modal');
 
 const hanledOpenModal = (e) => {
     e.preventDefault();
-    log(e.target.parentElement.children[1].children[0].children[2].children[0])
-    e.target.parentElement.children[1].children[0].children[2].children[0].focus();
+    // log(e.target.parentElement.children[1].children[0].children[2].children[0])
     e.target.parentElement.children[1].classList.add('modal--show')
+    if(e.target.parentElement.children[1].children[0].children[2].children[0]){
+        e.target.parentElement.children[1].children[0].children[2].children[0].focus();
+    }
    
     // element.classList.add('modal--show');
 };

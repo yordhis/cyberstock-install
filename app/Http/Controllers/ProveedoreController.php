@@ -9,6 +9,8 @@ use App\Models\{
 };
 use App\Http\Requests\StoreProveedoreRequest;
 use App\Http\Requests\UpdateProveedoreRequest;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class ProveedoreController extends Controller
@@ -20,7 +22,129 @@ class ProveedoreController extends Controller
         $this->data = new DataDev();
     }
 
-    
+    /** API PROVEEDOR */
+    public function getProveedor($idProveedor)
+    {
+        
+        try {
+            /** Validamos si el id esta definodo */
+            if($idProveedor == "undefined"){
+                return response()->json([
+                    "mensaje" => "Indentificacion o rif no definida.",
+                    "data" => $idProveedor,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+
+            /** Realizamos la consulta de la data del Proveedor */
+            $resultado = Proveedore::where('codigo', $idProveedor)->get();
+
+            /** Validamos si hay un resultado */
+            if(count($resultado)){
+                return response()->json([
+                    "mensaje" => "Consulta exitosa",
+                    "data" => $resultado,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }else{
+                return response()->json([
+                    "mensaje" => "Proveedor NO registrado!",
+                    "data" => $resultado,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                "mensaje" => "Error al consultar Proveedor, " . $th->getMessage(),
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function storeProveedor(HttpRequest $request){
+        try {
+          
+            $proveedorExiste = Proveedore::where('codigo', $request->identificacion)->get();
+        
+            if(count($proveedorExiste)){
+                $mensaje = "El Proveedor Ya existe.";
+                $estatus = Response::HTTP_UNAUTHORIZED;
+
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => $proveedorExiste,
+                    "estatus" => $estatus
+                ], $estatus);
+
+            }else{
+                /** Procedemos a crear */
+                $estatusCrear = Proveedore::create($request->all());
+                $mensaje = $estatusCrear ? "El Proveedor se creo correctamente." : "El Proveedor no se creo";
+                $estatus = $estatusCrear ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
+            }
+
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => $estatusCrear,
+                "estatus" => $estatus
+            ], $estatus);
+
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                "mensaje" => "Error al registrar el Proveedor, " . $th->getMessage(),
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public function updateProveedor( HttpRequest $request,  $idProveedor ){
+        try {
+          
+            $proveedor = Proveedore::where('id', $idProveedor)->get();
+            /** Validamos si edito la cedula o rif */
+            if(count($proveedor)){
+                if( $proveedor[0]->identificacion != $request->identificacion ){
+                    $proveedorExiste = Proveedore::where('identificacion', $request->identificacion)->get();
+                    
+                    if(count($proveedorExiste)){
+                        $mensaje = "El Proveedor Ya existe.";
+                        $estatus = Response::HTTP_UNAUTHORIZED;
+                    }else{
+                        $estatusEditar = Proveedore::where( 'id', $idProveedor )->update($request->all());
+                        $mensaje = $estatusEditar ? "El Proveedor se actualizó correctamente." : "El Proveedor no se actualizó";
+                        $estatus = $estatusEditar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+                    }
+                }else{
+                    $estatusEditar = Proveedore::where( 'id', $idProveedor )->update($request->all());
+                    $mensaje = $estatusEditar ? "El Proveedor se actualizó correctamente." : "El Proveedor no se actualizó";
+                    $estatus = $estatusEditar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+                }
+            }else{
+                $mensaje = "El Proveedor se consiguio en los registros.";
+                $estatus = Response::HTTP_NOT_FOUND;
+            }
+            $proveedor = $estatusEditar ? $proveedor = Proveedore::where('id', $idProveedor)->get() : [];
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" => $proveedor,
+                "estatus" => $estatus
+            ], $estatus);
+
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                "mensaje" => "Error al editar el Proveedor, " . $th->getMessage(),
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    /** CIERRE API PROVEEDOR */
 
 
     /**

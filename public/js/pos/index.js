@@ -506,7 +506,7 @@ const hanledLoad = async (e) => {
     elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0});
     
     /** Numero de factura */ 
-    let resultado =  await getCodigoFactura(`${URL_BASE}/getCodigoFactura`);
+    let resultado =  await getCodigoFactura(`${URL_BASE}/getCodigoFactura/facturas`);
     codigoFactura.innerHTML = componenteNumeroDeFactura(resultado);
     
     // log(JSON.parse(localStorage.getItem('factura')))

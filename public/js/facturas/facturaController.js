@@ -1,3 +1,4 @@
+/** TRAE EL CODIGO DE FACTURA ENTRADA - SALIDA - POS */
 const getCodigoFactura = async (url) => {
     return await fetch(`${url}`, {      
         method: "GET", // or 'PUT'
@@ -11,7 +12,7 @@ const getCodigoFactura = async (url) => {
     .then(data => data)
 };
 
-
+/** FACTURA LOS CARRITOS DEL SALIDA - ENTRADA */
 const facturarCarrito = async (url, carrito) => {
     return await fetch(`${url}`, {
         method: "POST", // or 'PUT'
@@ -25,6 +26,21 @@ const facturarCarrito = async (url, carrito) => {
     .then( (response) => response ) 
 };
 
+/** Aqui se procesan las facturas de ENTRADA Y SALIDA */
+const setFactura = async (url, factura) => {
+    return await fetch(url, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(factura), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then( (res) => res.json() )
+        .catch( (error) => error )
+        .then( (response) => response )
+};
+
+/** FACTURAMOS LAS VENTAS */
 const facturaStore = async (factura) => {
     return await fetch(`${URL_BASE}/facturas`, {
         method: "POST", // or 'PUT'
@@ -38,76 +54,11 @@ const facturaStore = async (factura) => {
         .then( (response) => response )
 };
 
-
-const facturaStoreSalida  = async (factura) => {
-    log('llego aqui')
-     await fetch(`${URL_BASE}/storeSalida`, {
-        method: "POST", // or 'PUT'
-        body: JSON.stringify(factura), // data can be `string` or {object}!
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-        .then((res) => res.json())
-        .catch((error) => console.error("Error:", error))
-        .then((response) => {
-            log(response)
-            if (response.estatus == 200) {
-                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                if (resultado) {
-                    imprimirElemento(htmlTicket(response.data));
-                    
-                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                    if (resultadoOtraCapia) {
-                        imprimirElemento(htmlTicket(response.data));
-                    }
-                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
-                } else {
-                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
-                }
-            } else {
-                alert(response.mensaje)
-            }
-        })
-};
-
-const facturaStoreEntrada  = async (factura) => {
-    log('llego aqui')
-     await fetch(`${URL_BASE}/facturasInventarios`, {
-        method: "POST", // or 'PUT'
-        body: JSON.stringify(factura), // data can be `string` or {object}!
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-        .then((res) => res.json())
-        .catch((error) => console.error("Error:", error))
-        .then((response) => {
-            log(response)
-            if (response.estatus == 200) {
-                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                if (resultado) {
-                    imprimirElemento(htmlTicketEntrada(response.data));
-                    
-                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                    if (resultadoOtraCapia) {
-                        imprimirElemento(htmlTicketEntrada(response.data));
-                    }
-                    window.location.href = "http://cyberstock.com/inventarios/crearEntrada";
-                } else {
-                    window.location.href = "http://cyberstock.com/inventarios/crearEntrada";
-                }
-            } else {
-                alert(response.mensaje)
-            }
-        })
-};
-
-const htmlTicketEntrada = (factura) => {
+/** TICKET DE SALIDA NORMAL en dolares */
+const htmlTicketSalidaV1 = (factura) => {
     // Declaracion de variables
     let carritoHtml = '', 
-    descuentoHtml = '',
-    metodosPagosHtml = '',
+    descuentoHtml = '';
     // metodosPagos = factura.metodos.split(','),
     ivaHtml = '';
 
@@ -117,7 +68,7 @@ const htmlTicketEntrada = (factura) => {
             <tr>
                 <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
 
-                <td class="precio">Bs ${parseFloat(producto.subtotal * factura.tasa).toFixed(2) }</td>
+                <td class="precio">USD ${  darFormatoDeNumero( producto.subtotal ) }</td>
             </tr>
         `;
     });
@@ -128,7 +79,7 @@ const htmlTicketEntrada = (factura) => {
             <tr>
                 <td class="producto">IVA </td>
 
-                <td class="precio">Bs ${parseFloat(factura.subtotal * factura.tasa * (factura.iva/100)).toFixed(2)  }</td>
+                <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.subtotal  * factura.iva) )  }</td>
             </tr>
         `;
     }
@@ -138,7 +89,115 @@ const htmlTicketEntrada = (factura) => {
         descuentoHtml = ` 
             <tr>
                 <td class="producto">Descuento ${factura.descuento}%</td>
-                <td class="precio">Bs ${((factura.subtotal * (factura.descuento/100)) * factura.tasa).toFixed(2)}</td>
+                <td class="precio">USD ${ darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) }</td>
+            </tr>
+        `;
+    }
+
+
+    return `
+        <div class="ticket" id="ticket">
+        
+            <img src="${factura.pos.imagen}" alt="Logotipo">
+        
+        
+        <p class="centrado">
+            <br>${factura.pos.empresa}
+            <br>${factura.pos.codigo}
+            <br>${factura.pos.direccion}
+            
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th class="producto">N° FACTURA</th>
+                    <th class="precio">${factura.codigo_factura}</th>
+                </tr>
+                <tr>
+                    <th class="producto">FECHA</th>
+        
+                    <th class="precio">${factura.fecha}
+                    </th>
+                </tr>
+                <tr>
+                    <th class="producto">HORA</th>
+        
+                    <th class="precio">${factura.hora}
+                    </th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                
+                ${carritoHtml}
+                
+                <tr>
+                    <td class="producto">
+                        |Total de Articulos: ${ factura.totalArticulo } | <br>
+                        SUB-TOTAL <br>
+                    </td>
+        
+                    <td class="precio"><br> USD  ${ darFormatoDeNumero( parseFloat(factura.subtotal ) ) }</td>
+                </tr>
+              
+                ${descuentoHtml}
+
+                ${ivaHtml}
+
+                <tr>
+                    <td class="producto">TOTAL</td>
+        
+                    <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.total ) ) }</td>
+                </tr>
+              
+                
+            </tbody>
+        </table>
+        
+        
+        <p class="centrado">
+            ¡GRACIAS POR SU COMPRA!
+        </p>
+        </div>
+      `;
+};
+
+/** TICKET DE ENTRADA */
+const htmlTicketEntrada = (factura) => {
+    // Declaracion de variables
+    let carritoHtml = '', 
+    descuentoHtml = '';
+    // metodosPagos = factura.metodos.split(','),
+    ivaHtml = '';
+
+    // Recorremos el carrito
+    factura.carrito.forEach(producto => {
+        carritoHtml+=`
+            <tr>
+                <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
+
+                <td class="precio">USD ${  darFormatoDeNumero(quitarFormato( producto.subtotal  )) }</td>
+            </tr>
+        `;
+    });
+
+    // Verificacamos si se aplico el impuesto
+    if( factura.iva > 0 ){
+        ivaHtml = `
+            <tr>
+                <td class="producto">IVA </td>
+
+                <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.subtotal  * factura.iva) )  }</td>
+            </tr>
+        `;
+    }
+
+    // Verificamos si se aplico un descuento
+    if(factura.descuento > 0){
+        descuentoHtml = ` 
+            <tr>
+                <td class="producto">Descuento ${factura.descuento}%</td>
+                <td class="precio">USD ${ darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) }</td>
             </tr>
         `;
     }
@@ -189,7 +248,7 @@ const htmlTicketEntrada = (factura) => {
                         SUB-TOTAL <br>
                     </td>
         
-                    <td class="precio"><br> Bs  ${parseFloat(factura.subtotal * factura.tasa).toFixed(2) }</td>
+                    <td class="precio"><br> USD  ${ darFormatoDeNumero( parseFloat(factura.subtotal ) ) }</td>
                 </tr>
               
                 ${descuentoHtml}
@@ -199,7 +258,7 @@ const htmlTicketEntrada = (factura) => {
                 <tr>
                     <td class="producto">TOTAL</td>
         
-                    <td class="precio">Bs ${ parseFloat(factura.total * factura.tasa).toFixed(2)  }</td>
+                    <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.total ) ) }</td>
                 </tr>
               
                 
@@ -208,13 +267,13 @@ const htmlTicketEntrada = (factura) => {
         
         
         <p class="centrado">
-            ¡GRACIAS POR SU COMPRA!
+            ¡FACTURA DE COMPRA !
         </p>
         </div>
       `;
 };
 
-
+/** TICKET DE POS - VENTA */
 const htmlTicket = (factura) => {
     // Declaracion de variables
     let carritoHtml = '', 
@@ -378,7 +437,21 @@ const htmlTicket = (factura) => {
       `;
 };
 
+/** BUSCA LAS FACTURA POR SI CODIGO */
+const getFacturaES = async (url, data) => {
+    return await fetch(url, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(data), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+        },
+    })
+    .then((res) => res.json())
+    .catch((error) => error)
+    .then((response) => response )
+};
 
+/** BUSCA LAS FACTURA POR SI CODIGO */
 const getFactura = async (codigoFactura) => {
     return await fetch(`${URL_BASE}/getFactura/${codigoFactura}`, {
         method: "GET", // or 'PUT'
@@ -392,6 +465,7 @@ const getFactura = async (codigoFactura) => {
     .then((response) => response )
 };
 
+/** TOMA EL ELEMENTO HTML PARA IMPRIMIR UN PDF O TIKCKET */
 const imprimirElemento = (elemento) => {
     var ventana = window.open('', 'PRINT', 'height=400,width=600');
     ventana.document.write('<html><head><title>Factura</title>');

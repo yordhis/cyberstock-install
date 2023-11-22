@@ -19,20 +19,20 @@
                 <h2> Inventario </h2>
             </div>
     
-            <div class="col-sm-4 col-xs-12">
+            <div class="col-sm-6 col-xs-12">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="filtro-descripcion" placeholder="Buscar producto por descripción" aria-label="Buscar producto" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" id="filtro-descripcion" placeholder="Buscar producto por Código o Descripcion" aria-label="Buscar producto" aria-describedby="basic-addon1">
                     <span class="text-danger invalido"></span>
                 </div>
             </div>
-            <div class="col-sm-4 col-xs-12">
+            {{-- <div class="col-sm-4 col-xs-12">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1"><i class="bi bi-qr-code"></i></span>
                     <input type="text" class="form-control" id="filtro-codigo" placeholder="Ingrese código" aria-label="Buscar producto" aria-describedby="basic-addon1">
                     <span class="text-danger invalido"></span>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="col-sm-4 col-xs-12">
                 <div class="input-group mb-3">

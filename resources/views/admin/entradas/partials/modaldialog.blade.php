@@ -48,7 +48,7 @@
                       @foreach ($factura->carrito as $producto)
                         <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                           <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
-                          <div class="p-2 bd-highlight" >Bs {{ number_format($producto->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                          <div class="p-2 bd-highlight" >USD {{ $producto->subtotal }}</div>
                         </div>
                       @endforeach
 
@@ -56,32 +56,23 @@
 
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">
-                          SUBTIL: <br>
-                          |Total de Articulos: {{ $factura->totalArticulos }} |
+                          SUBTOTAL: <br>
+                          |Total de Articulos: {{  number_format($factura->totalArticulos, 2, ',', '.') }} |
                         </div>
-                        <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight">USD {{  number_format($factura->subtotal, 2, ',', '.') }}</div>
                       </div>
 
-                      <p>------------------------------------------------------------------------------</p>
-
-                      <div class="d-flex justify-content-between w-100 m-0 p-0">
-                        <div class="p-2 bd-highlight">TOTAL SIN IVA:</div>
-                        <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
-                      </div>
+                     
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">IVA:</div>
-                        <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal * $factura->tasa * $utilidades[0]->iva['restar'], 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight">USD {{ number_format($factura->subtotal * $utilidades[0]->iva['restar'], 2, ',', '.') }}</div>
                       </div>
 
                       <p>------------------------------------------------------------------------------</p>
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">TOTAL:</div>
-                        <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight">USD {{ number_format($factura->total, 2, ',', '.') }}</div>
                       </div>
-                      {{-- <div class="d-flex justify-content-between w-100 m-0 p-0">
-                        <div class="p-2 bd-highlight">EFECTIVO 3</div>
-                        <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
-                      </div> --}}
 
                   
                   </div>
@@ -100,9 +91,9 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-          <a href="pos/imprimirFactura/{{$factura->codigo}}" target="_blank" rel="noopener noreferrer">
+          {{-- <a href="pos/imprimirFactura/{{$factura->codigo}}" target="_blank" rel="noopener noreferrer">
             IMPRIMIR
-          </a>
+          </a> --}}
           
         </div>
       </div>

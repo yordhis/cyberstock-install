@@ -34,6 +34,23 @@ $subcategoria = 'LISTA';
                 <i class="bi bi-box"></i><span>INVENTARIO</span></i>
             </a>
         </li><!-- End Components Nav | INVENTARIO -->
+
+        <!-- Start Components Nav | CLIENTES -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "CLIENTES" ? "bg-white text-black": '' }}" href="/pos/clientes" target="_self">
+                <i class="bi bi-box"></i><span>CLIENTES</span></i>
+            </a>
+        </li><!-- End Components Nav | CLIENTES -->
+
+        <!-- Start Components Nav | FACTURAS -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "FACTURAS" ? "bg-white text-black": '' }}" href="/pos/facturas" target="_self">
+                <i class="bi bi-box"></i><span>CLIENTES</span></i>
+            </a>
+        </li><!-- End Components Nav | FACTURAS -->
+
+    
+
         @endif
         {{-- Cierre Permisos del vendedor --}}
 
@@ -64,7 +81,7 @@ $subcategoria = 'LISTA';
         <!-- Start Components Nav | Niveles de estudio -->
         <li class="nav-item">
             <a class="nav-link" target="_self" href="proveedores">
-                <i class="bi bi-controller"></i><span>PROVEEDORES</span>
+                <i class="bi bi-person-vcard-fill"></i><span>PROVEEDORES</span>
                 {{-- <i class="bi bi-chevron-down ms-auto"></i> --}}
             </a>
 
@@ -78,6 +95,19 @@ $subcategoria = 'LISTA';
            
         </li><!-- End Components Nav | Planes de Pago -->
 
+        <!-- Start Components Nav | CLIENTES -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "CLIENTES" ? "bg-white text-black": '' }}" href="/pos/clientes" target="_self">
+                <i class="bi bi-person-badge"></i><span>CLIENTES</span></i>
+            </a>
+        </li><!-- End Components Nav | CLIENTES -->
+        
+        <!-- Start Components Nav | FACTURAS -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "FACTURAS" ? "bg-white text-black": '' }}" href="/pos/facturas" target="_self">
+                <i class="bi bi-receipt"></i><span>FACTURAS</span></i>
+            </a>
+        </li><!-- End Components Nav | FACTURAS -->
      
         @endif
 

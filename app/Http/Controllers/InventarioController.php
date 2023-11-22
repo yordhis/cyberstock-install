@@ -32,9 +32,12 @@ class InventarioController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
+     *  Display a listing of the resource.
+     *  DESPLEGAMOS LA LISTA DE RECURSOS
      * @return \Illuminate\Http\Response
+     * 
+     * @return pathname
+     * @return menuSuperior
      */
     public function index()
     {
@@ -48,7 +51,7 @@ class InventarioController extends Controller
         }
     }
 
-    /** Api */
+    /** API REST FULL */
     public function getInventariosFiltro(Request $request)
     {
         try {
@@ -57,10 +60,6 @@ class InventarioController extends Controller
             // filtramos por la descripcion
             if (request('filtro')) {
                 /** Buscamos por codigo de barra */
-                // $resultadosCodigoDeBarra = Inventario::where("{$request->campo}", 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->paginate(100);
-                // if(count($resultadosCodigoDeBarra)){
-
-                // }else{
                 foreach ($request->campo as $key => $campo) {
                     switch ($campo) {
                         case 'codigo':
@@ -190,6 +189,7 @@ class InventarioController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
     public function deleteProductoDelInventario($id)
     {
         try {
@@ -217,6 +217,7 @@ class InventarioController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    /** CIERRE DE API REST FULL */
 
     /**
      * Se consideran entradas los siguientes ID Y CONCEPTOS
@@ -235,6 +236,8 @@ class InventarioController extends Controller
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
         ])->get();
+
+        
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
@@ -287,56 +290,24 @@ class InventarioController extends Controller
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
-            $tiposEntradas = $this->data->tiposEntradas;
-            $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);
-            $iva = $this->data->utilidades[0]->iva;
-            $codigo = Helpers::getCodigo('factura_inventarios');
             $pathname = $request->path();
-
-            $carritos = CarritoInventario::where([
-                'codigo' => $codigo
-            ])->get();
-
-            if (count($carritos)) {
-                foreach ($carritos as $key => $producto) {
-                    $producto['proveedor'] = Proveedore::where('codigo', $producto->identificacion)->get()[0];
-                    $producto->costoBs = number_format(floatval($producto->costo) * $tasa, 2, ',', '.') . " Bs";
-                    $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
-                }
-            }
-
-
-            return view('admin.entradas.index', compact('request', 'codigo', 'carritos', 'tiposEntradas', 'menuSuperior', 'pathname', 'tasa', 'iva'));
+            return view('admin.entradas.index', compact('menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
+          
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de entradas, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
     }
 
+    /** RENDERIZANDO VISTA DE POS DE SALIDA */
     public function crearSalida(Request $request)
     {
         try {
+
             $menuSuperior = $this->data->menuSuperior;
-            $tiposEntradas = $this->data->tiposEntradas;
-            $tasa = number_format(floatval($this->data->utilidades[0]->tasa), 2);
-            $iva = $this->data->utilidades[0]->iva;
-            $codigo = Helpers::getCodigo('factura_inventarios');
-            $codigoFactura = Helpers::getCodigo('facturas');
             $pathname = $request->path();
+            return view('admin.salidas.index', compact( 'menuSuperior', 'pathname'));
 
-            $carritos = CarritoInventario::where([
-                'codigo' => $codigo
-            ])->get();
-
-            if (count($carritos)) {
-                foreach ($carritos as $key => $producto) {
-                    $producto['cliente'] = Cliente::where('identificacion', $producto->identificacion)->get();
-                    $producto->costoBs = number_format(floatval($producto->costo) * $tasa, 2, ',', '.') . " Bs";
-                    $producto->subtotalBs = number_format(floatval($producto->subtotal) * $tasa, 2, ',', '.') . " Bs";
-                }
-            }
-
-            return view('admin.salidas.index', compact('request', 'carritos', 'tasa', 'iva', 'codigo', 'codigoFactura', 'tiposEntradas', 'menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de salidas, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
