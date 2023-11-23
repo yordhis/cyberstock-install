@@ -12,13 +12,13 @@ factura = {
         codigo:'',
         razon_social:'', // nombre de cliente o proveedor
         identificacion:'', // numero de documento
-        subtotal:'', // se guarda en divisas
-        total:'',
-        tasa:'', // tasa en el momento que se hizo la transaccion
-        iva:'', // impuesto
+        subtotal: 0, // se guarda en divisas
+        total: 0,
+        tasa: 0, // tasa en el momento que se hizo la transaccion
+        iva: 0, // impuesto
         tipo:'', // fiscal o no fialcal
         concepto:'', // venta, compra ...
-        descuento:'', // descuento
+        descuento: 0, // descuento
         fecha:'', // fecha venta, compra ...
         metodos:''
 },
@@ -536,7 +536,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`;
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
         localStorage.setItem('factura', JSON.stringify(factura));
         // log(JSON.parse(localStorage.getItem('factura')))
     }
@@ -1242,25 +1242,43 @@ async function validarDataDeFormularioCliente(formulario){
     else return esquema;
 }
 
+/** ADAPTADOR DE PRODUCTO */
 function adaptadorDeProducto(data){
     return {
         id: data.id,
         numero: data.id,
         codigo: data.codigo,
         descripcion: data.descripcion,
-        cantidad: data.cantidad,
-        costo: darFormatoDeNumero(parseFloat( data.costo )),
-        costoBs: darFormatoDeNumero(parseFloat( data.costo * data.tasa )),
-        pvp: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp) )),
-        pvpUsd:  darFormatoDeNumero(parseFloat(data.pvp)),
-        pvp_2: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp_2) )),
-        pvpUsd_2:  darFormatoDeNumero(parseFloat(data.pvp_2)),
-        pvp_3: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp_3) )),
-        pvpUsd_3:  darFormatoDeNumero(parseFloat(data.pvp_3)),
         marca: data.id_marca.nombre,
         imagen: data.imagen,
         fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),
         categoria: data.id_categoria.nombre,
+        /** Datos numéricos */
+        cantidad: parseFloat( data.cantidad ),
+        costo: parseFloat( data.costo ),
+        costoBs: parseFloat( data.costo * data.tasa ),
+        pvp: parseFloat( (data.tasa * data.pvp) ),
+        pvpUsd:  parseFloat(data.pvp),
+        pvp_2: parseFloat( (data.tasa * data.pvp_2) ),
+        pvpUsd_2:  parseFloat(data.pvp_2),
+        pvp_3: parseFloat( (data.tasa * data.pvp_3) ),
+        pvpUsd_3:  parseFloat(data.pvp_3),
+    };
+};
+
+function adaptadorDeProductoACarrito(producto, cantidad, factura){
+    return {
+        codigo: factura.codigo, // Codigo de la factura
+        codigo_producto: producto.codigo,
+        identificacion: factura.identificacion,
+        descripcion: producto.descripcion,
+        /** Datos numéricos */
+        cantidad: cantidad,
+        stock: producto.cantidad,
+        costo: parseFloat(producto.pvp), // costo/pvp en dolares 
+        costoBs: parseFloat(producto.pvp * factura.tasa), // costo/pvp en bolivares
+        subtotal: parseFloat(producto.pvp * cantidad), // subtotal en dolares
+        subtotalBs: parseFloat(producto.pvp * cantidad * factura.tasa), // subtotal en bolivares
     };
 };
 
@@ -1298,20 +1316,7 @@ function removerEstilosDelElemento(elementos, estilo){
     });
 };
 
-function adaptadorDeProductoACarrito(producto, cantidad, factura){
-    return {
-        codigo: factura.codigo, // Codigo de la factura
-        codigo_producto: producto.codigo,
-        identificacion: factura.identificacion,
-        cantidad: cantidad,
-        stock: producto.cantidad,
-        costo: darFormatoDeNumero(parseFloat(producto.pvp)), // costo/pvp en dolares 
-        costoBs: darFormatoDeNumero(parseFloat(producto.pvp * factura.tasa)), // costo/pvp en bolivares
-        descripcion: producto.descripcion,
-        subtotal: darFormatoDeNumero(parseFloat(producto.pvp * cantidad)), // subtotal en dolares
-        subtotalBs: darFormatoDeNumero(parseFloat(producto.pvp * cantidad * factura.tasa)), // subtotal en bolivares
-    };
-};
+
 
 async function cargarListaDeProductoDelCarrito(carrito){
     let lista = '';

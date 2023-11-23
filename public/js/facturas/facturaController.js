@@ -79,7 +79,7 @@ const htmlTicketSalidaV1 = (factura) => {
             <tr>
                 <td class="producto">IVA </td>
 
-                <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.subtotal  * factura.iva) )  }</td>
+                <td class="precio"> USD ${ darFormatoDeNumero( factura.subtotal  * factura.iva )  }</td>
             </tr>
         `;
     }
@@ -137,7 +137,7 @@ const htmlTicketSalidaV1 = (factura) => {
                         SUB-TOTAL <br>
                     </td>
         
-                    <td class="precio"><br> USD  ${ darFormatoDeNumero( parseFloat(factura.subtotal ) ) }</td>
+                    <td class="precio"><br> USD  ${ darFormatoDeNumero( factura.subtotal  ) }</td>
                 </tr>
               
                 ${descuentoHtml}
@@ -147,7 +147,7 @@ const htmlTicketSalidaV1 = (factura) => {
                 <tr>
                     <td class="producto">TOTAL</td>
         
-                    <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.total ) ) }</td>
+                    <td class="precio"> USD ${ darFormatoDeNumero( factura.total ) }</td>
                 </tr>
               
                 
@@ -176,7 +176,7 @@ const htmlTicketEntrada = (factura) => {
             <tr>
                 <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
 
-                <td class="precio">USD ${  darFormatoDeNumero(quitarFormato( producto.subtotal  )) }</td>
+                <td class="precio">USD ${   darFormatoDeNumero( producto.subtotal ) }</td>
             </tr>
         `;
     });
@@ -187,7 +187,7 @@ const htmlTicketEntrada = (factura) => {
             <tr>
                 <td class="producto">IVA </td>
 
-                <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.subtotal  * factura.iva) )  }</td>
+                <td class="precio"> USD ${ darFormatoDeNumero( factura.subtotal  * factura.iva )  }</td>
             </tr>
         `;
     }

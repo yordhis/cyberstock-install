@@ -13,13 +13,13 @@ factura = {
         codigo_factura:'',
         razon_social:'', // nombre de cliente o proveedor
         identificacion:'', // numero de documento
-        subtotal:'', // se guarda en divisas
-        total:'',
-        tasa:'', // tasa en el momento que se hizo la transaccion
-        iva:'', // impuesto
+        subtotal:0, // se guarda en divisas
+        total:0,
+        tasa:0, // tasa en el momento que se hizo la transaccion
+        iva:0, // impuesto
         tipo:'', // fiscal o no fialcal
         concepto:'', // venta, compra ...
-        descuento:'', // descuento
+        descuento:0, // descuento
         fecha:'', // fecha venta, compra ...
         metodos:''
 },
@@ -276,11 +276,11 @@ const componenteListaDeProductoEnFactura = (producto) => {
     } else {
         return `
         <tr>
-                <td>${producto.codigo_producto}</td>
-                <td>${producto.descripcion}</td>
-                <td>${producto.cantidad}</td>
-                <td>${producto.costo}</td>
-                <td>${producto.subtotal}</td>
+                <td>${ producto.codigo_producto }</td>
+                <td>${ producto.descripcion }</td>
+                <td>${ producto.cantidad }</td>
+                <td>${ darFormatoDeNumero(producto.costo) }</td>
+                <td>${ darFormatoDeNumero(producto.subtotal) }</td>
                 <td class="d-flex d-inline">
                     <button class="btn btn-none acciones-factura" id="editarCantidadFactura" name="${producto.codigo_producto}">
                         <i class="bi bi-pencil fs-4"></i>
@@ -385,15 +385,15 @@ const componenteVuelto = async (metodos, factura) => {
     vuelto = 0;
   
     metodos.forEach(elementoAbono => {
-        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
-        else abonado = ( abonado + ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) );
+        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
+        else abonado += parseFloat(elementoAbono.montoDelPago / factura.tasa);
      
     });
    
 
-    vuelto = quitarFormato(darFormatoDeNumero(factura.total)) - quitarFormato(darFormatoDeNumero(abonado));
+    vuelto = Math.round(factura.total) - Math.round(abonado);
 
-
+    log(factura.total+ '-' +abonado)
     if(vuelto > 0){
         estilos = "text-danger";
         mensajeVuelto = "PENDIENTE";
@@ -419,45 +419,20 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
 
     let listaMetodos = '',
     metodoSeleccionado = "",
-    total=0;
+    total=0,
+    contador = 1;
 
     if(factura.total){
-        total =  quitarFormato( darFormatoDeNumero( factura.total * factura.tasa ) ) ;
+        total = factura.total * factura.tasa;
     }
 
   
         metodosPagos.forEach(elementoPago => {
-            metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
-            : `<option selected>Método de pago</option>`; 
+                /** Obtenemos el metodo de pago seleccionado */
+                metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
+                : `<option selected>Método de pago</option>`; 
 
-            if( metodosPagos.length == 1 || elementoPago.tipoDePago == null ){
-                listaMetodos += `
-                    <div class="metodoAdd mt-2 row g-3">
-                        <div class="col-md-6">
-                            <select class="form-select acciones-pagos" id="tipoDePago" >
-                                <option selected>Método de pago</option>
-                                <option value="EFECTIVO">EFECTIVO</option>
-                                <option value="DIVISAS">DIVISAS</option>
-                                <option value="PAGO MOVIL">PAGO MOVIL</option>
-                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                <option value="TD">TD | PUNTO</option>
-                                <option value="TC">TC | PUNTO</option>
-                            </select>
-                            
-                        </div>
-        
-                        <div class="col-md-4">
-                            <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
-                            value="${ elementoPago.montoDelPago ? elementoPago.montoDelPago : 0 }" id="montoDelPago" >
-                        </div>
-        
-                        <div class="col-md-2" id="${elementoPago.id}">
-                            <i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>
-                        </div>
-                    </div>
-                `;
-            }else{
-    
+                /** añadimos el html del componente configurado */
                 listaMetodos += `
                     <div class="metodoAdd mt-2 row g-3">
                         <div class="col-md-6">
@@ -475,14 +450,15 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
                         <div class="col-md-4">
                             <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
                             value="${elementoPago.montoDelPago}" id="montoDelPago" >
+                            <span class="text-danger"></span>
                         </div>
         
                         <div class="col-md-2 " id="${elementoPago.id}">
-                            <i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>
+                            ${elementoPago.montoDelPago == 0 ?  `<i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>` 
+                            : `<i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>` }
                         </div>
                     </div>
                 `;
-            }
         });
     
 
@@ -573,7 +549,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`;
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
         localStorage.setItem( 'facturaSalida', JSON.stringify(factura) );
     }
 
@@ -785,14 +761,15 @@ const hanledAgregarAFactura = async (e) => {
 
                 /** Creamos el esquema de datos de entrada */
                 for (const data of datosDeSalida) {
-                    esquemaDeDatosDeSalida[data.name] = data.value;
+                    esquemaDeDatosDeSalida[data.name] = parseFloat(data.value);
                 }
 
                 log(esquemaDeDatosDeSalida);
                 
                 /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
-                factura.tasa = resultado.tasa;
+                factura.tasa = parseFloat(resultado.tasa);
                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
+              
 
                 /** Validamos que la cantidad ingresada no sobrepase la del inventario */
                 if(parseFloat(esquemaDeDatosDeSalida.cantidad) > parseFloat(resultado.data.data[0].cantidad) ){
@@ -804,8 +781,9 @@ const hanledAgregarAFactura = async (e) => {
 
                 /** Adaptamos el producto para añadirlo al carrito */
                 productoAdaptado = adaptadorDeProductoACarrito(resultado.data.data[0], esquemaDeDatosDeSalida, factura);
-             
-
+               
+         
+               
                 /** Si ya existe un carrito añadimos a ese carrito */
                 if(carritoActual.length){
                     /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
@@ -814,8 +792,8 @@ const hanledAgregarAFactura = async (e) => {
                             if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
                             else {
                                 producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal =  darFormatoDeNumero( productoAdaptado.cantidad * quitarFormato( productoAdaptado.costo ) );
-                                producto.subtotalBs = darFormatoDeNumero( productoAdaptado.cantidad * quitarFormato( productoAdaptado.costoBs ) );
+                                producto.subtotal =  productoAdaptado.cantidad *  productoAdaptado.costo;
+                                producto.subtotalBs =  productoAdaptado.cantidad *  productoAdaptado.costoBs;
                             }; 
                         }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                             banderaDeProductoNuevo++;
@@ -836,7 +814,7 @@ const hanledAgregarAFactura = async (e) => {
                 }else{
                     carritoActualizado.push(productoAdaptado);
                 }
-    
+                
                 /** Guardamos en localStorage */
                 localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizado.reverse()));
     
@@ -864,12 +842,6 @@ const hanledAgregarAFactura = async (e) => {
             break;
     }
 
- 
-
-    if(e.target.id == "agregarProductoAlCarrito"){
-       
-
-    }
 };
 
 const hanledBuscarProducto = async (e) => {    
@@ -910,7 +882,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     e.preventDefault();
     /** Declaracion de variables */
     let cantidad = 0,
-    carritoActualizado = [],
     carritoActual = JSON.parse(localStorage.getItem('carritoSalida')),
     accion='',
     banderaDeError = 0,
@@ -945,7 +916,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 }
 
                 /** actualizamos el carrito */
-                carritoActualizado = carritoActual.map(producto => {
+                let carritoActualizadoB = carritoActual.map(producto => {
                     if( parseFloat(cantidad) > parseFloat(producto.stock) ){
                         banderaDeError++;
                         return producto;
@@ -967,9 +938,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 }
 
                /** Guardamos en local el nuevo carrito */
-                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizado.reverse()));
+                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoB.reverse()));
                 /** Cargamos la lista del carrito de compra */
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado.reverse());
+                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB.reverse());
             
 
                  /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
@@ -980,13 +951,13 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             break;
         case 'eliminarProductoFactura':
-                carritoActualizado = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
-                log(carritoActualizado)
-                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizado.reverse()));
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado.reverse());
+                let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
+                log(carritoActualizadoC)
+                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoC.reverse()));
+                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
                 /** Actualizamos la factura */
-                await cargarDatosDeFactura(carritoActualizado, factura);
+                await cargarDatosDeFactura(carritoActualizadoC, factura);
             break;
         case 'eliminarFactura':
             /** validamos si hay factura para eliminar */
@@ -1058,14 +1029,15 @@ const hanledAccionesDeCarritoFactura = async (e) => {
          
             /** Sumamos todos los metodos de pago */
             metodosPagos.forEach(elementoAbono => {
-                if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
-                else abonado += ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) ;
+                if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
+                else abonado += elementoAbono.montoDelPago / factura.tasa;
             });
 
     
 
                 /** Validamos si el monto es mayor o igual al total a pagar */
-                if( quitarFormato(darFormatoDeNumero(abonado)) >= quitarFormato(darFormatoDeNumero(factura.total)) ){
+                log(abonado + ' -- ' + factura.total);
+                if( abonado >= factura.total ){
                     
                     /** Agregamos los metodos en formato JSON a la factura */
                     factura.metodos = JSON.stringify(metodosPagos);
@@ -1080,13 +1052,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
                     carritoVender.forEach(async producto => {
                         producto.identificacion = facturaVender.identificacion;
-                        producto.subtotal = quitarFormato(producto.subtotal);
+                        producto.subtotal = producto.subtotal;
                         await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
                     });
                   
                     /** Procesamos la factura y generamos el ticket */
                     resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
-                    return log(resultadoDeFacturar);
 
                     /** Mostramos el dialogo de facturar */
                      if (resultadoDeFacturar.estatus == 201) {
@@ -1157,14 +1128,22 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 
     switch (accion) {
         case 'agregarMetodo':
-            if(metodosActuales.length >= 4) return alert('El limite de metodos de pago son 4.')
+            /** limpiamos la validacion */
+            e.target.parentElement.parentElement.children[1].children[1].textContent = "";
 
+            /** Validacion del limite de metodos de pagos */
+            if(metodosActuales.length >= 4) return alert('El limite de metodos de pago son 4.');
+            if(e.target.parentElement.parentElement.children[1].children[0].value <= 0) return e.target.parentElement.parentElement.children[1].children[1].textContent = "Debe ingresar un monto mayor a cero, para agregar otro método";
+
+            /** recorremos los metodos de pago */
                 metodosActuales.forEach((element, index) => {
+                 
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago: element.children[1].lastElementChild.value,
+                        id: element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(element.children[1].children[0].value),
                     });
+
                     if(arregloDeMetodosDePago[index].tipoDePago == "Método de pago" || arregloDeMetodosDePago[0].tipoDePago == null){
                         banderaDeError++;
                     } 
@@ -1178,69 +1157,80 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                     tipoDePago: null,
                     montoDelPago: 0,
                 });
-                log(arregloDeMetodosDePago)
                 metodosPagos = arregloDeMetodosDePago;
-                log(metodosPagos)
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
+                elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos.reverse(), factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'eliminarMetodo':
                 // elementoMetodoDePago.innerHTML += componenteMetodosForm();
+                /** limpiamos la validacion */
+                e.target.parentElement.parentElement.children[1].children[1].textContent = "";
+
                 log(e.target.parentElement.id);
                 metodosActuales.forEach(element => {
                     if(element.children[2].id  != e.target.parentElement.id){
                         arregloDeMetodosDePago.push({
-                            id: contadorID,
-                            tipoDePago: element.children[0].lastElementChild.value,
-                            montoDelPago: element.children[1].lastElementChild.value,
+                            id: element.children[2].id,
+                            tipoDePago: element.children[0].children[0].value,
+                            montoDelPago: parseFloat(element.children[1].children[0].value) ? parseFloat(element.children[1].children[0].value) : 0,
                         });
                     }
-                    contadorID++;
                 });
                 metodosPagos = arregloDeMetodosDePago; 
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
-                elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+                log(metodosPagos)
+                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
+                elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
-            
+            log('agregando tipo de pago')
+            /** Limpiamos la validación */
+            e.target.parentElement.parentElement.children[1].children[1].textContent = "";
+
+            /** Verificamos que tipo de metodo de pago es para convertir todo a dolares */
             if(metodosActuales.length == 1){
-                if(e.target.value == "DIVISAS" ) e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total));
-                else e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total * factura.tasa));
+                if(e.target.value == "DIVISAS" ) e.target.parentElement.parentElement.children[1].children[0].value = factura.total;
+                else e.target.parentElement.parentElement.children[1].children[0].value = factura.total * factura.tasa;
             }
            
+            /** Recorremos los metodosde pagos actuales */
             metodosActuales.forEach(element => {
                 arregloDeMetodosDePago.push({
-                    id: contadorID,
-                    tipoDePago: element.children[0].lastElementChild.value,
-                    montoDelPago: element.children[1].lastElementChild.value,
+                    id: element.children[2].id,
+                    tipoDePago: element.children[0].children[0].value,
+                    montoDelPago: parseFloat(element.children[1].children[0].value),
                 });
-                contadorID++;
             });
 
             metodosPagos = arregloDeMetodosDePago; 
             elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
             break;
         case 'montoDelPago':
-            /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
-            // log(e.target.parentElement.parentElement.children[2].lastElementChild.id)
+           
+            log(e.target.value * 1)
+            log(e.target.parentElement.parentElement.children)
+            log(e.target.parentElement.parentElement.children[2].id)
+            /** VAlidamos que el dato ingresado sea numero */
+            if(e.target.value <= 0) return e.target.parentElement.parentElement.children[1].children[1].textContent="Este campo solo permite números mayor a cero";
+            else e.target.parentElement.parentElement.children[1].children[1].textContent = "";
+
+            /** Recorremos los metodos de pago y alimentamos el objeto */
             metodosActuales.forEach(element => {
-                if(e.target.parentElement.parentElement.children[2].lastElementChild.id == element.id){
+                /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
+                if(e.target.parentElement.parentElement.children[2].id == element.id){
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago:e.target.value,
+                        id: element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(e.target.value),
                     });
                     
                 }else{
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago: element.children[1].lastElementChild.value,
+                        id: element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(element.children[1].children[0].value),
                     });
                 }
-                
-                contadorID++;
             });
             metodosPagos = arregloDeMetodosDePago;
             elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
@@ -1369,9 +1359,9 @@ function adaptadorDeProductoACarrito(producto, dataSalida, factura){
         cantidad: dataSalida.cantidad,
         stock: producto.cantidad,
         costo: dataSalida.precio, // costo/pvp en dolares 
-        costoBs: darFormatoDeNumero(parseFloat(dataSalida.precio  * factura.tasa)), // costo/pvp en bolivares
-        subtotal: darFormatoDeNumero(parseFloat(dataSalida.precio  * dataSalida.cantidad)), // subtotal en dolares
-        subtotalBs: darFormatoDeNumero(parseFloat(dataSalida.precio  * dataSalida.cantidad * factura.tasa)), // subtotal en bolivares
+        costoBs: parseFloat(dataSalida.precio  * factura.tasa), // costo/pvp en bolivares
+        subtotal: parseFloat(dataSalida.precio  * dataSalida.cantidad), // subtotal en dolares
+        subtotalBs: parseFloat(dataSalida.precio  * dataSalida.cantidad * factura.tasa), // subtotal en bolivares
     };
 
 };
@@ -1392,7 +1382,7 @@ async function cargarListaDeProductoDelCarrito(carrito){
 async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuento = 0){
     let acumuladorSubtotal = 0;
     carritoActual.forEach(producto => {
-        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + quitarFormato(producto.subtotal); 
+        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
     });
     log(acumuladorSubtotal)
     factura.iva = iva; 
