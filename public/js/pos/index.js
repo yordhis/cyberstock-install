@@ -244,8 +244,8 @@ const componenteListaDeProductoEnFactura = (producto) => {
                 <td>${producto.codigo_producto}</td>
                 <td>${producto.descripcion}</td>
                 <td>${producto.cantidad}</td>
-                <td>${producto.costoBs}</td>
-                <td>${producto.subtotalBs}</td>
+                <td>${darFormatoDeNumero(producto.costoBs)}</td>
+                <td>${darFormatoDeNumero(producto.subtotalBs)}</td>
                 <td class="d-flex d-inline">
                     <button class="btn btn-none acciones-factura" id="editarCantidadFactura" name="${producto.codigo_producto}">
                         <i class="bi bi-pencil fs-4"></i>
@@ -301,8 +301,8 @@ const componenteFactura = async (factura) => {
         </div>
         <div class="col-sm-6">
             <p>TOTAL</p>
-            <p class="fs-1 text-success">${ factura.total == "" ? 0 : (  darFormatoDeNumero(parseFloat(factura.total) * factura.tasa)) } BS</p>
-            <p class="fs-5 text-success">REF ${ factura.total == "" ? 0 : darFormatoDeNumero(parseFloat(factura.total)) }</p>
+            <p class="fs-1 text-success">${ factura.total == "" ? 0 :  darFormatoDeNumero(factura.total * factura.tasa) } BS</p>
+            <p class="fs-5 text-success">REF ${ factura.total == "" ? 0 : darFormatoDeNumero(factura.total) }</p>
             
         </div>
 
@@ -349,17 +349,18 @@ const componenteVuelto = async (metodos, factura) => {
     mensajeVuelto = "",
     estilos = "",
     vuelto = 0;
-  
+    /** Guardamos los métodos de pagosen la variable global */
+    metodosPagos = metodos;
+
+    /** Recorremos los metodos de pagos para acumular los abonos */
     metodos.forEach(elementoAbono => {
-        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
-        else abonado = ( abonado + ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) );
-     
+        log(elementoAbono)
+        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
+        else abonado +=  elementoAbono.montoDelPago / factura.tasa ;
     });
    
-
-    vuelto = quitarFormato(darFormatoDeNumero(factura.total)) - quitarFormato(darFormatoDeNumero(abonado));
-
-
+    vuelto = (Math.round(factura.total * 100)/100) - (Math.round(abonado*100)/100);
+    log( (Math.round(factura.total * 100)/100)+ ' - ' + (Math.round(abonado*100)/100) )
     if(vuelto > 0){
         estilos = "text-danger";
         mensajeVuelto = "PENDIENTE";
@@ -386,70 +387,40 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
     let listaMetodos = '',
     metodoSeleccionado = "",
     total=0;
-
-    if(factura.total){
-        total =  quitarFormato( darFormatoDeNumero( factura.total * factura.tasa ) ) ;
-    }
-
   
-        metodosPagos.forEach(elementoPago => {
-            metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
-            : `<option selected>Método de pago</option>`; 
+    metodosPagos.forEach(elementoPago => {
+        /** Obtenemos el metodo de pago seleccionado */
+        metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
+        : `<option selected>Método de pago</option>`; 
 
-            if( metodosPagos.length == 1 || elementoPago.tipoDePago == null ){
-                listaMetodos += `
-                    <div class="metodoAdd mt-2 row g-3">
-                        <div class="col-md-6">
-                            <select class="form-select acciones-pagos" id="tipoDePago" >
-                                <option selected>Método de pago</option>
-                                <option value="EFECTIVO">EFECTIVO</option>
-                                <option value="DIVISAS">DIVISAS</option>
-                                <option value="PAGO MOVIL">PAGO MOVIL</option>
-                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                <option value="TD">TD | PUNTO</option>
-                                <option value="TC">TC | PUNTO</option>
-                            </select>
-                            
-                        </div>
-        
-                        <div class="col-md-4">
-                            <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
-                            value="${ elementoPago.montoDelPago ? elementoPago.montoDelPago : 0 }" id="montoDelPago" >
-                        </div>
-        
-                        <div class="col-md-2" id="${elementoPago.id}">
-                            <i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>
-                        </div>
-                    </div>
-                `;
-            }else{
-    
-                listaMetodos += `
-                    <div class="metodoAdd mt-2 row g-3">
-                        <div class="col-md-6">
-                            <select class="form-select acciones-pagos" id="tipoDePago" >
-                                ${ metodoSeleccionado }
-                                <option value="EFECTIVO">EFECTIVO</option>
-                                <option value="DIVISAS">DIVISAS</option>
-                                <option value="PAGO MOVIL">PAGO MOVIL</option>
-                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                <option value="TD">TD | PUNTO</option>
-                                <option value="TC">TC | PUNTO</option>
-                            </select>
-                        </div>
-        
-                        <div class="col-md-4">
-                            <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
-                            value="${elementoPago.montoDelPago}" id="montoDelPago" >
-                        </div>
-        
-                        <div class="col-md-2 " id="${elementoPago.id}">
-                            <i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>
-                        </div>
-                    </div>
-                `;
-            }
-        });
+        /** añadimos el html del componente configurado */
+        listaMetodos += `
+            <div class="metodoAdd mt-2 row g-3">
+                <div class="col-md-6">
+                    <select class="form-select acciones-pagos" id="tipoDePago" >
+                        ${ metodoSeleccionado }
+                        <option value="EFECTIVO">EFECTIVO</option>
+                        <option value="DIVISAS">DIVISAS</option>
+                        <option value="PAGO MOVIL">PAGO MOVIL</option>
+                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                        <option value="TD">TD | PUNTO</option>
+                        <option value="TC">TC | PUNTO</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
+                    value="${elementoPago.montoDelPago}" id="montoDelPago" >
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2 " id="${elementoPago.id}">
+                    ${elementoPago.montoDelPago == 0 ?  `<i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>` 
+                    : `<i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>` }
+                </div>
+            </div>
+        `;
+});
     
 
     return listaMetodos; 
@@ -753,8 +724,8 @@ const hanledAgregarAFactura = async (e) => {
                         if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeALertar++;
                         else {
                             producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                            producto.subtotal =  darFormatoDeNumero( producto.cantidad * quitarFormato(producto.costo) );
-                            producto.subtotalBs = darFormatoDeNumero( producto.cantidad * quitarFormato(producto.costoBs) );
+                            producto.subtotal =   producto.cantidad * producto.costo;
+                            producto.subtotalBs =  producto.cantidad * producto.costoBs;
                         }; 
                     }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                         banderaDeProductoNuevo++;
@@ -890,8 +861,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     if(producto.codigo_producto == codigoProducto ) {
                         log(parseFloat(producto.costo));
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = darFormatoDeNumero( quitarFormato(producto.costo) * cantidad );
-                        producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
+                        producto.subtotal = producto.costo * cantidad ;
+                        producto.subtotalBs = cantidad * producto.costoBs;
                     };
                     return producto;
                 });
@@ -1001,15 +972,15 @@ const hanledAccionesDeCarritoFactura = async (e) => {
          
             /** Sumamos todos los metodos de pago */
             metodosPagos.forEach(elementoAbono => {
-                if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
-                else abonado += ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) ;
+                if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
+                else abonado += elementoAbono.montoDelPago / factura.tasa;
             });
 
             /** Previsualizamos el monto abonado */
             log(abonado)
 
                 /** Validamos si el monto es mayor o igual al total a pagar */
-                if( quitarFormato(darFormatoDeNumero(abonado)) >= quitarFormato(darFormatoDeNumero(factura.total)) ){
+                if( Math.round(abonado) >= factura.total ){
                     
                     /** Agregamos los metodos en formato JSON a la factura */
                     factura.metodos = JSON.stringify(metodosPagos);
@@ -1022,41 +993,44 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    await carritoVender.forEach(async producto => {
+                    carritoVender.forEach(producto => {
                         producto.identificacion = facturaVender.identificacion;
-                        producto.subtotal = quitarFormato(producto.subtotal);
-                        await facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                        producto.subtotal = producto.subtotal;
+                        facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
                     });
-
-                    /** Procesamos la factura y generamos el ticket */
-                    resultadoDeFacturar = await facturaStore(facturaVender);
-                    log(resultadoDeFacturar);
-
-                    /** Mostramos el dialogo de facturar */
-                     if (resultadoDeFacturar.estatus == 201) {
-                        log('entro aqui en la impresion de la factura')
-                        resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                        if (resultado) {
-                            imprimirElemento(htmlTicket(resultadoDeFacturar.data));
-                            
-                            resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                            if (resultadoOtraCapia) {
+                    
+                    setTimeout( async ()=>{
+                        
+                        /** Procesamos la factura y generamos el ticket */
+                        resultadoDeFacturar = await facturaStore(facturaVender);
+                        log(resultadoDeFacturar);
+    
+                        /** Mostramos el dialogo de facturar */
+                         if (resultadoDeFacturar.estatus == 201) {
+                            log('entro aqui en la impresion de la factura')
+                            resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                            if (resultado) {
                                 imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                                
+                                resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                                if (resultadoOtraCapia) {
+                                    imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                                }
+                                /** Eliminamos la factura del Storagr */
+                                localStorage.removeItem('carrito');
+                                localStorage.removeItem('factura');
+                                window.location.href = "http://cyberstock.com/pos";
+    
+                            } else {
+                                 /** Eliminamos la factura del Storagr */
+                                 localStorage.removeItem('carrito');
+                                 localStorage.removeItem('factura');
+                                window.location.href = "http://cyberstock.com/pos";
                             }
-                            /** Eliminamos la factura del Storagr */
-                            localStorage.removeItem('carrito');
-                            localStorage.removeItem('factura');
-                            window.location.href = "http://cyberstock.com/pos";
-
                         } else {
-                             /** Eliminamos la factura del Storagr */
-                             localStorage.removeItem('carrito');
-                             localStorage.removeItem('factura');
-                            window.location.href = "http://cyberstock.com/pos";
+                            alert(resultadoDeFacturar.mensaje)
                         }
-                    } else {
-                        alert(resultadoDeFacturar.mensaje)
-                    }
+                    },2500)
 
                 }else{
                     e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
@@ -1108,9 +1082,9 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 
                 metodosActuales.forEach((element, index) => {
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago: element.children[1].lastElementChild.value,
+                        id: element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(element.children[1].children[0].value),
                     });
                     if(arregloDeMetodosDePago[index].tipoDePago == "Método de pago" || arregloDeMetodosDePago[0].tipoDePago == null){
                         banderaDeError++;
@@ -1125,72 +1099,65 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                     tipoDePago: null,
                     montoDelPago: 0,
                 });
-                log(arregloDeMetodosDePago)
+
                 metodosPagos = arregloDeMetodosDePago;
-                log(metodosPagos)
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
+                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'eliminarMetodo':
                 // elementoMetodoDePago.innerHTML += componenteMetodosForm();
-                log(e.target.parentElement.id);
                 metodosActuales.forEach(element => {
                     if(element.children[2].id  != e.target.parentElement.id){
                         arregloDeMetodosDePago.push({
-                            id: contadorID,
-                            tipoDePago: element.children[0].lastElementChild.value,
-                            montoDelPago: element.children[1].lastElementChild.value,
+                            id: element.children[2].id,
+                            tipoDePago: element.children[0].children[0].value,
+                            montoDelPago: parseFloat(element.children[1].children[0].value),
                         });
                     }
-                    contadorID++;
                 });
-                metodosPagos = arregloDeMetodosDePago; 
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
-                elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+           
+                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
+                elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
             
             if(metodosActuales.length == 1){
-                if(e.target.value == "DIVISAS" ) e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total));
-                else e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total * factura.tasa));
+                if(e.target.value == "DIVISAS" ) e.target.parentElement.parentElement.children[1].children[0].value = factura.total;
+                else e.target.parentElement.parentElement.children[1].children[0].value = factura.total * factura.tasa;
             }
            
             metodosActuales.forEach(element => {
                 arregloDeMetodosDePago.push({
-                    id: contadorID,
-                    tipoDePago: element.children[0].lastElementChild.value,
-                    montoDelPago: element.children[1].lastElementChild.value,
-                });
-                contadorID++;
+                    id: element.children[2].id,
+                    tipoDePago: element.children[0].children[0].value,
+                    montoDelPago: parseFloat(element.children[1].children[0].value),
+                }); 
             });
-
-            metodosPagos = arregloDeMetodosDePago; 
-            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+            log(arregloDeMetodosDePago)
+            elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
             break;
         case 'montoDelPago':
             /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
             // log(e.target.parentElement.parentElement.children[2].lastElementChild.id)
             metodosActuales.forEach(element => {
-                if(e.target.parentElement.parentElement.children[2].lastElementChild.id == element.id){
+                if(e.target.parentElement.parentElement.children[2].id == element.id){
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago:e.target.value,
+                        id: element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(e.target.value), /** actualizamos el monto */
                     });
                     
                 }else{
                     arregloDeMetodosDePago.push({
-                        id: contadorID,
-                        tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago: element.children[1].lastElementChild.value,
+                        id:  element.children[2].id,
+                        tipoDePago: element.children[0].children[0].value,
+                        montoDelPago: parseFloat(element.children[1].children[0].value),
                     });
                 }
                 
-                contadorID++;
             });
-            metodosPagos = arregloDeMetodosDePago;
-            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+            elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
 
             break;
         
@@ -1274,7 +1241,7 @@ function adaptadorDeProductoACarrito(producto, cantidad, factura){
         descripcion: producto.descripcion,
         /** Datos numéricos */
         cantidad: cantidad,
-        stock: producto.cantidad,
+        stock: parseFloat(producto.cantidad),
         costo: parseFloat(producto.pvp), // costo/pvp en dolares 
         costoBs: parseFloat(producto.pvp * factura.tasa), // costo/pvp en bolivares
         subtotal: parseFloat(producto.pvp * cantidad), // subtotal en dolares
@@ -1334,13 +1301,13 @@ async function cargarListaDeProductoDelCarrito(carrito){
 async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuento = 0){
     let acumuladorSubtotal = 0;
     carritoActual.forEach(producto => {
-        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + quitarFormato(producto.subtotal); 
+        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
     });
     log(acumuladorSubtotal)
     factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;
-    factura.total = (parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento/100)));
+    factura.total = parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal ) - parseFloat( acumuladorSubtotal * (factura.descuento/100) );
     
     localStorage.setItem('factura', JSON.stringify(factura));
 

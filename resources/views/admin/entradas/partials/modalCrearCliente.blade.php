@@ -1,5 +1,5 @@
 <!-- Vertically centered Modal -->
-<button type="button" class="nav-item text-green bg-primary p-2 rounded-2 " data-bs-toggle="modal"
+<button type="button" class="btn btn-primary h-25 mt-4 mb-2 me-2  " data-bs-toggle="modal"
     data-bs-target="#modalCrear" >
     <i class="bx bx-user-circle "></i> Agregar Proveedor
 </button>
@@ -24,7 +24,7 @@
                 class=" g-3 needs-validation" novalidate>
                 @csrf
                 @method('post')
-
+                <input type="hidden" name="formulario" value="{{ $pathname }}">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-12">
@@ -57,7 +57,7 @@
                                       @enderror
                                       <option value="V">V</option>
                                       <option value="J">J</option>
-                                      <option value="E">E</option>
+                                      <option value="J">E</option>
                                     
                                     </select>
   

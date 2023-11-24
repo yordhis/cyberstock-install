@@ -389,11 +389,9 @@ const componenteVuelto = async (metodos, factura) => {
         else abonado += parseFloat(elementoAbono.montoDelPago / factura.tasa);
      
     });
-   
 
-    vuelto = Math.round(factura.total) - Math.round(abonado);
+    vuelto = (Math.round(factura.total * 100)/100) - (Math.round(abonado*100)/100);
 
-    log(factura.total+ '-' +abonado)
     if(vuelto > 0){
         estilos = "text-danger";
         mensajeVuelto = "PENDIENTE";
@@ -421,10 +419,6 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
     metodoSeleccionado = "",
     total=0,
     contador = 1;
-
-    if(factura.total){
-        total = factura.total * factura.tasa;
-    }
 
   
         metodosPagos.forEach(elementoPago => {
@@ -1048,54 +1042,59 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     /** Obtenemos el carrito y la factura actualizados */
                     let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
                     carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
-                   
+                 
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
                     carritoVender.forEach(async producto => {
                         producto.identificacion = facturaVender.identificacion;
                         producto.subtotal = producto.subtotal;
                         await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
                     });
-                  
-                    /** Procesamos la factura y generamos el ticket */
-                    resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
-
-                    /** Mostramos el dialogo de facturar */
-                     if (resultadoDeFacturar.estatus == 201) {
-                        log('entro aqui en la impresion de la factura')
-                        resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                        if (resultado) {
-
-                            imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
-                            
-                            resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                            if (resultadoOtraCapia) {
-                                imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
+                    
+                    setTimeout( async ()=>{
+                        
+                            /** Procesamos la factura y generamos el ticket */
+                            resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
+        
+                            /** Mostramos el dialogo de facturar */
+                            if (resultadoDeFacturar.estatus == 201) {
+                                log('entro aqui en la impresion de la factura')
+                                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                                if (resultado) {
+        
+                                    imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
+                                    
+                                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                                    if (resultadoOtraCapia) {
+                                        imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
+                                    }
+                                    /** Eliminamos la factura del Storagr */
+                                    localStorage.removeItem('carritoSalida');
+                                    localStorage.removeItem('facturaSalida');
+                                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+        
+                                } else {
+                                    /** Eliminamos la factura del Storagr */
+                                    localStorage.removeItem('carritoSalida');
+                                    localStorage.removeItem('facturaSalida');
+                                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+                                }
+                            } else {
+                                alert(resultadoDeFacturar.mensaje)
                             }
-                            /** Eliminamos la factura del Storagr */
-                            localStorage.removeItem('carritoSalida');
-                            localStorage.removeItem('facturaSalida');
-                            window.location.href = "http://cyberstock.com/inventarios/crearSalida";
-
-                        } else {
-                             /** Eliminamos la factura del Storagr */
-                             localStorage.removeItem('carritoSalida');
-                             localStorage.removeItem('facturaSalida');
-                            window.location.href = "http://cyberstock.com/inventarios/crearSalida";
-                        }
-                    } else {
-                        alert(resultadoDeFacturar.mensaje)
+        
+                        }, 2500);
+                        
+                    }else{
+                        
+                        e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
+                        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
+                        return setTimeout( () => {
+                            elementoAlertaVender.forEach(element => {
+                                element.classList.add('d-none')
+                            });
+                            cargarEventosAccionesDeFactura();
+                        }, 2500);
                     }
-
-                }else{
-                    e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
-                    let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                    return setTimeout( () => {
-                        elementoAlertaVender.forEach(element => {
-                            element.classList.add('d-none')
-                        });
-                        cargarEventosAccionesDeFactura();
-                    }, 2500);
-                }
 
 
             break;
@@ -1388,7 +1387,7 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;
-    factura.total = (parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento/100)));
+    factura.total =  parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal ) - parseFloat( acumuladorSubtotal * (factura.descuento/100) );
     
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 

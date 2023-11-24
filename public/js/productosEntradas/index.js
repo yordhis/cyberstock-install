@@ -326,13 +326,13 @@ const componenteFactura = async (factura) => {
             <p>DESCT.  ${factura.descuento == "" ? 0 : factura.descuento}%</p>
         </div>
         <div class="col-sm-4 ">
-            <p>${ factura.subtotal == "" ? 0 : factura.subtotal } USD</p>
-            <p>${ factura.subtotal == "" ? 0 : factura.subtotal * factura.iva } USD</p>
-            <p>${ factura.descuento == "" ? 0 :  factura.subtotal * (factura.descuento/100)  } USD</p>
+            <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero( factura.subtotal )} USD</p>
+            <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero( factura.subtotal * factura.iva )} USD</p>
+            <p>${ factura.descuento == "" ? 0 :  darFormatoDeNumero( factura.subtotal * (factura.descuento/100) )} USD</p>
         </div>
         <div class="col-sm-6">
             <p>TOTAL</p>
-            <p class="fs-1 text-success">${ factura.total == "" ? 0 : (  factura.total) } USD</p>
+            <p class="fs-1 text-success">${ factura.total == "" ? 0 : (  darFormatoDeNumero(factura.total) ) } USD</p>
             <!--<p class="fs-5 text-success">REF ${ factura.total == "" ? 0 : factura.total }</p>-->
             
         </div>
@@ -387,9 +387,7 @@ const componenteVuelto = async (metodos, factura) => {
      
     });
    
-
-    vuelto = quitarFormato(darFormatoDeNumero(factura.total)) - quitarFormato(darFormatoDeNumero(abonado));
-
+    vuelto = (Math.round(factura.total * 100)/100) - (Math.round(abonado*100)/100);
 
     if(vuelto > 0){
         estilos = "text-danger";
@@ -777,7 +775,7 @@ const hanledAgregarAFactura = async (e) => {
 
             /** Creamos el esquema de datos de entrada */
             for (const data of datosDeEntrada) {
-                esquemaDeDatosDeEntrada[data.name] = data.value;
+                esquemaDeDatosDeEntrada[data.name] = parseFloat(data.value);
             }
 
             /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
@@ -1068,11 +1066,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     log(carritoVender)
                    
                     /** Al procesar la facturacion del carrito agregamos al inventario las cantidades */
-                    await carritoVender.forEach(async producto => {
-                        resultadoDefacturarCarritoZ = await facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
+                    carritoVender.forEach(async producto => {
+                        facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
                     });
 
-    
+                    setTimeout(async ()=>{
+                        
                         /** Procesamos la factura y generamos el ticket */
                         resultadoDeFacturar = await setFactura( `${URL_BASE}/setFacturaEntrada`, facturaVender );
                         /** Factura creada previsualizacion */
@@ -1109,6 +1108,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         } else {
                             alert(resultadoDeFacturar.mensaje)
                         }
+                    }, 2500);
 
 
             }else{
@@ -1303,7 +1303,7 @@ function adaptadorDeProducto(data){
             imagen: data.imagen,
             /** Data de inventario */
             idInventario: dataInventario.id,
-            stock: dataInventario.cantidad,
+            stock: parseFloat(dataInventario.cantidad),
             costo: parseFloat( dataInventario.costo ),
             pvp: parseFloat( ( dataInventario.pvp ) ),
             pvp_2: parseFloat( ( dataInventario.pvp_2 ) ),
@@ -1339,13 +1339,14 @@ function adaptadorDeProductoACarrito(producto, data, factura){
         codigo_producto: producto.codigo,
         identificacion: factura.identificacion,
         descripcion: producto.descripcion,
-        cantidad: data.cantidad,
-        // stock: producto.cantidad,
+        fecha: factura.fecha,
+        stock: producto.cantidad, // disponibles o en existencia
+        /** Datos numéricos */
+        cantidad: parseFloat(data.cantidad), // la cantida de entrada de este producto
         costo: parseFloat(data.costo), // costo en dolares 
         pvp: parseFloat(data.pvp), // pvp en dolares 
         pvp_2: parseFloat(data.pvp_2), // pvp 2 en dolares 
         pvp_3: parseFloat(data.pvp_3), // pvp 3 en dolares 
-        fecha: factura.fecha,
         subtotal: parseFloat(data.costo * data.cantidad), // subtotal en dolares
     };
 };

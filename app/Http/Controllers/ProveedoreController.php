@@ -179,41 +179,41 @@ class ProveedoreController extends Controller
     public function store(StoreProveedoreRequest $request)
     {
         try {
-            $menuSuperior = $this->data->menuSuperior;
-            $resulProveedor = Proveedore::where('codigo', $request->codigo)->get();
+          
+            //$resulProveedor = Proveedore::where('codigo', $request->codigo)->get();
+             
             // Validamos si ya existe el proveedor
-            if(count($resulProveedor)){
-                $proveedores = Proveedore::all();
-                $this->data->respuesta['mensaje'] = "El Código o Número de documento del proveedor ¡Ya existe! verifique los datos y vuelva a intentar";
-                $this->data->respuesta['estatus'] = 404;
-                $this->data->respuesta['activo'] = true;
-                $this->data->respuesta['elemento'] = "modalCrearProveedor";
-                $respuesta =  $this->data->respuesta;
-                return view('admin.proveedores.lista', compact('proveedores', 'menuSuperior', 'request', 'respuesta'));
-            }
+            //if(count($resulProveedor)){
+                //$mensaje = "Este proveedor ya existe";
+                //$estatus = 404;
+                //return redirect()->route("admin.proveedores.index", compact('mensaje', 'estatus'));
+            //}else{
+                
+                if($request->file){
+                    $url = Helpers::setFile($request);
+                    $request['imagen'] = $url;
+                }else {
+                    $request['imagen'] = FOTO_PORDEFECTO;
+                }
+    
+                $estatusCrear = Proveedore::create($request->all());
+    
+                $mensaje = $estatusCrear ? "Proveedor registrado correctamente" : "No se registro el proveedor";
+                $estatus = $estatusCrear ? 201 : 404;
+    
+         
+                if($request->formulario == "inventarios/crearEntrada"){
+                    return redirect()->route('admin.inventarios.crearEntrada', compact('mensaje', 'estatus'));
+                }else{
+                    return redirect()->route("admin.proveedores.index", compact('mensaje', 'estatus'));
+                }
+            //}
             // Seteamos la imagen
-            if($request->file){
-                $url = Helpers::setFile($request);
-                $request['imagen'] = $url;
-            }else {
-                $request['imagen'] = FOTO_PORDEFECTO;
-            }
-
-            $estatusCrear = Proveedore::create($request->all());
-
-            $mensaje = $estatusCrear ? "Proveedor registrado correctamente" : "No se registro el proveedor";
-            $estatus = $estatusCrear ? 201 : 404;
-
-     
-            if($request->formulario == "inventarios/crearEntrada"){
-                return redirect()->route('admin.inventarios.crearEntrada', compact('mensaje', 'estatus'));
-            }else{
-                return redirect()->route("admin.proveedores.index", compact('mensaje', 'estatus'));
-            }
 
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear el Proveedor, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = "No se registro el proveedor";
+            $estatus = 404;
+            return redirect()->route("admin.proveedores.index", compact('mensaje', 'estatus'));
         }
     }
 
