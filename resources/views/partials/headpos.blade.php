@@ -6,7 +6,7 @@
 {{-- SEO --}}
 <meta content="" name="description">
 <meta content="" name="keywords">
-<base href="http://cyberstock.com/public" target="objetivo">
+<base href="{{ env('APP_URL') }}" target="objetivo">
 <!-- Favicons -->
 <link href="assets/img/logocs.png" rel="icon">
 <link href="assets/img/logo.png" rel="apple-touch-icon">

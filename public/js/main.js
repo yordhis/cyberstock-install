@@ -1,6 +1,6 @@
 console.log("conectado al master");
-const URL_BASE = "http://cyberstock.com/api",
-URL_BASE_APP = "http://cyberstock.com",
+const URL_BASE = `/api`,
+URL_BASE_APP = ``,
 d = document,
 log = console.log,
 VENTA = {
@@ -9,7 +9,7 @@ VENTA = {
 },
 spinner = `
     <div class="spinner-border text-success" role="status" id="spinnerGlobal">
-    <span class="visually-hidden">Loading...</span>
+    <span class="visually-hidden">CARGANDO...</span>
     </div>
 `;
 

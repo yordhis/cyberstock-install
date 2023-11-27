@@ -29,11 +29,11 @@ $subcategoria = 'LISTA';
                 </a>
             </li><!-- End Components Nav | POS venta-->
             <!-- Start Components Nav | INVENTARIO -->
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link {{ $categoria == "INVENTARIOS" ? "bg-white text-black": '' }}" href="/inventarios" target="_self">
                 <i class="bi bi-box"></i><span>INVENTARIO</span></i>
             </a>
-        </li><!-- End Components Nav | INVENTARIO -->
+        </li><!-- End Components Nav | INVENTARIO --> --}}
 
         <!-- Start Components Nav | CLIENTES -->
         <li class="nav-item">
@@ -45,7 +45,7 @@ $subcategoria = 'LISTA';
         <!-- Start Components Nav | FACTURAS -->
         <li class="nav-item">
             <a class="nav-link {{ $categoria == "FACTURAS" ? "bg-white text-black": '' }}" href="/pos/facturas" target="_self">
-                <i class="bi bi-box"></i><span>CLIENTES</span></i>
+                <i class="bi bi-box"></i><span>FACTURAS</span></i>
             </a>
         </li><!-- End Components Nav | FACTURAS -->
 

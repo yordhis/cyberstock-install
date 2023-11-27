@@ -360,7 +360,7 @@ const componenteVuelto = async (metodos, factura) => {
     });
    
     vuelto = (Math.round(factura.total * 100)/100) - (Math.round(abonado*100)/100);
-    log( (Math.round(factura.total * 100)/100)+ ' - ' + (Math.round(abonado*100)/100) )
+   
     if(vuelto > 0){
         estilos = "text-danger";
         mensajeVuelto = "PENDIENTE";
@@ -977,10 +977,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             });
 
             /** Previsualizamos el monto abonado */
-            log(abonado)
-
+         
                 /** Validamos si el monto es mayor o igual al total a pagar */
-                if( Math.round(abonado) >= factura.total ){
+                if( (Math.round(abonado*100)/100) >= (Math.round(factura.total * 100)/100) ){
                     
                     /** Agregamos los metodos en formato JSON a la factura */
                     factura.metodos = JSON.stringify(metodosPagos);
