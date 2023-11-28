@@ -1030,8 +1030,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     
 
                 /** Validamos si el monto es mayor o igual al total a pagar */
-                log(abonado + ' -- ' + factura.total);
-                if( abonado >= factura.total ){
+             
+                if( (Math.round(abonado*100)/100) >= (Math.round(factura.total * 100)/100) ){
                     
                     /** Agregamos los metodos en formato JSON a la factura */
                     factura.metodos = JSON.stringify(metodosPagos);
@@ -1049,7 +1049,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         producto.subtotal = producto.subtotal;
                         await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
                     });
-                    
+
+                    /** MOSTRAR QUE ESTA CARGANDO  */
+                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+
+                    /** FACTURAR */
                     setTimeout( async ()=>{
                         
                             /** Procesamos la factura y generamos el ticket */

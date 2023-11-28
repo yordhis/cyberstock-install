@@ -1070,6 +1070,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
                     });
 
+                    /** MOSTRAR QUE ESTA CARGANDO  */
+                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+
+                    /** FACTURAR LA ENTRADA */
                     setTimeout(async ()=>{
                         
                         /** Procesamos la factura y generamos el ticket */
@@ -1077,7 +1081,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         /** Factura creada previsualizacion */
                         log('Factura de entrada creada')
                         log(resultadoDeFacturar);
-    
+                        
+
+
                         /** Mostramos el dialogo de facturar */
                          if ( resultadoDeFacturar.estatus == 201 ) {
                             log('entro aqui en la impresion de la factura')

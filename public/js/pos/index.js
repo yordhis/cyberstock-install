@@ -991,6 +991,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     let facturaVender = JSON.parse(localStorage.getItem('factura')),
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
+                    /** FACTURAR EL CARRITO */
                     /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
                     carritoVender.forEach(producto => {
                         producto.identificacion = facturaVender.identificacion;
@@ -998,12 +999,15 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
                     });
                     
+                    /** MOSTRAR QUE ESTA CARGANDO  */
+                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+
+                    /** FACTURAR */
                     setTimeout( async ()=>{
-                        
                         /** Procesamos la factura y generamos el ticket */
                         resultadoDeFacturar = await facturaStore(facturaVender);
                         log(resultadoDeFacturar);
-    
+                        
                         /** Mostramos el dialogo de facturar */
                          if (resultadoDeFacturar.estatus == 201) {
                             log('entro aqui en la impresion de la factura')
