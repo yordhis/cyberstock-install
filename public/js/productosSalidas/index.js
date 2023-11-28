@@ -1070,13 +1070,13 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                                     /** Eliminamos la factura del Storagr */
                                     localStorage.removeItem('carritoSalida');
                                     localStorage.removeItem('facturaSalida');
-                                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+                                    window.location.href = "/inventarios/crearSalida";
         
                                 } else {
                                     /** Eliminamos la factura del Storagr */
                                     localStorage.removeItem('carritoSalida');
                                     localStorage.removeItem('facturaSalida');
-                                    window.location.href = "http://cyberstock.com/inventarios/crearSalida";
+                                    window.location.href = "/inventarios/crearSalida";
                                 }
                             } else {
                                 alert(resultadoDeFacturar.mensaje)
