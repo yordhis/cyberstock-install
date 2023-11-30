@@ -42,24 +42,25 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout')
 
 
 Route::middleware(['auth'])->group(function () {
-    // Panel Principal
+    /** RUTAS DE PANEL */
     Route::get('/panel', [DashboardController::class, 'index']);
+
     /** ADMINISTRADOR */
-        // lista de cuenta por pagar y cobrar
+        /** RUTAS DE FACTURAS */
         Route::get('/facturas/{id}', [FacturaController::class, "show"])->name('admin.factura.ver');
         Route::get('/listaFacturaPorPagar', [FacturaController::class, "listaFacturaPorPagar"])->name('admin.listaFacturaPorPagar');
         Route::get('/listaFacturaPorCobrar', [FacturaController::class, "listaFacturaPorCobrar"])->name('admin.listaFacturaPorCobrar');
-        //  Usuarios
+        
+        /** RUTAS DE USUARIOS */
         Route::resource('/usuarios', UserController::class)->names('admin.users');
+        
+        /** RUTA EDITAR TASA */
         Route::put('/updateTasa/{idTasa}', [UtilidadeController::class, 'updateTasa'])->name('admin.utilidades.updateTasa');
+        
+        /** RUTAS DE UTILIDADES */
         Route::resource('/utilidades', UtilidadeController::class)->names('admin.utilidades');
     
-        //  Inventario
-        // Route::get('/inventarios/general', [InventarioController::class, "index"])->name('admin.inventarios.general');
-        // Route::post('/storeSalida', [CarritoInventarioController::class, "storeSalida"])->name('admin.carrito.inventario.salida');
-        // Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
-        // Route::delete('/carritoInventario/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroy"])->name('admin.carrito.inventario.destroy');
-        // Route::delete('/carritoInventarioSalida/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroySalida"])->name('admin.carrito.inventario.destroy');
+        /** RUTAS DE INVENTARIO */
         Route::get('/inventarios/listaEntradas', [InventarioController::class, "listaEntradas"])->name('admin.inventarios.listaEntradas');
         Route::get('/inventarios/listaSalidas', [InventarioController::class, "listaSalidas"])->name('admin.inventarios.listaSalidas');
         Route::get('/inventarios/crearEntrada', [InventarioController::class, "crearEntrada"])->name('admin.inventarios.crearEntrada');
@@ -80,14 +81,19 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('/categorias', CategoriaController::class)->names('admin.categorias');
             Route::resource('/marcas', MarcaController::class)->names('admin.marcas');
         });
+
+    /** @param CIERRE ADMINISTRADOR */
     
     /** VENDEDOR - ADMIN */
     /** POS VENTA */
+    Route::prefix('vendedor')->group(function (){
+        Route::get('/inventarios', [InventarioController::class, "getInventarioVendedor"])->name('vendedor.inventarios');
+    });
     Route::prefix('pos')->group(function (){
+        Route::resource('', PoController::class)->names('admin.pos');
         Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
         Route::resource('facturas', FacturaController::class)->names('admin.facturas');
         Route::resource('clientes', ClienteController::class)->names('admin.clientes');
     });
-    Route::resource('pos', PoController::class)->names('admin.pos');
       
 });
