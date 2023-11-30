@@ -22,169 +22,141 @@ class CarritoController extends Controller
         $this->data = new DataDev;
     }
 
-    public function eliminarCarritoCompleto($codigo)
-    {
-        try {
-            $carritoExiste = Carrito::where('codigo', $codigo)->get();
-            if (count($carritoExiste)) {
-                $estatusEliminar = Carrito::where('codigo', $codigo)->delete();
-                $mensaje = $estatusEliminar ? "La Factura se eliminó correctamente." : "No se pudo eliminar la factura";
-                $estatus = $estatusEliminar ? 201 : 404;
-            } else {
-                $mensaje = "La factura no se ha registrado, no se encontro factura que eliminar.";
-                $estatus = 404;
-            }
-
-            return redirect()->route('admin.pos.index', compact('mensaje', 'estatus'));
-        } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al Elimianr factura, ");
-            return view('errors.404', compact('mensajeError'));
-        }
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * API CARRITO
-     */
-    /** Listar carrito */
-    public function getCarrito($codigoFactura)
-    {
-        try {
-            $carrito = Carrito::where('codigo', $codigoFactura)->get();
-            if (count($carrito)) {
-                return response()->json([
-                    "mensaje" => "Consulta exitosa del carrito",
-                    "data" => $carrito,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            } else {
-                return response()->json([
-                    "mensaje" => "No hay carrito facturado con el codigo de factura ingresado",
-                    "data" => $carrito,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }
-        } catch (\Throwable $th) {
-            $mensaje = Helpers::getMensajeError($th, "Error al consultar carrito de compra");
-            return response()->json([
-                "mensaje" => $mensaje,
-                "data" => [],
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /** Registrar producto en el carrito */
-    public function facturarCarrito(HttpRequest $request)
-    {
-        try {
-       
-            /** Validadmos que la cantida no sobre pase la del inventario */
-            $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
-            if (count($productoEnInventario)) {
-                if ($request->cantidad > $productoEnInventario[0]->cantidad) {
+    /** @ API CARRITO @ */
+        /** Listar carrito */
+        public function getCarrito($codigoFactura)
+        {
+            try {
+                $carrito = Carrito::where('codigo', $codigoFactura)->get();
+                if (count($carrito)) {
                     return response()->json([
-                        "mensaje" => "La Existencia es insuficiente para facturar el producto {$request->descripcion} | Disponibles: {$request->cantidad} .",
-                        "data" => $productoEnInventario,
-                        "estatus" => Response::HTTP_UNAUTHORIZED
-                    ], Response::HTTP_UNAUTHORIZED);
+                        "mensaje" => "Consulta exitosa del carrito",
+                        "data" => $carrito,
+                        "estatus" => Response::HTTP_OK
+                    ], Response::HTTP_OK);
+                } else {
+                    return response()->json([
+                        "mensaje" => "No hay carrito facturado con el codigo de factura ingresado",
+                        "data" => $carrito,
+                        "estatus" => Response::HTTP_OK
+                    ], Response::HTTP_OK);
                 }
+            } catch (\Throwable $th) {
+                $mensaje = Helpers::getMensajeError($th, "Error al consultar carrito de compra");
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => [],
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-
-            /** Registramos el producto en el carrito DB */
-            $resultado = Carrito::create($request->all());
-            return response()->json([
-                "mensaje" => "El carrito se facturó correctamente",
-                "data" => $resultado,
-                "estatus" => Response::HTTP_OK,
-            ], Response::HTTP_OK);
-
-        } catch (\Throwable $th) {
-            $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
-            return response()->json([
-                "mensaje" => $mensaje,
-                "data" =>  $request->request,
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
 
-    /** Editar el producto del carrito */
-    /** Eliminar producto del carritos */
-    /** Eliminar todo el carrito */
+        /** Registrar producto en el carrito */
+        public function facturarCarrito(HttpRequest $request)
+        {
+            try {
+        
+                /** Validadmos que la cantida no sobre pase la del inventario */
+                // $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
+                // if (count($productoEnInventario)) {
+                //     if ($request->cantidad > $productoEnInventario[0]->cantidad) {
+                //         return response()->json([
+                //             "mensaje" => "La Existencia es insuficiente para facturar el producto {$request->descripcion} | Disponibles: {$request->cantidad} .",
+                //             "data" => $productoEnInventario,
+                //             "estatus" => Response::HTTP_UNAUTHORIZED
+                //         ], Response::HTTP_UNAUTHORIZED);
+                //     }
+                // }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Carrito  $carrito
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Carrito $carrito)
-    {
-        //
-    }
+                /** Registramos el producto en el carrito DB */
+                $resultado = Carrito::create($request->all());
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Carrito  $carrito
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Carrito $carrito)
-    {
-        //
-    }
+                if($resultado){
+                    return response()->json([
+                        "mensaje" => "El producto se agrego al carrito de la factura correctamente",
+                        "data" => $resultado,
+                        "estatus" => Response::HTTP_OK,
+                    ], Response::HTTP_OK);
+                }else{
+                    return response()->json([
+                        "mensaje" => "El producto no se agrego al carrito de la factura.",
+                        "data" => $resultado,
+                        "estatus" => Response::HTTP_NOT_FOUND,
+                    ], Response::HTTP_NOT_FOUND);
+                }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateCarritoRequest  $request
-     * @param  \App\Models\Carrito  $carrito
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateCarritoRequest $request, Carrito $carrito)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Carrito  $carrito
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Carrito $carrito)
-    {
-        try {
-            $identificacion = $carrito->identificacion;
-            $menuSuperior = $this->data->menuSuperior;
-            $carrito->delete();
-
-            $carritos = Carrito::where('codigo', $carrito->codigo)->get();
-            $codigo = $carrito->codigo;
-            return redirect()->route('admin.pos.index', compact('identificacion'));
-        } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al eliminar la producto del carrito, ");
-            return view('errors.404', compact('mensajeError'));
+            } catch (\Throwable $th) {
+                $mensaje = Helpers::getMensajeError($th, "Error al intentar agregar producto al carrito de la factura, ");
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" =>  $request->request,
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
-    }
+
+        /** Editar el producto del carrito */
+        /** Eliminar producto del carritos */
+        public function eliminarProductoCarrito($idProductoCarrito)
+        {
+            try {
+                
+                if($idProductoCarrito > 0) $resultado = Carrito::where('id', $idProductoCarrito)->delete();
+
+                if($resultado){
+                    return response()->json([
+                        "mensaje" => "El producto se eliminó del carrito de compra.",
+                        "data" => $resultado,
+                        "estatus" => Response::HTTP_OK,
+                    ], Response::HTTP_OK);
+                }else{
+                    return response()->json([
+                        "mensaje" => "¡El producto NO se eliminó del carrito de compra!",
+                        "data" => $resultado,
+                        "estatus" => Response::HTTP_NOT_FOUND,
+                    ], Response::HTTP_OK);
+                }
+                
+            } catch (\Throwable $th) {
+                $mensajeError = Helpers::getMensajeError($th, "Error Al eliminar la producto del carrito, ");
+                return response()->json([
+                    "mensaje" => $mensajeError,
+                    "data" => [],
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR,
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        /** Eliminar todo el carrito de la factura */
+        public function eliminarCarritoCompleto($codigoFactura)
+        {
+            try {
+            
+                $estatusEliminar = Carrito::where('codigo', $codigoFactura)->delete();
+                if($estatusEliminar){
+                    $mensaje = $estatusEliminar ? "Todos los productos del carrito se eliminarón correctamente de la factura" : "No se pudo eliminar el carrito de la factura";
+                    $estatus = $estatusEliminar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+                } else {
+                    $mensaje = "La factura no poseé carrito de compra.";
+                    $estatus = Response::HTTP_NOT_FOUND;
+                }
+
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => $estatusEliminar,
+                    "estatus" => $estatus,
+                ], $estatus);
+
+            } catch (\Throwable $th) {
+                $mensajeError = Helpers::getMensajeError($th, "Error Al Eliminar todos los productos de la factura, ");
+                return response()->json([
+                    "mensaje" =>  $mensajeError,
+                    "data" => [],
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR,
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+    /** @ CIERRE API CARRITO @ */
+  
 }

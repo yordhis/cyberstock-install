@@ -7,10 +7,10 @@
         <div class="card-body">
             <h1>Información de error del servidor:</h1>
             <p class="fs-5 text-danger">
-                {{$errorInfo ?? "No Hay datos del error"}}
+                {{$errorInfo ?? "Error 500"}}
             </p>
 
-            <a href="/login" target="_self" class="btn btn-primary">Volver al panel</a>
+            <a href="/login" target="_self" class="btn btn-danger">VOLVER</a>
         </div>
     </div>
     
