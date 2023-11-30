@@ -52,10 +52,10 @@
   @if ($pathname == 'inventarios')
       <script src="./js/inventarios/index.js" defer></script>
       <script src="./js/inventarios/inventarioController.js" defer></script>
-      {{-- <script src="./js/proveedores/proveedorController.js" defer></script>
-      <script src="./js/productos/productoController.js" defer></script>
-      <script src="./js/facturas/facturaController.js" defer></script>
-      <script src="./js/productosEntradas/index.js" defer></script> --}}
+  @endif
+  @if ($pathname == 'vendedor/inventarios')
+      <script src="./js/inventarios/vendedor.js" defer></script>
+      <script src="./js/inventarios/inventarioController.js" defer></script>
   @endif
 
 

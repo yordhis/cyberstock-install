@@ -51,6 +51,12 @@ class InventarioController extends Controller
         }
     }
 
+    public function getInventarioVendedor(){
+        $menuSuperior = $this->data->menuSuperior;
+            $pathname = FacadesRequest::path();
+            return view("admin.inventarios.listaVenedor", compact('menuSuperior', 'pathname'));
+    }
+
     /** API REST FULL */
     public function getInventariosFiltro(Request $request)
     {
