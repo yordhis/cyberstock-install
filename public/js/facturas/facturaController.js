@@ -378,7 +378,7 @@ const htmlTicket = (factura) => {
                     <th colspan="2" class="cantidad">RIF: ${factura.cliente.tipo}-${factura.cliente.identificacion}</th>
                 </tr>
                 <tr>
-                    <th class="producto"> N° ${factura.iva > 0 ? 'FACTURA' : 'NOTA'} </th>
+                    <th class="producto"> N° ${factura.iva == 0 ? 'NOTA' : 'FACTURA'} </th>
         
                     <th class="precio"> ${factura.codigo} </th>
                 </tr>

@@ -89,8 +89,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('vendedor')->group(function (){
         Route::get('/inventarios', [InventarioController::class, "getInventarioVendedor"])->name('vendedor.inventarios');
     });
+    Route::resource('pos', PoController::class)->names('admin.pos');
     Route::prefix('pos')->group(function (){
-        Route::resource('', PoController::class)->names('admin.pos');
         Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
         Route::resource('facturas', FacturaController::class)->names('admin.facturas');
         Route::resource('clientes', ClienteController::class)->names('admin.clientes');

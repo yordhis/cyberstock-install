@@ -34,9 +34,9 @@ use App\Http\Controllers\{
 Route::group(['middleware' => ['cors']], function () {
     /** PRODUCTOS */
     Route::post('getProductosFiltro', [ProductoController::class, 'getProductosFiltro'])->name('api.getProductosFiltro');
-    Route::get('getProductoData/{barcode}', [ProductoController::class, 'getProductoData'])->name('api.productos');
-    Route::get('getProducto/{barcode}', [ProductoController::class, 'getProducto'])->name('api.productos');
-    Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.productos');
+    Route::get('getProductoData/{barcode}', [ProductoController::class, 'getProductoData'])->name('api.getProductoData');
+    Route::get('getProducto/{barcode}', [ProductoController::class, 'getProducto'])->name('api.getProducto');
+    Route::get('getProductos', [ProductoController::class, 'getProductos'])->name('api.getProductos');
     Route::resource('productos', ProductoController::class)->names('api.productos');
     
     /** CATEGORIAS */

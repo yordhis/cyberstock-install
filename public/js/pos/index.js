@@ -40,6 +40,7 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <p class="card-text">
                 <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
                 <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
+                <b>Teléfono:</b> ${cliente.telefono.substring(4,0)}-${cliente.telefono.substring(4)} <br><br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
@@ -112,6 +113,15 @@ const componenteFormularioAgregarCliente = () => {
             <div class="form-floating m-2">
                 <div id="respuesta-de-validacion"></div>                
             </div>
+
+            <div class="form-floating m-2">
+                <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <label for="floatingInput">TELÉFONO</label>
+                <div class="text-danger validate"></div>
+            </div>
+            <div class="form-floating m-2">
+                <div id="respuesta-de-validacion"></div>                
+            </div>
             <div class="form-floating m-2">
                 <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
                 
@@ -160,6 +170,11 @@ const componenteFormularioEditarCliente = (cliente) => {
                 <div class="form-floating m-2">
                     <input type="number" class="form-control" name="identificacion" value="${cliente.identificacion}" id="floatingInput" placeholder="Ingrese número de identificación.">
                     <label for="floatingInput">RIF O ID</label>
+                    <div class="text-danger validate"></div>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <label for="floatingInput">TELÉFONO</label>
                     <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
