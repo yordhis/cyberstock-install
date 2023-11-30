@@ -34,9 +34,7 @@ class UserController extends Controller
         try {
             $usuarios = Helpers::getUsuarios();
             $pathname = Request::path();
-           
             $menuSuperior = $this->data->menuSuperior;
-        
             return view('admin.usuarios.lista', compact('menuSuperior', 'pathname', 'usuarios'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al Consultar datos de usuarios en el metodo index,");
@@ -52,7 +50,7 @@ class UserController extends Controller
     public function create()
     {
         try {
-            $roles = Role::where('id','>', 1)->get();
+            $roles = Role::where('nombre', '!=', 'root')->get();
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
             return view('admin.usuarios.crear', compact('roles', 'pathname', 'menuSuperior'));
@@ -74,16 +72,18 @@ class UserController extends Controller
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
             
-            $roles = Role::where('id','>', 1)->get();
+            $roles = Role::where('nombre', '!=', 'root')->get();
             $estatusCreate = 0;
-            $datoExiste = Helpers::datoExiste($request, ["users" => ["email","","email"]]);
-            if(!$datoExiste){
+
+            $datoExiste = User::where('email', $request->email)->get();
+            
+            if(!count($datoExiste)){
                 // Seteamos la foto
                 if(isset($request->file)){
                     $request['foto'] = Helpers::setFile($request);
                 }
                 // Encriptamos la contraseña
-                $request['password'] = Hash::make($request['password']);
+                $request['password'] = Hash::make($request->password);
                 // Creamos el usuario
                 $estatusCreate = User::create($request->all());
             }

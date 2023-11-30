@@ -55,15 +55,15 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('/utilidades', UtilidadeController::class)->names('admin.utilidades');
     
         //  Inventario
-        Route::get('/inventarios/general', [InventarioController::class, "index"])->name('admin.inventarios.general');
+        // Route::get('/inventarios/general', [InventarioController::class, "index"])->name('admin.inventarios.general');
+        // Route::post('/storeSalida', [CarritoInventarioController::class, "storeSalida"])->name('admin.carrito.inventario.salida');
+        // Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
+        // Route::delete('/carritoInventario/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroy"])->name('admin.carrito.inventario.destroy');
+        // Route::delete('/carritoInventarioSalida/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroySalida"])->name('admin.carrito.inventario.destroy');
         Route::get('/inventarios/listaEntradas', [InventarioController::class, "listaEntradas"])->name('admin.inventarios.listaEntradas');
         Route::get('/inventarios/listaSalidas', [InventarioController::class, "listaSalidas"])->name('admin.inventarios.listaSalidas');
         Route::get('/inventarios/crearEntrada', [InventarioController::class, "crearEntrada"])->name('admin.inventarios.crearEntrada');
         Route::get('/inventarios/crearSalida', [InventarioController::class, "crearSalida"])->name('admin.inventarios.crearSalida');
-        Route::post('/storeSalida', [CarritoInventarioController::class, "storeSalida"])->name('admin.carrito.inventario.salida');
-        Route::post('/carritoInventario', [CarritoInventarioController::class, "store"])->name('admin.carrito.inventario');
-        Route::delete('/carritoInventario/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroy"])->name('admin.carrito.inventario.destroy');
-        Route::delete('/carritoInventarioSalida/{codigoFactura}/{codigoProducto}', [CarritoInventarioController::class, "destroySalida"])->name('admin.carrito.inventario.destroy');
         Route::resource('/inventarios', InventarioController::class)->names('admin.inventarios');
         
         /** Rutas de productos */

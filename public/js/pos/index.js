@@ -225,7 +225,7 @@ const componenteAgregarCantidadDeProductoModal = (producto) =>{
                     <label for="floatingInput">Cantidad</label>
                 </div>
                 <p class="text-muted fs-4"> Enter para agregar </p>
-                <p class="btn btn-none text-danger fs-5 cerrar__ModalCustom" id="cerrarModalCustom"> SALIR </p>
+                <p class="btn btn-none text-danger fs-5 cerrar__ModalCustom" id="cerrarModalCustom"> CERRAR </p>
             </div>
         </section>
     `;
@@ -486,6 +486,14 @@ const hanledLoad = async (e) => {
     if(facturaStorage){
 
         factura = facturaStorage;
+         /** ALMACENAMOS LA FACTURA */
+         factura.codigo = resultado.data;
+         factura.concepto = VENTA.name;
+         factura.tipo = 'SALIDA';
+         factura.iva = 0.16;
+         let fecha = new Date();
+         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+         localStorage.setItem('factura', JSON.stringify(factura));
 
         /** CLIENTE */
         elementoTarjetaCliente.innerHTML = spinner;
@@ -540,8 +548,7 @@ const hanledLoad = async (e) => {
 
 const hanledAccionesCliente = async (e) => {
     e.preventDefault();
-    // log(e.key)
-    // log(e.target.parentElement)
+
 
     switch (e.target.parentElement.id) {
         case 'activarInputBuscarCliente':
