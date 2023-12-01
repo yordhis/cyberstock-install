@@ -18,11 +18,18 @@ class DataDev
     public $utilidades;
     public $tiposEntradas;
     public $tiposSalidas;
+    public $datosDefault;
     /**
      * Constructor
      */
      public function __construct(){
 
+        $this->datosDefault = [
+            "FOTO_PORDEFECTO" => "/storage/fotos/default.jpg",
+            "FOTO_PORDEFECTO_PRODUCTO" => "/storage/fotos/producto.jpg",
+            "LOGO_PORDEFECTO" => "/storage/fotos/logo-default.png",
+        ];
+        
         $this->tiposEntradas = [
             "COMPRA", // 5
             "DEVOLUCION", // 6

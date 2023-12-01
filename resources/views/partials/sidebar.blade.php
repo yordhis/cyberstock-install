@@ -49,6 +49,13 @@ $subcategoria = 'LISTA';
             </a>
         </li><!-- End Components Nav | FACTURAS -->
 
+        <!-- Start Components Nav | REPORTES -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "REPORTES" ? "bg-white text-black": '' }}" href="/vendedor/reportes" target="_self">
+                <i class='bx bx-receipt'></i><span>REPORTES</span></i>
+            </a>
+        </li><!-- End Components Nav | REPORTES -->
+
     
 
         @endif
@@ -108,6 +115,13 @@ $subcategoria = 'LISTA';
                 <i class="bi bi-receipt"></i><span>FACTURAS</span></i>
             </a>
         </li><!-- End Components Nav | FACTURAS -->
+
+        <!-- Start Components Nav | REPORTES -->
+        <li class="nav-item">
+            <a class="nav-link {{ $categoria == "REPORTES" ? "bg-white text-black": '' }}" href="/reportes" target="_self">
+                <i class='bx bx-receipt'></i><span>REPORTES</span></i>
+            </a>
+        </li><!-- End Components Nav | REPORTES -->
      
         @endif
 

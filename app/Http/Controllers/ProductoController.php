@@ -14,6 +14,7 @@ use App\Http\Requests\StoreProductoRequest;
 use App\Http\Requests\UpdateProductoRequest;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 
 class ProductoController extends Controller
@@ -275,8 +276,8 @@ class ProductoController extends Controller
     public function store(StoreProductoRequest $request)
     {
         try {
-            // return $request;
             $menuSuperior = $this->data->menuSuperior;
+
             $productos = Producto::all();
             $categorias = Categoria::all();
             $marcas = Marca::all();
@@ -285,9 +286,8 @@ class ProductoController extends Controller
                 $url = Helpers::setFile($request);
                 $request['imagen'] = $url;
             }else {
-                $request['imagen'] = FOTO_PORDEFECTO_PRODUCTO;
+                $request['imagen'] = $this->data->datosDefault['FOTO_PORDEFECTO_PRODUCTO'];
             }
-
            
 
             // Validamos si el producto tiene stock inicial
@@ -362,7 +362,7 @@ class ProductoController extends Controller
              // Seteamos la imagen
              if($request->file){
                 // Removemos la imagen anterior
-                if($producto->imagen != FOTO_PORDEFECTO_PRODUCTO){
+                if($producto->imagen != $this->data->datosDefault['FOTO_PORDEFECTO_PRODUCTO'] ){
                     Helpers::removeFile($producto->imagen);
                 }
                 $url = Helpers::setFile($request);
@@ -403,6 +403,20 @@ class ProductoController extends Controller
                             'producto', 'categorias', 'marcas', 'menuSuperior', 'pathname',
                             'mensaje', 'estatus'
                         ));
+                    }
+                }else{
+                    $estaEnInventario = Inventario::where('codigo', $codigo)->get();
+                    if(count($estaEnInventario)){
+                        Inventario::updateOrCreate(
+                            [
+                                "codigo" => $codigo,
+                            ],
+                            [
+                                "descripcion" => $producto->descripcion,
+                                "id_marca" => $producto->id_marca,
+                                "id_categoria" => $producto->id_categoria,
+                                "imagen" => $producto->imagen,
+                        ]);
                     }
                 }
             }
