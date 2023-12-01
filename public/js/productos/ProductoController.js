@@ -64,7 +64,7 @@ const getProductos = async (url) => {
                         },
                     })
                     .then(response => response.json())
-                    .catch(err => log(err))
+                    .catch(err => err)
                     .then(data => data)    
 }
      
@@ -85,7 +85,7 @@ const getProducto = (barcode) => {
                     },
                 })
                 .then(response => response.json())
-                .catch(err => log(err))
+                .catch(err => err)
                 .then(data => data)
         
                 })

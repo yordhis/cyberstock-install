@@ -15,6 +15,7 @@ use App\Models\{
     Helpers,
     Po,
     Proveedore,
+    Utilidade,
     Utility
 };
 
@@ -61,8 +62,7 @@ class InventarioController extends Controller
     public function getInventariosFiltro(Request $request)
     {
         try {
-            $tasa = $this->data->utilidades[0]->tasa;
-            $inventarios = [];
+            $tasa = Utilidade::all()[0]->tasa;
             // filtramos por la descripcion
             if (request('filtro')) {
                 /** Buscamos por codigo de barra */
@@ -127,7 +127,7 @@ class InventarioController extends Controller
     public function getInventarios(Request $request)
     {
         try {
-            $tasa = $this->data->utilidades[0]->tasa;
+            $tasa = Utilidade::all()[0]->tasa;
 
             // filtramos por la descripcion
             if (request('filtro')) {
@@ -309,7 +309,6 @@ class InventarioController extends Controller
     public function crearSalida(Request $request)
     {
         try {
-
             $menuSuperior = $this->data->menuSuperior;
             $pathname = $request->path();
             return view('admin.salidas.index', compact( 'menuSuperior', 'pathname'));

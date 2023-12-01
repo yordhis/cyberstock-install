@@ -193,7 +193,7 @@ class ProveedoreController extends Controller
                     $url = Helpers::setFile($request);
                     $request['imagen'] = $url;
                 }else {
-                    $request['imagen'] = FOTO_PORDEFECTO;
+                    $request['imagen'] = $this->data->datosDefault['FOTO_PORDEFECTO'];
                 }
     
                 $estatusCrear = Proveedore::create($request->all());

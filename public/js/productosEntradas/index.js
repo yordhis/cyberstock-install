@@ -291,7 +291,6 @@ const componenteListaDeProductoEnFactura = (producto) => {
 };
 
 const componenteNumeroDeFactura = (data) =>{
-    // log(data)
     return `<i class="bi bi-back"></i> N° Movimiento: ${data.data}`;
 };
 
@@ -534,7 +533,6 @@ const hanledLoad = async (e) => {
     let resultado =  await getCodigoFactura(`${URL_BASE}/getCodigoFactura/factura_inventarios`);
     codigoFactura.innerHTML = componenteNumeroDeFactura(resultado);
     
-    // log(JSON.parse(localStorage.getItem('facturaInventario')))
     facturaStorage = JSON.parse(localStorage.getItem('facturaInventario'))
 
     if(facturaStorage){
@@ -563,7 +561,6 @@ const hanledLoad = async (e) => {
         let fecha = new Date();
         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
         localStorage.setItem('facturaInventario', JSON.stringify(factura));
-        // log(JSON.parse(localStorage.getItem('facturaInventario')))
     }
 
     /** Cargamos el componente factura */
@@ -616,7 +613,7 @@ const hanledAccionesCliente = async (e) => {
             break;
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner;
-            // log(e.target.parentElement.pathname.substring(1))
+
             let proveedor = await getProveedor(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(proveedor.data);
             cargarEventosAccionesDelCliente();
@@ -637,12 +634,10 @@ const hanledBuscarProveedor = async (e) => {
         if(!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo es obligatorio!");
         else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
   
-        
-        // log(e.target.value)
         /** Se cargar el spinner para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner;
         let cliente = await getProveedor( parseInt(e.target.value) );
-        log(cliente)
+
         /** Validamos si no hay data del cliente */
         if(!cliente.data.length){
             elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);
@@ -656,7 +651,6 @@ const hanledBuscarProveedor = async (e) => {
             factura.tipoDocumento = cliente.data[0].tipo_documento;
             factura.razon_social = cliente.data[0].empresa;
             localStorage.setItem('facturaInventario', JSON.stringify(factura));
-            log(JSON.parse(localStorage.getItem('facturaInventario')))
             // utilidad de cargar eventos de las acciones del cliente
             cargarEventosAccionesDelCliente()
         }
@@ -667,19 +661,15 @@ const hanledFormulario = async (e) => {
     e.preventDefault();
     let resultado = '', 
     cliente = '';
-    // log(e.target)
-    // log(e.target.action)
-    // log(e.target)
+ 
     switch (e.target.id) {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
-                    log(resultado)
                     if(!resultado) return;
                     e.target.innerHTML = spinner;
                     
                     proveedor = await storeProveedor(resultado);
 
-                    log(proveedor)
                     if(proveedor.estatus == 401){
                         elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
                         let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
@@ -706,9 +696,7 @@ const hanledFormulario = async (e) => {
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
             e.target.innerHTML = spinner;
-            log(resultado)
             proveedor = await updateProveedor(e.target.action, resultado);
-            log(proveedor)
                /** Seteamos el proveedor en la factura de local storage */
                factura.identificacion = proveedor.data[0].codigo;
                factura.tipoDocumento = proveedor.data[0].tipo_documento;
@@ -733,7 +721,6 @@ const hanledFormulario = async (e) => {
 
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
-    log(e.target.id)
 
     if(e.target.id == "cerrarModalCustom"){
            /** CERRAMOS EL MODAL */
@@ -741,7 +728,6 @@ const hanledAgregarAFactura = async (e) => {
     }
 
     if(e.target.id == "agregarProductoAlCarrito"){
-        log('envio la cantidad')
         let carritoActualizado = [],
         carritoActual = localStorage.getItem('carritoInventario') != 'undefined' ? JSON.parse(localStorage.getItem('carritoInventario')) : [],
         banderaDeALertar = 0,
@@ -762,7 +748,6 @@ const hanledAgregarAFactura = async (e) => {
             esquemaDeDatosDeEntrada = {}; // tipo de dato OBJECT
 
            /** Validamos que la cantida sea agreagada y el costo y pvp detal */
-            log(datosDeEntrada)
             for (const datosEntrantes of datosDeEntrada) {
                if(datosEntrantes.name == "cantidad" || datosEntrantes.name == "costo" || datosEntrantes.name == "pvp"){
                     if(datosEntrantes.value == "") banderaDeALertar++, datosEntrantes.parentElement.children[2].textContent = `El campo ${datosEntrantes.name.toUpperCase()} es obligatorio.`;
@@ -849,7 +834,6 @@ const hanledBuscarProducto = async (e) => {
         let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
         lista='';
     
-        log(resultado);
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         resultado.data.data.forEach( async (producto) => {
             producto.tasa = resultado.tasa;
@@ -886,7 +870,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     }
 
 
-    // log(e.target.id);
     switch (accion) {
         case 'editarCantidadFactura':
               
@@ -912,7 +895,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         return producto;
                     }
                     if(producto.codigo_producto == codigoProducto ) {
-                        log(parseFloat(producto.costo));
                         producto.cantidad = parseFloat( cantidad );
                         producto.subtotal = parseFloat( producto.costo * cantidad );
                         // producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
@@ -941,7 +923,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'eliminarProductoFactura':
                 let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
-                log(carritoActualizadoC)
                 localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoC.reverse()));
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
@@ -990,10 +971,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         case 'cargarModalMetodoPago':
                 if(factura.identificacion == ""){
                     return alert("Debes Ingresar un cliente para poder vender");
-                    log(elementoMetodoDePagoModal)
                 }
                
-                log(elementoMetodoDePagoModal.children[0])
                await cargarEventosAccionesDeFactura()
 
             break;
@@ -1020,9 +999,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             /** Validamos si el codigo de la factura del proveedor no se repite */
             let yaExisteElCodigoFacturaEntrada = await getFacturaES(`${URL_BASE}/getFacturaES`, factura );  
-    
             if(yaExisteElCodigoFacturaEntrada.estatus == 409) return elementoAlertas.innerHTML = componenteAlerta(yaExisteElCodigoFacturaEntrada.mensaje, 401), elementoCodigoFacturaProveedor.value = "", factura.codigo_factura = "", setTimeout(()=>{elementoAlertas.innerHTML = ''},2500);
-            else log('continua con el proceso de entrada')
             
             /** validamos si el cliente esta agregado a la factura  */
             if(factura.identificacion == "") {
@@ -1039,17 +1016,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             /** VALIDAMOS QUE HALLA PRODUCTOS EN LA FACTURA O CARRITO */
             if(!carritoActual.length) return  elementoAlertas.innerHTML = componenteAlerta("Debes ingresar productos a la factura, para continuar.", 401), setTimeout(()=>{elementoAlertas.innerHTML=""},2500);
             
-            /** SETEAMOS EL CODIGO DE LA FACTURA DEL PROVEEDOR */
-            log(factura)
-            log(carritoActual)
-            
             localStorage.setItem( 'facturaInventario', JSON.stringify(factura) );
             carritoActualizadoZ = carritoActual.map(productoEnCarrito => {
                 productoEnCarrito.identificacion = factura.identificacion;
                 productoEnCarrito.codigo_factura =  elementoCodigoFacturaProveedor.value;
                 return productoEnCarrito;
             })
-            log(carritoActualizadoZ)
             localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoZ));
 
             /** Preguntamos si desea seguir con la acción */
@@ -1057,13 +1029,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             /** Validamos la respuesta del usuario */
             if(confirmarProcesoDeEntrada){
-                log('procesando entrada');
-    
+        
                     /** Obtenemos el carrito y la factura actualizados */
                     let facturaVender = JSON.parse(localStorage.getItem('facturaInventario')),
                     carritoVender = JSON.parse(localStorage.getItem('carritoInventario'));
-                    
-                    log(carritoVender)
                    
                     /** Al procesar la facturacion del carrito agregamos al inventario las cantidades */
                     carritoVender.forEach(async producto => {
@@ -1078,17 +1047,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         
                         /** Procesamos la factura y generamos el ticket */
                         resultadoDeFacturar = await setFactura( `${URL_BASE}/setFacturaEntrada`, facturaVender );
-                        /** Factura creada previsualizacion */
-                        log('Factura de entrada creada')
-                        log(resultadoDeFacturar);
-                        
-
 
                         /** Mostramos el dialogo de facturar */
                          if ( resultadoDeFacturar.estatus == 201 ) {
-                            log('entro aqui en la impresion de la factura')
                             resultadoConfirm = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                            log(resultadoConfirm)
                             if (resultadoConfirm) {
                                     imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
                                 // imprimirElemento(htmlTicket(resultadoDeFacturar.data));
@@ -1118,20 +1080,17 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
 
             }else{
-                return log('accion cancelada.')
+                return alert('Acción cancelada.')
             }
 
             break;
         case 'desactivarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
             break;
         case 'activarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0.16, factura.descuento);
             break;
         case 'editarDescuento':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
         default:
@@ -1145,7 +1104,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
 /** NO SE ESTA USANDO ESTE MANEJADOR */
 const hanledAccionesDeMetodoDePago = async (e) => {
-    log(e.target.id)
     let accion = e.target.id,
     elementoMetodoDePago = d.querySelector('#elementoMetodoDePago'),
     metodosActuales = d.querySelectorAll('.metodoAdd'),
@@ -1177,15 +1135,12 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                     tipoDePago: null,
                     montoDelPago: 0,
                 });
-                log(arregloDeMetodosDePago)
                 metodosPagos = arregloDeMetodosDePago;
-                log(metodosPagos)
                 elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'eliminarMetodo':
                 // elementoMetodoDePago.innerHTML += componenteMetodosForm();
-                log(e.target.parentElement.id);
                 metodosActuales.forEach(element => {
                     if(element.children[2].id  != e.target.parentElement.id){
                         arregloDeMetodosDePago.push({
@@ -1222,7 +1177,6 @@ const hanledAccionesDeMetodoDePago = async (e) => {
             break;
         case 'montoDelPago':
             /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
-            // log(e.target.parentElement.parentElement.children[2].lastElementChild.id)
             metodosActuales.forEach(element => {
                 if(e.target.parentElement.parentElement.children[2].lastElementChild.id == element.id){
                     arregloDeMetodosDePago.push({
@@ -1338,7 +1292,6 @@ function adaptadorDeProducto(data){
 };
 
 function adaptadorDeProductoACarrito(producto, data, factura){
-    log(data);
     return {
         codigo: factura.codigo, // Codigo del movimiento
         codigo_factura: factura.codigo_factura, // Codigo de la factura
@@ -1414,7 +1367,6 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     carritoActual.forEach(producto => {
         acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
     });
-    log(acumuladorSubtotal)
     factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;

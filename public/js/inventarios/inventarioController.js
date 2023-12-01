@@ -1,5 +1,3 @@
-log('conectado a los controladores')
-
 const getInventarios = async (url) => {
     return await fetch(`${url}`, {      
         method: "GET", // or 'PUT'
@@ -9,7 +7,7 @@ const getInventarios = async (url) => {
         },
     })
     .then(response => response.json())
-    .catch(err => log(err))
+    .catch(err => err)
     .then(data => data)
 };
 

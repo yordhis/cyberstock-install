@@ -15,6 +15,7 @@ use App\Http\Requests\UpdateProductoRequest;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
 class ProductoController extends Controller
@@ -35,20 +36,10 @@ class ProductoController extends Controller
     {
         $menuSuperior = $this->data->menuSuperior;
         $utilidades = $this->data->utilidades;
-        $inventarioPorDefecto = ['costo'=>0,'cantidad'=>0, 'pvp'=>0];
-        // return Producto::paginate(15);
-        $productos = Helpers::setNameElementId(Producto::all(), 'id,nombre', 'categorias,marcas');
-        
-        foreach ($productos as $key => $producto) {
-            $resultado = Inventario::where('codigo', $producto->codigo)->select('costo', 'cantidad', 'pvp')->get();
-            $producto['inventario'] = count($resultado) ? $resultado[0] :  $inventarioPorDefecto;
-        }
-
-        
         $pathname = Request::path();
         $categorias = Categoria::all();
         $marcas = Marca::all();
-        return view('admin.productos.lista', compact('productos', 'menuSuperior', 'categorias', 'marcas', 'pathname', 'utilidades') );
+        return view('admin.productos.lista', compact( 'menuSuperior', 'pathname', 'utilidades', 'categorias', 'marcas') );
     }
 
     /** API REST FULL */
@@ -178,65 +169,8 @@ class ProductoController extends Controller
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
     }
-
-    // public function getProductoData($barcode){
-    //     try {
-          
-    //         $product = Producto::where(['codigo'=> $barcode])->get();
-    //         if (count($product)) {
-    //             return response()->json([
-    //                 "message" => "Consulta exitosa",
-    //                 "data" => $product[0],
-    //                 "status" => Response::HTTP_OK
-    //             ], Response::HTTP_OK);
-    //         }else{
-    //             return response()->json([
-    //                 "message" => "No hay resultados",
-    //                 "data" => [],
-    //                 "status" => Response::HTTP_OK
-    //             ], Response::HTTP_OK);
-    //         }
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
-    //             "data" => [],
-    //             "status" => Response::HTTP_INTERNAL_SERVER_ERROR
-    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
-
-    // public function getProducto($barcode){
-    //     try {
-    //         // $utilidades = $this->data->utilidades;
-    //         $product = Inventario::where(['codigo'=> $barcode])->get();
-    //         // return $utilidades->pvp_1['sumar'];
-    //         // if($product[0]->pvp == 0){
-    //         //     $product[0]->pvp =  $product[0]->costo * $utilidades->pvp_1['sumar'];
-    //         // }
-    //         if (count($product)) {
-    //             return response()->json([
-    //                 "message" => "Consulta exitosa",
-    //                 "data" => $product[0],
-    //                 "status" => Response::HTTP_OK
-    //             ], Response::HTTP_OK);
-    //         }else{
-    //             return response()->json([
-    //                 "message" => "El código de barra no corresponde a ningún producto en nuestros registros, por favor ingrese otro código o registre el producto.",
-    //                 "data" => [],
-    //                 "status" => Response::HTTP_OK
-    //             ], Response::HTTP_OK);
-    //         }
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             "message" => "Error al consultar producto por codigo de barra, " . $th->getMessage(),
-    //             "data" => [],
-    //             "status" => Response::HTTP_INTERNAL_SERVER_ERROR
-    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    
     /**  CIERRE API REST FULL */
 
    

@@ -6,9 +6,9 @@ elementoCodigoFactura = d.querySelector('#codigoFactura'),
 factura = {};
 
 const hanledLoad = async () => {
-log(elementoCodigoFactura.textContent)
+// log(elementoCodigoFactura.textContent)
     factura = await getFactura(elementoCodigoFactura.textContent);
-    log(factura)
+    // log(factura)
  
     /** Si la factura existe mostramosl o metodos de pagos */
     if (factura.estatus == 200) {
@@ -47,7 +47,7 @@ const hanledImprimirFactura = async (e) => {
 
     elementoCargando.innerHTML = spinner;
     resultado = await getFactura(e.target.id);
-    log(resultado);
+    // log(resultado);
     if (resultado.estatus == 200) {
         imprimirElemento(htmlTicket(resultado.data));
         elementoCargando.innerHTML = '';
