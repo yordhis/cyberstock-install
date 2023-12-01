@@ -22,6 +22,11 @@
   <script src="./js/partials/alert.js" defer></script>
 
 
+  @if ( $pathname == 'reportes' || $pathname == 'vendedor/reportes' )
+      <script src="./js/reportes/index.js" defer></script>
+  @endif
+
+
   @if ($pathname == 'productos')
       <script src="./js/productos/productoController.js" defer></script>
       <script src="./js/productos/categorias/CategoriaController.js" defer></script>
@@ -53,6 +58,7 @@
       <script src="./js/inventarios/index.js" defer></script>
       <script src="./js/inventarios/inventarioController.js" defer></script>
   @endif
+
   @if ($pathname == 'vendedor/inventarios')
       <script src="./js/inventarios/vendedor.js" defer></script>
       <script src="./js/inventarios/inventarioController.js" defer></script>

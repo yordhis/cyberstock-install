@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     PoController,
     ProductoController,
     ProveedoreController,
+    ReporteController,
     UtilidadeController,
 };
 
@@ -82,18 +83,23 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('/marcas', MarcaController::class)->names('admin.marcas');
         });
 
+        Route::get('/reportes', [ReporteController::class, "index"])->name('admin.reportes');
+
     /** @param CIERRE ADMINISTRADOR */
     
     /** VENDEDOR - ADMIN */
-    /** POS VENTA */
-    Route::prefix('vendedor')->group(function (){
-        Route::get('/inventarios', [InventarioController::class, "getInventarioVendedor"])->name('vendedor.inventarios');
-    });
-    Route::prefix('pos')->group(function (){
-        Route::resource('', PoController::class)->names('admin.pos');
-        Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
-        Route::resource('facturas', FacturaController::class)->names('admin.facturas');
-        Route::resource('clientes', ClienteController::class)->names('admin.clientes');
-    });
+        /** LISTA INVENTARIO  */
+        Route::prefix('vendedor')->group(function (){
+            Route::get('/inventarios', [InventarioController::class, "getInventarioVendedor"])->name('vendedor.inventarios');
+            Route::get('/reportes', [ReporteController::class, "index"])->name('vendedor.reportes');
+        });
+
+        /** POS VENTA */
+        Route::prefix('pos')->group(function (){
+            Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+            Route::resource('facturas', FacturaController::class)->names('admin.facturas');
+            Route::resource('clientes', ClienteController::class)->names('admin.clientes');
+        });
+        Route::resource('pos', PoController::class)->names('admin.pos');
       
 });

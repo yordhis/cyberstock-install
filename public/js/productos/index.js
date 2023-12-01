@@ -265,7 +265,6 @@ const hanledLoad = async (e) => {
 
 const hanledBotonEliminar = async (e) => {
     e.preventDefault();
-    // log(e.target.parentElement.parentElement.parentElement.isConnected);
  
     // Asignamos el spinner
     e.target.parentElement.parentElement.children[1].innerHTML = spinner;
@@ -275,7 +274,7 @@ const hanledBotonEliminar = async (e) => {
 
     // Hacemos la peticion a la API para eliminar el producto del inventario
     let resultado = await deleteProducto(e.target.id);
-    log(resultado);
+   
     // retornamos una respuesta
     // e.target.parentElement.parentElement.children[1].innerHTML = respuesta( resultado.mensaje, resultado.estatus );
     

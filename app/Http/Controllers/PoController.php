@@ -38,16 +38,7 @@ class PoController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
+    
     /**
      * Store a newly created resource in storage.
      *
@@ -56,7 +47,7 @@ class PoController extends Controller
      */
     public function store(StorePoRequest $request)
     {
-        return $request;
+        return redirect('/pos/1');
     }
 
     /**
@@ -75,17 +66,6 @@ class PoController extends Controller
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar POS, ");
             return view('errors.404', compact('mensajeError'));
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Po  $po
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Po $po)
-    {
-        return $po;
     }
 
     /**
@@ -118,7 +98,7 @@ class PoController extends Controller
           
             if($estatusActualizar == 0){
                 if($url != null){
-                    if ($url != LOGO_PORDEFECTO) {
+                    if ($url !=  $this->data->datosDefault['LOGO_PORDEFECTO']) {
                         Helpers::removeFile($url);
                     }
                 }
@@ -129,7 +109,7 @@ class PoController extends Controller
             return redirect()->route('admin.pos.show', [$id, "estatus" => $estatus, "mensaje"=> $mensaje]);
         } catch (\Throwable $th) {
             if($url != null){
-                if ($url != LOGO_PORDEFECTO) {
+                if ($url != $this->data->datosDefault['LOGO_PORDEFECTO']) {
                     Helpers::removeFile($url);
                 }
             }
@@ -138,14 +118,4 @@ class PoController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Po  $po
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Po $po)
-    {
-        //
-    }
 }

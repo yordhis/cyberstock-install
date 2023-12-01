@@ -295,7 +295,6 @@ const componenteListaDeProductoEnFactura = (producto) => {
 };
 
 const componenteNumeroDeFactura = (data, nombre) =>{
-    // log(data)
     return `<i class="bi bi-back"></i> N° ${nombre}: ${data.data}`;
 };
 
@@ -515,7 +514,6 @@ const hanledLoad = async (e) => {
     codigoFactura.innerHTML += '<br>';
     codigoFactura.innerHTML += componenteNumeroDeFactura(resultadoNumeroDeFactura, 'Factura');
 
-    // log(JSON.parse(localStorage.getItem('factura')))
     facturaStorage = JSON.parse(localStorage.getItem('facturaSalida'))
 
     if(facturaStorage){
@@ -566,7 +564,6 @@ const hanledLoad = async (e) => {
         localStorage.setItem('carritoSalida', JSON.stringify(carritoStorage));
 
         /** Cargamos los datos de la factura */
-        log(factura)
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
 
@@ -594,7 +591,7 @@ const hanledAccionesCliente = async (e) => {
             break;
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner;
-            // log(e.target.parentElement.pathname.substring(1))
+
             let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
             cargarEventosAccionesDelCliente();
@@ -616,7 +613,6 @@ const hanledBuscarCliente = async (e) => {
         else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
   
         
-        // log(e.target.value)
         /** Se cargar el spinner para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner;
         let cliente = await getCliente( parseInt(e.target.value) );
@@ -648,13 +644,11 @@ const hanledFormulario = async (e) => {
     switch (e.target.id) {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
-                    log(resultado)
                     if(!resultado) return;
                     e.target.innerHTML = spinner;
                     
                     cliente = await storeCliente(resultado);
 
-                    log(cliente)
                     if(cliente.estatus == 401){
                         elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
                         let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
@@ -681,9 +675,8 @@ const hanledFormulario = async (e) => {
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
             e.target.innerHTML = spinner;
-            log(resultado)
+
             cliente = await updateCliente(e.target.action, resultado);
-            log(cliente)
                /** Seteamos el cliente en la factura de local storage */
                factura.identificacion = cliente.data[0].identificacion;
                factura.tipoDocumento = cliente.data[0].tipo;
@@ -732,14 +725,12 @@ const hanledAgregarAFactura = async (e) => {
             resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro);
 
             if(resultado.estatus == 200){
-                log('Producto Obtenido');
                 /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
                 let  classIdentificadora = resultado.data.data[0].codigo + "_data",
                 datosDeSalida = await d.getElementsByClassName(classIdentificadora),
                 esquemaDeDatosDeSalida = {}; // tipo de dato OBJECT
 
                 /** Validamos que la cantida sea agreagada y el costo y pvp detal */
-                log(datosDeSalida)
                 for (const datosSalida of datosDeSalida) {
                     if(datosSalida.name == "cantidad" || datosSalida.name == "precio" ){
         
@@ -757,8 +748,6 @@ const hanledAgregarAFactura = async (e) => {
                 for (const data of datosDeSalida) {
                     esquemaDeDatosDeSalida[data.name] = parseFloat(data.value);
                 }
-
-                log(esquemaDeDatosDeSalida);
                 
                 /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
                 factura.tasa = parseFloat(resultado.tasa);
@@ -828,7 +817,7 @@ const hanledAgregarAFactura = async (e) => {
                 /** Cargamos la factura y sus eventos de acciones del carrito de factura */
                 await cargarDatosDeFactura(carritoActual, factura);
             }else{
-                log(resultado.mensaje);
+                alert(resultado.mensaje);
             }
             break;
     
@@ -854,7 +843,6 @@ const hanledBuscarProducto = async (e) => {
         let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
         lista='';
     
-        log(resultado);
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
     
          resultado.data.data.forEach( async (producto) => {
@@ -916,7 +904,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         return producto;
                     }
                     if(producto.codigo_producto == codigoProducto ) {
-                        log(parseFloat(producto.costo));
                         producto.cantidad = parseFloat(cantidad);
                         producto.subtotal = darFormatoDeNumero( quitarFormato(producto.costo) * cantidad );
                         producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
@@ -946,7 +933,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'eliminarProductoFactura':
                 let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
-                log(carritoActualizadoC)
                 localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoC.reverse()));
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
@@ -997,10 +983,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     
                   
                     return alert("Debes Ingresar un cliente para poder vender");
-                    log(elementoMetodoDePagoModal)
                 }
                
-                log(elementoMetodoDePagoModal.children[0])
                await cargarEventosAccionesDeFactura()
 
             break;
@@ -1061,7 +1045,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         
                             /** Mostramos el dialogo de facturar */
                             if (resultadoDeFacturar.estatus == 201) {
-                                log('entro aqui en la impresion de la factura')
                                 resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
                                 if (resultado) {
         
@@ -1103,15 +1086,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             break;
         case 'desactivarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
             break;
         case 'activarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0.16, factura.descuento);
             break;
         case 'editarDescuento':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
         default:
@@ -1120,7 +1100,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 };
 
 const hanledAccionesDeMetodoDePago = async (e) => {
-    log(e.target.id)
     let accion = e.target.id,
     elementoMetodoDePago = d.querySelector('#elementoMetodoDePago'),
     metodosActuales = d.querySelectorAll('.metodoAdd'),
@@ -1169,7 +1148,6 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                 /** limpiamos la validacion */
                 e.target.parentElement.parentElement.children[1].children[1].textContent = "";
 
-                log(e.target.parentElement.id);
                 metodosActuales.forEach(element => {
                     if(element.children[2].id  != e.target.parentElement.id){
                         arregloDeMetodosDePago.push({
@@ -1180,13 +1158,13 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                     }
                 });
                 metodosPagos = arregloDeMetodosDePago; 
-                log(metodosPagos)
+              
                 elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
                 elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
-            log('agregando tipo de pago')
+           
             /** Limpiamos la validación */
             e.target.parentElement.parentElement.children[1].children[1].textContent = "";
 
@@ -1210,9 +1188,6 @@ const hanledAccionesDeMetodoDePago = async (e) => {
             break;
         case 'montoDelPago':
            
-            log(e.target.value * 1)
-            log(e.target.parentElement.parentElement.children)
-            log(e.target.parentElement.parentElement.children[2].id)
             /** VAlidamos que el dato ingresado sea numero */
             if(e.target.value <= 0) return e.target.parentElement.parentElement.children[1].children[1].textContent="Este campo solo permite números mayor a cero";
             else e.target.parentElement.parentElement.children[1].children[1].textContent = "";
@@ -1314,7 +1289,7 @@ async function cargarEventosDeAgregarProductoAFactura(){
     let elementoAgregarAFactura = d.querySelectorAll('.agregar-producto'),
     elementoCerrarModalCustom = d.querySelectorAll('.cerrar__ModalCustom'),
     elementoInputPrecioRadio = d.querySelectorAll('.acciones-pvp');
-    log(elementoInputPrecioRadio);
+
     /** Cargamos los eventos de cerrar modal */
     elementoCerrarModalCustom.forEach(btnCerrarModal => {
         btnCerrarModal.addEventListener('click', hanledAgregarAFactura);
@@ -1387,7 +1362,6 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     carritoActual.forEach(producto => {
         acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
     });
-    log(acumuladorSubtotal)
     factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;

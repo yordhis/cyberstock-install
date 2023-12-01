@@ -38,9 +38,9 @@ class DashboardController extends Controller
             $pathname = Request::path();
             // Datos de las estadisticas
             $datosDash = [
-                "totalProductos" => Inventario::all()->count(),
-                "totalClientes" => Cliente::all()->count(),
-                "totalProveedores" => Proveedore::all()->count(),
+                "totalProductos" => Inventario::count(),
+                "totalClientes" => Cliente::count(),
+                "totalProveedores" => Proveedore::count(),
                 "totalFacturasPorPagar" => FacturaInventario::where([
                     "tipo" => 'ENTRADA',
                     "concepto" => 'CREDITO',
@@ -60,69 +60,4 @@ class DashboardController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreDashboardRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreDashboardRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Dashboard  $dashboard
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Dashboard  $dashboard
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateDashboardRequest  $request
-     * @param  \App\Models\Dashboard  $dashboard
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateDashboardRequest $request, Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Dashboard  $dashboard
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Dashboard $dashboard)
-    {
-        //
-    }
 }

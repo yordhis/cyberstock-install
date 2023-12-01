@@ -15,6 +15,7 @@ use App\Models\{
     Helpers,
     Po,
     Proveedore,
+    Utilidade,
     Utility
 };
 
@@ -61,8 +62,7 @@ class InventarioController extends Controller
     public function getInventariosFiltro(Request $request)
     {
         try {
-            $tasa = $this->data->utilidades[0]->tasa;
-            $inventarios = [];
+            $tasa = Utilidade::all()[0]->tasa;
             // filtramos por la descripcion
             if (request('filtro')) {
                 /** Buscamos por codigo de barra */
@@ -127,7 +127,7 @@ class InventarioController extends Controller
     public function getInventarios(Request $request)
     {
         try {
-            $tasa = $this->data->utilidades[0]->tasa;
+            $tasa = Utilidade::all()[0]->tasa;
 
             // filtramos por la descripcion
             if (request('filtro')) {
@@ -309,7 +309,6 @@ class InventarioController extends Controller
     public function crearSalida(Request $request)
     {
         try {
-
             $menuSuperior = $this->data->menuSuperior;
             $pathname = $request->path();
             return view('admin.salidas.index', compact( 'menuSuperior', 'pathname'));
@@ -320,60 +319,8 @@ class InventarioController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreInventarioRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreInventarioRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Inventario  $inventario
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Inventario $inventario)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Inventario  $inventario
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Inventario $inventario)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateInventarioRequest  $request
-     * @param  \App\Models\Inventario  $inventario
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateInventarioRequest $request, Inventario $inventario)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.

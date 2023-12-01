@@ -11,7 +11,7 @@ elementoTablaPaginacion = d.querySelector('.paginacion');
 
 /** COMPONENTES */
 const componenteFila = (data) => {
-    log(data)
+    // log(data)
     if (data.estatus == 0) {
         return `
         <tr>
@@ -362,7 +362,7 @@ const hanledFiltro = async (e) => {
                 elementoTablaPaginacion.innerHTML = '';
                 elementoTablaCuerpo.innerHTML = spinner;
                 let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-                log(inventarios);
+                // log(inventarios);
                 if(!inventarios.data){
                     elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
                 }else{
@@ -431,7 +431,7 @@ elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
 
 /** FUNCIONES O UTILIDADES EXTRAS */
 function adaptadorDeProducto(data){
-    log(data)
+    // log(data)
     return {
         id: data.id,
         numero: data.id,
