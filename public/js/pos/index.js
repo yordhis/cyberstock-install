@@ -31,8 +31,16 @@ metodosPagos = [{
 
 /** COMPONENTES */
 const componenteTarjetaCliente = (cliente, mensaje) => {
+
+
+
     if(cliente.length){
         cliente = cliente[0];
+        if(!cliente.telefono){
+            cliente.telefono = "no asignado";
+        }else{
+            cliente.telefono = cliente.telefono.substring(4,0) +"-"+ cliente.telefono.substring(4);
+        }
         return `
         <div class="card-body">
             <h5 class="card-title text-danger">Cliente N°: ${cliente.id}</h5>
@@ -40,7 +48,7 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <p class="card-text">
                 <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
                 <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
-                <b>Teléfono:</b> ${cliente.telefono.substring(4,0)}-${cliente.telefono.substring(4)} <br><br>
+                <b>Teléfono:</b> ${cliente.telefono} <br><br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
@@ -506,7 +514,7 @@ const hanledLoad = async (e) => {
          factura.tipo = 'SALIDA';
          factura.iva = 0.16;
          let fecha = new Date();
-         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+         factura.fecha = fecha;
          localStorage.setItem('factura', JSON.stringify(factura));
 
         /** CLIENTE */
@@ -529,7 +537,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+        factura.fecha = fecha;
         localStorage.setItem('factura', JSON.stringify(factura));
      
     }

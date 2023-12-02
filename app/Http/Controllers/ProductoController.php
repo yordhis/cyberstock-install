@@ -212,9 +212,7 @@ class ProductoController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
 
-            $productos = Producto::all();
-            $categorias = Categoria::all();
-            $marcas = Marca::all();
+           
             // Seteamos la imagen
             if($request->file){
                 $url = Helpers::setFile($request);
@@ -223,7 +221,7 @@ class ProductoController extends Controller
                 $request['imagen'] = $this->data->datosDefault['FOTO_PORDEFECTO_PRODUCTO'];
             }
            
-
+           
             // Validamos si el producto tiene stock inicial
             if ($request->cantidad_inicial > 0) {
                 if ($request->costo > 0) {
@@ -242,14 +240,12 @@ class ProductoController extends Controller
                         "fecha_entrada" => date('Y-m-d'),
                     ]);
                 }else{
-                    $mensaje = [
-                        "texto" => "Se requiere del campo costo para procesar el registro",
-                        "input" => "costo"
-                    ];
-                    return view('admin.productos.lista', compact('request', 'mensaje', 'menuSuperior','productos', 'categorias', 'marcas'));
+                    $mensaje = "Se requiere del campo costo para procesar el registro";
+                    $estatus = Response::HTTP_UNAUTHORIZED;
+                    return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
                 }
             }
-           
+            
             // Registramos el producto
             $estatusCrear = Producto::create([
                 "codigo" => $request->codigo,
@@ -260,17 +256,16 @@ class ProductoController extends Controller
                 "fecha_vencimiento" => $request->fecha_vencimiento,
               
             ]);
-            
             $mensaje = $estatusCrear ? "El producto se creo correctamente." : "El producto no se creo";
             $estatus = $estatusCrear ? 201 : 404;
             
-            return $estatusCrear ? redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') )
-            : view('admin.productos.lista', compact('mensaje', 'estatus', 'menuSuperior', $request));
+            return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
             
         } catch (\Throwable $th) {
             //throw $th;
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear el producto, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = "¡El producto no se pudo crear por que el código ya existe!";
+            $estatus = 404;
+            return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
 
         }
 

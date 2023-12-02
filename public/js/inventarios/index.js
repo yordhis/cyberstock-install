@@ -474,6 +474,7 @@ async function cargarEventosDelBotonEliminar(){
         botonEliminar.addEventListener('click', hanledBotonEliminar);
     });
 };
+
 async function cargarEventosDelBotonEditar(){
     let formularios = d.forms;
     for (const iterator of formularios) {

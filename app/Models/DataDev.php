@@ -35,6 +35,7 @@ class DataDev
             "DEVOLUCION", // 6
             "INICIALIZACION" // 7
         ];
+        
         $this->tiposSalidas = [
             "VENTA", // 1
             "CONSUMO", // 2

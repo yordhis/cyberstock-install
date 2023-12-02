@@ -23,6 +23,7 @@
 
 
   @if ( $pathname == 'reportes' || $pathname == 'vendedor/reportes' )
+      <script src="./js/reportes/reporteController.js" defer></script>
       <script src="./js/reportes/index.js" defer></script>
   @endif
 

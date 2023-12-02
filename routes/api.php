@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     InventarioController,
     MarcaController,
     ProductoController,
-    ProveedoreController
+    ProveedoreController,
+    ReporteController
 };
 
 /*
@@ -32,6 +33,10 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
+
+    /** REPORTES */
+    Route::post('storeReportes', [ReporteController::class, 'storeReportes'])->name('storeReportes');
+
     /** PRODUCTOS */
     Route::post('getProductosFiltro', [ProductoController::class, 'getProductosFiltro'])->name('api.getProductosFiltro');
     Route::get('getProductoData/{barcode}', [ProductoController::class, 'getProductoData'])->name('api.getProductoData');

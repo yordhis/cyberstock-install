@@ -82,7 +82,8 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('/categorias', CategoriaController::class)->names('admin.categorias');
             Route::resource('/marcas', MarcaController::class)->names('admin.marcas');
         });
-
+        
+        /** REPORTES */
         Route::get('/reportes', [ReporteController::class, "index"])->name('admin.reportes');
 
     /** @param CIERRE ADMINISTRADOR */

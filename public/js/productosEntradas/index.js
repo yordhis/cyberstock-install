@@ -559,7 +559,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'ENTRADA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+        factura.fecha = fecha;
         localStorage.setItem('facturaInventario', JSON.stringify(factura));
     }
 
