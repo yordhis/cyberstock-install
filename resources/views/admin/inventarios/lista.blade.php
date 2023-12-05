@@ -18,8 +18,43 @@
             <div class="col-sm-12">
                 <h2> Inventario </h2>
             </div>
+
+            <div class="col-sm-10 mb-3">
+                <form action="getInventariosFiltro" id="formularioFiltro" method="post" target="_self">
+                    <div class="input-group">
+                     
+                        <input type="text" class="form-control" id="filtro" name="filtro" placeholder="Buscar producto por Código o Descripcion" aria-label="Buscar producto" aria-describedby="basic-addon1">
+                        <span class="text-danger invalido"></span>
     
-            <div class="col-sm-6 col-xs-12">
+                        <select class="form-select" id="categorias" name="id_categoria">
+                            <option selected>CATEGORIAS</option>
+                            @foreach ($categorias as $categoria)
+                                <option value="{{ $categoria->id }}"> {{ $categoria->nombre }} </option>
+                            @endforeach
+                     
+                        </select>
+    
+                        <select class="form-select" id="marcas" name="id_marca">
+                            <option selected>MARCAS</option>
+                            @foreach ($marcas as $marca)
+                                <option value="{{ $marca->id }}"> {{ $marca->nombre }} </option>
+                            @endforeach
+                        </select>
+                        
+                        
+                        <button class="btn btn-outline-success" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-outline-danger w-100" type="bottom" id="limpiarFiltro">
+                    <i class="bi bi-trash3"></i> Limpiar filtro
+                </button>
+            </div>
+    
+            {{-- <div class="col-sm-6 col-xs-12">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" id="filtro-descripcion" placeholder="Buscar producto por Código o Descripcion" aria-label="Buscar producto" aria-describedby="basic-addon1">
@@ -32,7 +67,7 @@
                 <div class="input-group mb-3">
                     <input type="submit" class="btn btn-success form-control" id="filtro-limpiar" value="Limpiar Filtro" >
                 </div>
-            </div>
+            </div> --}}
 
             <div class="col-lg-12">
                 <div class="card">

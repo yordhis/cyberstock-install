@@ -3,9 +3,10 @@ log('conectado a productos')
 let elementoTablaCuerpo = d.querySelector('#lista'),
 elementoInputFiltroDescripcion = d.querySelector('#filtro-descripcion'),
 elementoInputFiltroCodigo = d.querySelector('#filtro-codigo'),
-elementoInputFiltroLimpiar = d.querySelector('#filtro-limpiar'),
 elementoSpanInvalido = d.querySelectorAll('.invalido'),
-elementoTablaPaginacion = d.querySelector('.paginacion');
+elementoTablaPaginacion = d.querySelector('.paginacion'),
+elementoBotonResetearFiltro = d.querySelector('#limpiarFiltro'),
+config = {};
 
 
 
@@ -288,11 +289,11 @@ const hanledBotonEliminar = async (e) => {
 const hanledPaginacion = async (e) => {
     e.preventDefault();
     if(e.target.href){
-        if(e.target.href.includes('getInventariosFiltro')){
+        if(e.target.href.includes('getProductosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
             elementoTablaCuerpo.innerHTML = spinner;
          
-            let inventarios = await getProductosFiltro(`${e.target.href}`,  { filtro: `${elementoInputFiltroDescripcion.value}`});
+            let inventarios = await getProductosFiltro(`${e.target.href}`,  config);
         
             if(!inventarios.data.data.length){
                 elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0});
@@ -320,54 +321,108 @@ const hanledPaginacion = async (e) => {
     }
 };
 
-const hanledFiltro = async (e) => {
-    // si se hizo click en limpiar filtro
+// const hanledFiltro = async (e) => {
+//     // si se hizo click en limpiar filtro
   
-    if(e.target.id == "filtro-limpiar"){
-        elementoInputFiltroDescripcion.value = '';
-        await getLista();
-        await cargarEventosDelBotonEliminar();
-        await cargarEventosDelBotonEditar();
-    } 
+//     if(e.target.id == "filtro-limpiar"){
+//         elementoInputFiltroDescripcion.value = '';
+//         await getLista();
+//         await cargarEventosDelBotonEliminar();
+//         await cargarEventosDelBotonEditar();
+//     } 
 
-    // validamos los keyup para no filtrar 
-    if (e.key == "Enter" ){
-        if(!e.target.value.trim().length){
-            hanledLoad();
-            return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
-        }
+//     // validamos los keyup para no filtrar 
+//     if (e.key == "Enter" ){
+//         if(!e.target.value.trim().length){
+//             hanledLoad();
+//             return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
+//         }
     
-        if(e.target.id.split('-')[1] == 'limpiar'){
-            elementoSpanInvalido.forEach(element => element.textContent = null);
-            elementoInputFiltroDescripcion.value = null;
-            elementoInputFiltroCodigo.value = null;
-            await getLista();
-            /** Activamos los eventos del boton eliminar */
-            await cargarEventosDelBotonEliminar();
-            await cargarEventosDelBotonEditar();
+//         if(e.target.id.split('-')[1] == 'limpiar'){
+//             elementoSpanInvalido.forEach(element => element.textContent = null);
+//             elementoInputFiltroDescripcion.value = null;
+//             elementoInputFiltroCodigo.value = null;
+//             await getLista();
+//             /** Activamos los eventos del boton eliminar */
+//             await cargarEventosDelBotonEliminar();
+//             await cargarEventosDelBotonEditar();
     
-        }else{
-            elementoSpanInvalido.forEach(element => element.textContent = null);
-            let filtro = {
-                filtro: `${e.target.value.trim()}`,
-                campo: ['codigo', ' descripcion'],
-            };
+//         }else{
+//             elementoSpanInvalido.forEach(element => element.textContent = null);
+//             let filtro = {
+//                 filtro: `${e.target.value.trim()}`,
+//                 campo: ['codigo', ' descripcion'],
+//             };
         
-            if(e.target.value){
-                elementoTablaPaginacion.innerHTML = '';
-                elementoTablaCuerpo.innerHTML = spinner;
-                let inventarios = await getProductosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
+//             if(e.target.value){
+//                 elementoTablaPaginacion.innerHTML = '';
+//                 elementoTablaCuerpo.innerHTML = spinner;
+//                 let inventarios = await getProductosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
            
-                if(!inventarios.data){
-                    elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
-                }else{
-                    elementoTablaCuerpo.innerHTML='';
+//                 if(!inventarios.data){
+//                     elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
+//                 }else{
+//                     elementoTablaCuerpo.innerHTML='';
                     
+//                     await inventarios.data.data.forEach( element => {
+//                         element.tasa = inventarios.tasa;
+//                         elementoTablaCuerpo.innerHTML +=  componenteFila(adaptadorDeProducto(element));
+//                     });
+                    
+//                     /** Activamos los eventos del boton eliminar */
+//                     await cargarEventosDelBotonEliminar();
+//                     await cargarEventosDelBotonEditar();
+            
+//                     if(inventarios.data.links){
+//                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+//                     }
+//                 }
+//             }
+//         }
+
+//     }
+
+
+// };
+
+const hanledFormulario = async (e) => {
+   
+    if(e.target.id != "cerrarSesion" && e.target.id != 'crearProductoLaravel'){
+        e.preventDefault();
+
+        log(e.target);
+        switch (e.target.id) {
+            case 'formularioFiltro':
+                log('filtrando')
+                let banderaDeALertarConfig = 0;
+                
+                for (const iterator of e.target) {
+                    if(iterator.localName == "input" || iterator.localName == "select"){
+                        // if(iterator.value == "") iterator.classList.add(['border-danger']), banderaDeALertarConfig++; 
+                        // else iterator.classList.remove(['border-danger']), iterator.classList.add(['border-success']);
+                        
+                        if(iterator.value == "CATEGORIAS" || iterator.value == "MARCAS")  config[iterator.name] = 0;
+                        else  config[iterator.name] = iterator.value;
+                    }
+                }
+                if(banderaDeALertarConfig) return;
+
+                /** Se configuran los campos */
+                config.campo = ['codigo', ' descripcion'];
+
+                let inventarios = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`,  config);
+                log(inventarios);
+                elementoTablaCuerpo.innerHTML = spinner;
+
+                /** Si no hay datos entregamos un estatus 0 */
+                if(!inventarios.data.data.length) return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
+
+                setTimeout(async ()=>{
+                    elementoTablaCuerpo.innerHTML = "";
                     await inventarios.data.data.forEach( element => {
                         element.tasa = inventarios.tasa;
-                        elementoTablaCuerpo.innerHTML +=  componenteFila(adaptadorDeProducto(element));
+                        elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
                     });
-                    
                     /** Activamos los eventos del boton eliminar */
                     await cargarEventosDelBotonEliminar();
                     await cargarEventosDelBotonEditar();
@@ -375,52 +430,33 @@ const hanledFiltro = async (e) => {
                     if(inventarios.data.links){
                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
                     }
-                }
-            }
-        }
-
-    }
-
-
-};
-
-const hanledFormulario = async (e) => {
-   
-    if(e.target.id != "cerrarSesion" && e.target.id != 'crearProductoLaravel'){
-        e.preventDefault();
-
-        let esquema = {},
-        banderaDeALertar = 0;
-        for (const iterator of e.target) {
-            if(iterator.localName == "input"){
-                if(iterator.value < 0) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent="No se permiten valoeres negativos"; 
-                else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent="", iterator.classList.add(['border-success']);
-                esquema[iterator.id] = parseFloat(iterator.value);
-            }
-        }
-        if(banderaDeALertar) return;
-
-        e.target.innerHTML = spinner;
     
-        let resultado = await updateProducto(e.target.action, esquema);
-        
-        // await getLista();
-        setTimeout(() => {
-            window.location.href=`${URL_BASE_APP}/productos?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
-        }, 1500);
+                    let elementoDePaginacion = d.querySelectorAll('.page-item');
+                    log(elementoDePaginacion)
+                    elementoDePaginacion.forEach( btnPaginacion => {
+                        btnPaginacion.addEventListener('click', hanledPaginacion);
+                    });
+                }, 1500)
+
+
+                
+                break;
+            case 'limpiarFiltro':
+                    for (const iterator of d.forms) {
+                        if(iterator.id == "formularioFiltro") iterator.reset();
+                    }
+                    hanledLoad();
+                break;
+            default:
+                break;
+        }
     }
 };
 
 /** EVENTOS */
 addEventListener('load', hanledLoad);
 elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
-elementoInputFiltroLimpiar.addEventListener('click', hanledFiltro);
-elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
-// elementoInputFiltroCodigo.addEventListener('keyup', hanledFiltro);
-
-
-
-
+elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
 
 /** FUNCIONES O UTILIDADES EXTRAS */
 function adaptadorDeProducto(data){
@@ -462,7 +498,7 @@ async function getLista(url = `${URL_BASE}/getProductos`){
         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
       
     }
-}
+};
 
 async function cargarEventosDelBotonEliminar(){
     elementoBotonEliminar = await d.querySelectorAll('.btn-eliminar');
@@ -477,11 +513,3 @@ async function cargarEventosDelBotonEditar(){
         iterator.addEventListener('submit', hanledFormulario);
     }
 };
-
-async function getCategoriasJson(){
-   return await getCategorias(`${URL_BASE}/getCategorias`);
-}
-
-async function getMarcasJson(){
-    return await getMarcas(`${URL_BASE}/getMarcas`);
-}
