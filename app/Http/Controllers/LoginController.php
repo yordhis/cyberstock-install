@@ -28,6 +28,12 @@ class LoginController extends Controller
      */
     public function store(Request $request)
     {
+        /** Validamos */
+        $request->validate([
+            "email" => 'required',
+            "password" => 'required'
+        ]);
+
         // Autenticamos al usuario
         $credenciales = $request->only('email', 'password');
 
@@ -41,7 +47,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'nombre' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            'mensajeError' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
         ]);
     }
 

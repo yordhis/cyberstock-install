@@ -148,6 +148,13 @@
     </div>
 
 
-
+    <script src="{{ asset('/js/main.js') }}" defer></script>
+  
+    <script src="{{ asset('/js/facturas/facturaController.js') }}" defer></script>
+    <script src="{{ asset('/js/partials/customModal.js') }}" defer></script>
+    <script src="{{ asset('/js/inventarios/inventarioController.js') }}" defer></script>
+    <script src="{{ asset('/js/clientes/clienteController.js') }}" defer></script>
+    <script src="{{ asset('/js/productosSalidas/index.js') }}" defer></script>
+    
 
 @endsection

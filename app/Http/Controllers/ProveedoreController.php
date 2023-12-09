@@ -154,7 +154,8 @@ class ProveedoreController extends Controller
      */
     public function index()
     {
-        $proveedores = Proveedore::all();
+        $proveedores = Proveedore::paginate(10);
+       
         $pathname  = Request::path();
         $menuSuperior = $this->data->menuSuperior;
         return view('admin.proveedores.lista', compact('menuSuperior', 'proveedores', 'pathname'));
@@ -217,27 +218,7 @@ class ProveedoreController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Proveedore  $proveedore
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Proveedore $proveedore)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Proveedore  $proveedore
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Proveedore $proveedore)
-    {
-        //
-    }
+ 
 
     /**
      * Update the specified resource in storage.

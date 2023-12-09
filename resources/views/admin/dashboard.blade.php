@@ -92,8 +92,8 @@
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{  $datosDash['totalFacturasPorCobrar']  }}</h6>
-                                            <span class="text-muted small pt-2 ps-1">
-                                                <a href="/listaFacturaPorCobrar" target="_self">
+                                            <span class="small pt-2 ps-1">
+                                                <a href="{{  route('admin.cuentas.por.cobrar.index') }}" class="text-primary" >
                                                     Ver lista
                                                 </a>    
                                             </span>
@@ -119,8 +119,8 @@
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $datosDash['totalFacturasPorPagar'] }}</h6>
-                                            <span class="text-muted small pt-2 ps-1">
-                                                <a href="/listaFacturaPorPagar" target="_self">
+                                            <span class="small pt-2 ps-1">
+                                                <a href="{{  route('admin.cuentas.por.pagar.index') }}" class="text-primary" >
                                                     Ver lista
                                                 </a>    
                                             </span>
@@ -138,7 +138,7 @@
                     <!-- POS -->
                     <div class="col-sm-4">
                         <div class="card info-card sales-card bg-primary rounded-3">
-                            <a href="/pos" target="_self">
+                            <a href="/pos" >
                                 <div class="card-body">
                                     <h5 class="card-title"></span></h5>
     

@@ -34,6 +34,11 @@ metodosPagos = [{
 const componenteTarjetaCliente = (cliente, mensaje) => {
     if(cliente.length){
         cliente = cliente[0];
+        if(!cliente.telefono){
+            cliente.telefono = "no asignado";
+        }else{
+            cliente.telefono = cliente.telefono.substring(4,0) +"-"+ cliente.telefono.substring(4);
+        }
         return `
         <div class="card-body">
             <h5 class="card-title text-danger">Cliente N°: ${cliente.id}</h5>
@@ -41,12 +46,13 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <p class="card-text">
                 <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
                 <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
+                <b>Teléfono:</b> ${cliente.telefono} <br><br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
                 <i class="bi bi-search fs-4"></i>
             </a>
-            <a href="${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
+            <a href="${URL_BASE_APP}/${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
                 <i class="bi bi-pencil-fill fs-4"></i>
             </a>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
@@ -113,6 +119,15 @@ const componenteFormularioAgregarCliente = () => {
             <div class="form-floating m-2">
                 <div id="respuesta-de-validacion"></div>                
             </div>
+
+            <div class="form-floating m-2">
+                <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <label for="floatingInput">TELÉFONO</label>
+                <div class="text-danger validate"></div>
+            </div>
+            <div class="form-floating m-2">
+                <div id="respuesta-de-validacion"></div>                
+            </div>
             <div class="form-floating m-2">
                 <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
                 
@@ -161,6 +176,11 @@ const componenteFormularioEditarCliente = (cliente) => {
                 <div class="form-floating m-2">
                     <input type="number" class="form-control" name="identificacion" value="${cliente.identificacion}" id="floatingInput" placeholder="Ingrese número de identificación.">
                     <label for="floatingInput">RIF O ID</label>
+                    <div class="text-danger validate"></div>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <label for="floatingInput">TELÉFONO</label>
                     <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
@@ -305,11 +325,7 @@ const componenteFactura = async (factura) => {
             <label for="floatingInput">Descuento %</label>
         </div>
     
-        <!--<div class="col-sm-3 form-floating mb-3">
-            <input type="number" class="form-control bg-secondary-light" readonly id="floatingInput" placeholder="16" value="16">
-            <label for="floatingInput">IVA %</label>
-        </div>-->
-        <div class="col-sm-6 ">
+        <div class="col-sm-3 ">
             <label for="">F. Fiscal</label> <br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked': ''}>
@@ -319,8 +335,17 @@ const componenteFactura = async (factura) => {
                 <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="desactivarFacturaFiscal" value="no" ${factura.iva == 0 ? 'checked': ''}>
                 <label class="form-check-label" for="inlineRadio2">NO</label>
             </div>
-            <!--<label for="">Fiscal</label>
-            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '': 'checked'}>-->
+        </div>
+
+        <div class="col-sm-3 ">
+            <div class="form-floating">
+                <select class="form-select acciones-factura" name="concepto_salida" id="concepto_salida" aria-label="Tipo de salida">
+                    <option value="${factura.concepto}" selected>${factura.concepto}</option>
+                    <option value="VENTA">VENTA</option>
+                    <option value="CREDITO">CREDITO</option>
+                </select>
+                <label for="concepto_salida">Concepto de salida</label>
+            </div>
         </div>
 
         <div class="col-sm-2 text-black">
@@ -591,7 +616,7 @@ const hanledAccionesCliente = async (e) => {
             break;
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner;
-
+          
             let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
             cargarEventosAccionesDelCliente();
@@ -869,6 +894,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     banderaDeError = 0,
     facturaActual = '',
     acumuladorSubtotal = 0;
+
+    log(e.target.localName)
+    log(e.target.parentElement.id)
   
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
@@ -876,10 +904,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     }else if(e.target.localName == 'i'){
         codigoProducto = e.target.parentElement.name;
         accion = e.target.parentElement.id;
+    }else if(e.target.localName == 'option'){
+        accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
     }
-
+log(accion)
     switch (accion) {
         case 'editarCantidadFactura':
                 cantidad = prompt('Ingrese nueva cantidad:');
@@ -1093,6 +1123,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'editarDescuento':
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
+            break;
+        case 'concepto_salida':
+                factura.concepto = e.target.value;
+                localStorage.setItem('facturaSalida', JSON.stringify(factura));
             break;
         default:
             break;
@@ -1309,6 +1343,7 @@ async function cargarEventosDeAgregarProductoAFactura(){
 async function cargarEventosAccionesDeFactura(){
     let elementoAccionesCarritoFactura = d.querySelectorAll('.acciones-factura'),
     elementoMetodoDePagoAcciones = d.querySelectorAll('.acciones-pagos');
+
     elementoAccionesCarritoFactura.forEach(acciones => {
         if(acciones.localName == "input") acciones.addEventListener('change', hanledAccionesDeCarritoFactura);
         else acciones.addEventListener('click', hanledAccionesDeCarritoFactura);

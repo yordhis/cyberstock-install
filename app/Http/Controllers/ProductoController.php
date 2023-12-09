@@ -68,6 +68,14 @@ class ProductoController extends Controller
                     switch ($campo) {
                         case 'codigo':
                                 $resultados = Producto::where("{$campo}", $request->filtro)->get();
+                                
+                                /** añadimos los datos de inventario */
+                                foreach ($resultados as $key => $producto) {
+                                    $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                                    if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                                    else $producto['inventario'] =  [];
+                                }
+                                
                                 $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
                                 if (count($resultados)) {
                                     return response()->json([
@@ -112,6 +120,13 @@ class ProductoController extends Controller
                                 $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
                             }
                             
+                            /** añadimos los datos de inventario */
+                            foreach ($resultados as $key => $producto) {
+                                $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                                if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                                else $producto['inventario'] =  [];
+                            }
+
                             /** Obtenemos los datos de marca y de categorias de cada producto */
                             $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
                           
@@ -165,9 +180,17 @@ class ProductoController extends Controller
                         "estatus" => Response::HTTP_NOT_FOUND
                     ], Response::HTTP_NOT_FOUND);
                 }
+                
+                /** añadimos los datos de inventario */
+
+                foreach ($resultados as $key => $producto) {
+                    $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                    if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                    else $producto['inventario'] =  [];
+                }
 
                 $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-
+              
                 return response()->json([
                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
                     "data" => $resultados,

@@ -58,8 +58,10 @@ class InventarioController extends Controller
 
     public function getInventarioVendedor(){
         $menuSuperior = $this->data->menuSuperior;
-            $pathname = FacadesRequest::path();
-            return view("admin.inventarios.listaVenedor", compact('menuSuperior', 'pathname'));
+        $categorias = Categoria::all();
+        $marcas = Marca::all();
+        $pathname = FacadesRequest::path();
+        return view("admin.inventarios.listaVenedor", compact('menuSuperior', 'pathname', 'categorias', 'marcas'));
     }
 
     /** API REST FULL */
@@ -281,15 +283,12 @@ class InventarioController extends Controller
      */
     public function listaEntradas()
     {
-        $utilidades = $this->data->utilidades;
+    
         $menuSuperior = $this->data->menuSuperior;
-        $pathname = FacadesRequest::path();
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->get();
-
-        
+        ])->paginate(10);
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
@@ -302,7 +301,7 @@ class InventarioController extends Controller
             $entrada->proveedor = Proveedore::where("codigo", $entrada->identificacion)->get();
         }
 
-        return view('admin.entradas.lista', compact('menuSuperior', 'utilidades', 'entradas', 'pathname'));
+        return view( 'admin.entradas.lista', compact('menuSuperior', 'entradas') );
     }
 
     /**
@@ -315,14 +314,14 @@ class InventarioController extends Controller
      */
     public function listaSalidas()
     {
-        $utilidades = $this->data->utilidades;
+    
         $menuSuperior = $this->data->menuSuperior;
-        $pathname = FacadesRequest::path();
         $pos = Po::all()[0];
-
         $salidas = FacturaInventario::where([
             "tipo" => "SALIDA"
-        ])->get();
+        ])->paginate(10);
+        
+        $cliente = [];
 
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
@@ -332,10 +331,16 @@ class InventarioController extends Controller
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
-            $salida->cliente = Cliente::where("identificacion", $salida->identificacion)->get();
-        }
+            count(Cliente::where("identificacion", $salida->identificacion)->get()) 
+                            ? array_push( $cliente, Cliente::where("identificacion", $salida->identificacion)->get()[0])
+                            : array_push( $cliente, ["nombre" => "CLIENTE"]);
 
-        return view('admin.salidas.lista', compact('menuSuperior', 'utilidades', 'salidas', 'pos', 'pathname'));
+            $salida->cliente = $cliente;
+            array_pop($cliente);
+        }
+     
+        return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));
+        
     }
 
     public function crearEntrada(Request $request)

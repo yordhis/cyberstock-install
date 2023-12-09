@@ -1,6 +1,6 @@
  <!-- Modal Dialog Scrollable -->
  <a type="button" class="" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$proveedore->id}}">
-    <i class="bi bi-eye"></i>
+    <i class="bi bi-eye text-info"></i>
  </a>
   <div class="modal fade" id="modalDialogScrollable{{$proveedore->id}}" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -89,7 +89,7 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
         </div>
       </div>

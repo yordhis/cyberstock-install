@@ -23,7 +23,8 @@
                                     iniciar sesión</p>
                             </div>
 
-                            <form action="/login" method="post" class="row g-3 needs-validation" target="_self" novalidate>
+                            <form action="/login" method="post" novalidate 
+                            class="row g-3 needs-validation" target="_self">
                                 @csrf
                                 @method('post')
                                 <div class="col-12">
@@ -33,7 +34,7 @@
                                         <input type="text" name="email" class="form-control" id="yourUsername"
                                             required>
                                         <div class="invalid-feedback">Por favor, ingrese su nombre de usuario!</div>
-                                        @error('nombre')
+                                        @error('email')
                                             <span class="text-danger">
                                                 {{ $message }}
                                             </span>
@@ -44,7 +45,12 @@
                                 <div class="col-12">
                                     <label for="yourPassword" class="form-label">Contraseña</label>
                                     <input type="password" name="password" class="form-control" id="yourPassword" required>
-                                    <div class="invalid-feedback">Por favor, ingrese su contraseña!</div>
+                                    @error('password')
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
+
                                 </div>
 
                                 <div class="col-12">
@@ -57,6 +63,12 @@
                                 <div class="col-12">
                                     <button class="btn btn-primary w-100" type="submit">Entrar</button>
                                 </div>
+
+                                    @error('mensajeError')
+                                        <span class="text-danger tex-center">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
                                 {{-- <div class="col-12">
                                   <p class="small mb-0 text-center"> 
                                     <a href="pages-register.html">¿Olvido su contraseña?</a>

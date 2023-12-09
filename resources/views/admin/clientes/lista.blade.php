@@ -15,13 +15,10 @@
             </div>
 
             <div class="col-lg-12 mt-4 ">
-
                 <div class="card">
                     <div class="card-body table-responsive">
-                    
-                        <!-- Table with stripped rows -->
-                        
-                            <table class="table datatable ">
+                        <!-- LISTA DE CLIENTES -->
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -32,11 +29,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $contador = 1; @endphp
                                     @if (count($clientes))
                                         @foreach ($clientes as $cliente)
                                             <tr>
-                                                <td scope="row">{{ $contador }}</td>
+                                                <td scope="row">{{ $cliente->id }}</td>
                                                 <td>{{ $cliente->nombre }}</td>
                                                 <td>{{ number_format($cliente->identificacion, 0, ',', '.') ?? '' }}</td>
                                                 <td>{{ $cliente->telefono ?? 'No registrado.' }}</td>
@@ -49,7 +45,7 @@
 
                                                 </td>
                                             </tr>
-                                            @php $contador++; @endphp
+                                        
                                         @endforeach
                                     @else
                                         <tr>
@@ -60,21 +56,19 @@
                                     
                                 </tbody>
                             </table>
-                     
-                        <!-- End Table with stripped rows -->
+                        <!-- End LISTA DE CLIENTES -->
 
+                        <!-- PAGINACION BLADE -->
+                            {{ $clientes->links() }}
+                            {{ "Total de clientes registrados: " . $clientes->total() }}
+                        <!-- CIERRE PAGINACION BLADE -->
                     </div>
                 </div>
-
             </div>
-
-
-
         </div>
     </section>
 
-    
-  
+ 
  
 
 @endsection

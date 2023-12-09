@@ -23,7 +23,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
         <a href="/panel" class="" target="_self">
-            <img src="assets/img/logo_2.png" height="50" width="" alt="">
+            <img src="{{ asset('assets/img/logo_2.png') }}" height="50" width="" alt="">
             {{-- <span class="d-none d-lg-block">NiceAdmin</span> --}}
         </a>
         <i class="bi bi-list toggle-sidebar-btn text-white active"></i>
@@ -39,15 +39,51 @@
             @foreach ($menuSuperior as $key => $item)
                 @if ($key == $categoria)
                     @if ($categoria == 'inventarios')
-                        @if (Auth::user()->rol == 1 || Auth::user()->rol == 2)    
-                            @foreach ($item as $keyItem => $menu)
+                        @if (Auth::user()->rol == 1 || Auth::user()->rol == 2)   
+                             <!-- Start Components Nav | GENERAL -->
+                            <li class="nav-item">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.index') }}">
+                                    <span>GENERAL</span></i>
+                                </a>
+                            </li><!-- End Components Nav | GENERAL -->
+
+                             <!-- Start Components Nav | MOVIMIENTOS DE SALIDAS -->
+                            <li class="nav-item">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaSalidas" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.listaSalidas') }}">
+                                    <span>SALIDAS</span></i>
+                                </a>
+                            </li><!-- End Components Nav | MOVIMIENTOS DE SALIDAS -->
+
+                             <!-- Start Components Nav | MOVIMIENTOS DE ENTRADAS -->
+                            <li class="nav-item">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaEntradas" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.listaEntradas') }}">
+                                    <span>ENTRADAS</span></i>
+                                </a>
+                            </li><!-- End Components Nav | MOVIMIENTOS DE ENTRADAS -->
+
+                             <!-- Start Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
+                            <li class="nav-item">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearSalida" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.crearSalida') }}">
+                                    <span>PROCESAR SALIDA</span></i>
+                                </a>
+                            </li><!-- End Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
+
+                             <!-- Start Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
+                            <li class="nav-item">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearEntrada" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.crearEntrada') }}">
+                                    <span>PROCESAR ENTRADA</span></i>
+                                </a>
+                            </li><!-- End Components Nav | PROCESAR MOVIMIENTO DE ENTRADA -->
+                        
+
+                            {{-- @foreach ($item as $keyItem => $menu)
                                 <li
                                     class="nav-item me-2 pe-2 {{ $menu == $subcategoria ? 'border p-2 bg-white text-black' : 'text-white border-end' }}">
                                     <a href="{{ $key . '/' . $menu }}" target="_self" class="nav-link">
                                         {{ $keyItem }}
                                     </a>
                                 </li>
-                            @endforeach
+                            @endforeach --}}
                         @endif
                     @else
                         @foreach ($item as $keyItem => $menu)

@@ -833,7 +833,7 @@ const hanledBuscarProducto = async (e) => {
     
         let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
         lista='';
-    
+        log(resultado)
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         resultado.data.data.forEach( async (producto) => {
             producto.tasa = resultado.tasa;
