@@ -2,7 +2,7 @@
 <html lang="es">
 
 <head>
-    @include('partials.head')
+    @include('partials.headindex')
 </head>
 
 <body style="background-image: url('assets/img/fondo.png')">

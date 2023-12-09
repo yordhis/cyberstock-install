@@ -352,7 +352,7 @@ const htmlTicket = (factura) => {
 
     // VERIFIVCAMOS SI SE DESEA IMPRIMIR CON EL LOGO
     if (factura.pos.estatusImagen) {
-        logo = `<img src="${factura.pos.imagen}" alt="Logotipo">`;
+        logo = `<img src="${factura.pos.imagen}" class="img" alt="Logotipo">`;
     } else {
         logo= '';
     }
@@ -362,7 +362,7 @@ const htmlTicket = (factura) => {
         
         ${logo}
         
-        <p class="centrado">
+        <p class="centrado empresa">
             <br>${factura.pos.empresa}
             <br>${factura.pos.rif}
             <br>${factura.pos.direccion}
@@ -420,11 +420,11 @@ const htmlTicket = (factura) => {
                 </tr>
 
                 <!-- Oculto para la roca -->
-                <!--<tr>
+                <tr>
                     <td class="producto">TOTAL REF</td>
         
                     <td class="precio"> ${ darFormatoDeNumero(factura.total) }</td>
-                </tr>-->
+                </tr>
               
                 ${metodosPagosHtml}
                 ${cambioHtml}
@@ -471,7 +471,7 @@ const getFactura = async (codigoFactura) => {
 const imprimirElemento = (elemento) => {
     var ventana = window.open('', 'PRINT', 'height=400,width=600');
     ventana.document.write('<html><head><title>Factura</title>');
-    ventana.document.write('<base href="http://cyberstock.com/public" target="objetivo">');
+    ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
     ventana.document.write(`<style>
         * {
             margin-top: 0%;
@@ -512,8 +512,11 @@ const imprimirElemento = (elemento) => {
             text-align: right;
         }
 
+        p.empresa{
+            margin-top: 0%;
+        }
+
         .centrado {
-            margin: 0%;
             text-align: center;
             align-content: center;
         }
@@ -523,12 +526,11 @@ const imprimirElemento = (elemento) => {
             max-width: 355px;
         }
 
-        img {
-            max-width: 150px;
-            width: 150px;
-            margin-top: 3%;
-            margin-bottom: 0%;
-            padding-left: 28%;
+        .img {
+            margin: 1%;
+            padding-left: 20%;
+            width: 195px;
+            max-width: 355px;
         }
     </style>`);
     ventana.document.write('</head><body >');

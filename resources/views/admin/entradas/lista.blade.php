@@ -19,10 +19,11 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table datatable ">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
+                                        <th scope="col">N° Movimiento</th>
                                         <th scope="col">N° factura</th>
                                         <th scope="col">Proveedor</th>
                                         <th scope="col">Monto</th>
@@ -37,6 +38,7 @@
                                         <tr>
                                             <td scope="row">{{ $contador }}</td>
                                             <td>{{ $factura->codigo }}</td>
+                                            <td>{{ $factura->codigo_factura }}</td>
                                             <td>{{ $factura->proveedor[0]->empresa }}</td>
                                             <td>{{ $factura->total }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
@@ -54,7 +56,12 @@
                             </table>
                      
                         <!-- End Table with stripped rows -->
-
+                        
+                        <!-- PAGINACION LARAVEL-->
+                        {{ $entradas->links(); }}
+                        
+                        <!-- Total de facturas pendientes -->
+                        {{ "Total de movimientos: " . $entradas->total() }}
                     </div>
                 </div>
 

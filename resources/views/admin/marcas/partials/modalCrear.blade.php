@@ -50,9 +50,9 @@
 
                 <div class="modal-footer">
                     @if ($errors->any())
-                        <a href="{{$pathname}}" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+                        <a href="{{$pathname}}" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</a>
                     @else
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     @endif
                     <button type="submit" class="btn btn-primary ">Guardar Datos</button>
                 </div>

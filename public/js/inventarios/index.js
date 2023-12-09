@@ -5,13 +5,15 @@ elementoInputFiltroDescripcion = d.querySelector('#filtro-descripcion'),
 elementoInputFiltroCodigo = d.querySelector('#filtro-codigo'),
 elementoInputFiltroLimpiar = d.querySelector('#filtro-limpiar'),
 elementoSpanInvalido = d.querySelectorAll('.invalido'),
-elementoTablaPaginacion = d.querySelector('.paginacion');
+elementoTablaPaginacion = d.querySelector('.paginacion'),
+elementoBotonResetearFiltro = d.querySelector('#limpiarFiltro'),
+config = {};
 
 
 
 /** COMPONENTES */
 const componenteFila = (data) => {
-    // log(data)
+
     if (data.estatus == 0) {
         return `
         <tr>
@@ -202,18 +204,19 @@ const componenteModalEditar = (data) => {
             
             <form action="${URL_BASE}/editarProductoDelInventario/${data.id}" 
             method="post" 
-            target="_self">
+            target="_self"
+            id="formularioEditar">
                 <div class="modal-body row">
 
                 
                     <div class="col-md-6 col-xs-12">
                         <label for="cantidad" class="form-label">Ingrese Cantidad</label>
-                        <input type="number" step="any" class="form-control" id="cantidad" value="${ data.cantidad }" required>
+                        <input type="number" step="any" class="form-control" name="cantidad" id="cantidad" value="${ data.cantidad }" required>
                         <div class="text-danger validate"></div>
                     </div>
                     <div class="col-md-6 col-xs-12">
                         <label for="costo" class="form-label">Costo</label>
-                        <input type="number" step="any" class="form-control" id="costo" value="${ data.costo }" required>
+                        <input type="number" step="any" class="form-control" name="costo" id="costo" value="${ data.costo }" required>
                         <div class="text-danger validate"></div>
                     </div>
 
@@ -222,7 +225,7 @@ const componenteModalEditar = (data) => {
                         <label for="pvp" class="form-label">PVP Detal</label>
                         <div class="input-group has-validation">
                             <span class="input-group-text" id="inputGroupPrepend">REF</span>
-                            <input type="number" step="any" class="form-control" id="pvp" value="${ data.pvpUsd }" required>
+                            <input type="number" step="any" class="form-control" name="pvp" id="pvp" value="${ data.pvpUsd }" required>
                             <div class="text-danger validate"></div>
                         </div>
                     </div>
@@ -231,7 +234,7 @@ const componenteModalEditar = (data) => {
                         <label for="pvp_2" class="form-label">PVP 2</label>
                         <div class="input-group has-validation">
                             <span class="input-group-text" id="inputGroupPrepend">REF</span>
-                            <input type="number" step="any" class="form-control" id="pvp_2" value="${ data.pvpUsd_2 }" required>
+                            <input type="number" step="any" class="form-control" name="pvp_2" id="pvp_2" value="${ data.pvpUsd_2 }" required>
                             <div class="text-danger validate"></div>
                         </div>
                     </div>
@@ -240,7 +243,7 @@ const componenteModalEditar = (data) => {
                         <label for="pvp_3" class="form-label">PVP 3</label>
                         <div class="input-group has-validation">
                             <span class="input-group-text" id="inputGroupPrepend">REF</span>
-                            <input type="number" step="any" class="form-control" id="pvp_3" value="${ data.pvpUsd_3 }" required>
+                            <input type="number" step="any" class="form-control" name="pvp_3" id="pvp_3" value="${ data.pvpUsd_3 }" required>
                             <div class="text-danger validate"></div>
                         </div>
                     </div>
@@ -250,7 +253,7 @@ const componenteModalEditar = (data) => {
                         
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary ">Guardar datos</button>
                 </div>
             </form>
@@ -297,8 +300,8 @@ const hanledPaginacion = async (e) => {
         if(e.target.href.includes('getInventariosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
             elementoTablaCuerpo.innerHTML = spinner;
-         
-            let inventarios = await getInventariosFiltro(`${e.target.href}`,  { filtro: `${elementoInputFiltroDescripcion.value}`});
+
+            let inventarios = await getInventariosFiltro(`${e.target.href}`,  config);
         
             if(!inventarios.data.data.length){
                 elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
@@ -326,53 +329,131 @@ const hanledPaginacion = async (e) => {
     }
 };
 
-const hanledFiltro = async (e) => {
-    // Limpiar filtro
-    if(e.target.id == "filtro-limpiar"){
-        elementoInputFiltroDescripcion.value = '';
-        await getLista();
-        await cargarEventosDelBotonEliminar();
-        await cargarEventosDelBotonEditar();
-    } 
+// const hanledFiltro = async (e) => {
+//     // Limpiar filtro
+//     if(e.target.id == "filtro-limpiar"){
+//         elementoInputFiltroDescripcion.value = '';
+//         await getLista();
+//         await cargarEventosDelBotonEliminar();
+//         await cargarEventosDelBotonEditar();
+//     } 
     
-    // validamos los keyup para no filtrar 
-    if (e.key == "Enter" ){
-        if(!e.target.value.trim().length){
-            hanledLoad();
-            return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
-        }
+//     // validamos los keyup para no filtrar 
+//     if (e.key == "Enter" ){
+//         if(!e.target.value.trim().length){
+//             hanledLoad();
+//             return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
+//         }
     
-        if(e.target.id.split('-')[1] == 'limpiar'){
-            elementoSpanInvalido.forEach(element => element.textContent = null);
-            elementoInputFiltroDescripcion.value = null;
-            elementoInputFiltroCodigo.value = null;
-            await getLista();
-            /** Activamos los eventos del boton eliminar */
-            await cargarEventosDelBotonEliminar();
-            await cargarEventosDelBotonEditar();
+//         if(e.target.id.split('-')[1] == 'limpiar'){
+//             elementoSpanInvalido.forEach(element => element.textContent = null);
+//             elementoInputFiltroDescripcion.value = null;
+//             elementoInputFiltroCodigo.value = null;
+//             await getLista();
+//             /** Activamos los eventos del boton eliminar */
+//             await cargarEventosDelBotonEliminar();
+//             await cargarEventosDelBotonEditar();
     
-        }else{
-            elementoSpanInvalido.forEach(element => element.textContent = null);
-            let filtro = {
-                filtro: `${e.target.value.trim()}`,
-                campo: ['codigo', ' descripcion'],
-            };
+//         }else{
+//             elementoSpanInvalido.forEach(element => element.textContent = null);
+//             let filtro = {
+//                 filtro: `${e.target.value.trim()}`,
+//                 campo: ['codigo', ' descripcion'],
+//             };
         
-            if(e.target.value){
-                elementoTablaPaginacion.innerHTML = '';
-                elementoTablaCuerpo.innerHTML = spinner;
-                let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-                // log(inventarios);
-                if(!inventarios.data){
-                    elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
-                }else{
-                    elementoTablaCuerpo.innerHTML='';
+//             if(e.target.value){
+//                 elementoTablaPaginacion.innerHTML = '';
+//                 elementoTablaCuerpo.innerHTML = spinner;
+//                 let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
+//                 // log(inventarios);
+//                 if(!inventarios.data){
+//                     elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
+//                 }else{
+//                     elementoTablaCuerpo.innerHTML='';
                     
+//                     await inventarios.data.data.forEach( element => {
+//                         element.tasa = inventarios.tasa;
+//                         elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
+//                     });
+                    
+//                     /** Activamos los eventos del boton eliminar */
+//                     await cargarEventosDelBotonEliminar();
+//                     await cargarEventosDelBotonEditar();
+            
+//                     if(inventarios.data.links){
+//                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+//                     }
+//                 }
+//             }
+//         }
+
+//     }
+
+
+// };
+
+// const hanledPaginacionFiltro =
+
+const hanledFormulario = async (e) => {
+    if(e.target.id != "cerrarSesion"){
+        e.preventDefault();
+
+        log(e.target);
+        switch (e.target.id) {
+            case 'formularioEditar':
+                let esquema = {},
+                banderaDeALertar = 0;
+                for (const iterator of e.target) {
+                    if(iterator.localName == "input"){
+                        if(iterator.value < 0) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent="No se permiten valores negativos"; 
+                        else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent="", iterator.classList.add(['border-success']);
+                        esquema[iterator.name] = parseFloat(iterator.value);
+                    }
+                }
+                if(banderaDeALertar) return;
+            
+            
+        
+                e.target.innerHTML = spinner;
+            
+                let resultado = await editarProductoDelInventario(e.target.action, esquema);
+                
+                // await getLista();
+                setTimeout(() => {
+                    window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
+                }, 500);
+                break;
+            case 'formularioFiltro':
+                log('filtrando')
+                let banderaDeALertarConfig = 0;
+                
+                for (const iterator of e.target) {
+                    if(iterator.localName == "input" || iterator.localName == "select"){
+                        // if(iterator.value == "") iterator.classList.add(['border-danger']), banderaDeALertarConfig++; 
+                        // else iterator.classList.remove(['border-danger']), iterator.classList.add(['border-success']);
+                        
+                        if(iterator.value == "CATEGORIAS" || iterator.value == "MARCAS")  config[iterator.name] = 0;
+                        else  config[iterator.name] = iterator.value;
+                    }
+                }
+                if(banderaDeALertarConfig) return;
+
+                /** Se configuran los campos */
+                config.campo = ['codigo', ' descripcion'];
+
+                let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  config);
+                log(inventarios);
+                elementoTablaCuerpo.innerHTML = spinner;
+
+                /** Si no hay datos entregamos un estatus 0 */
+                if(!inventarios.data.data.length) return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
+
+                setTimeout(async ()=>{
+                    elementoTablaCuerpo.innerHTML = "";
                     await inventarios.data.data.forEach( element => {
                         element.tasa = inventarios.tasa;
                         elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
                     });
-                    
                     /** Activamos los eventos del boton eliminar */
                     await cargarEventosDelBotonEliminar();
                     await cargarEventosDelBotonEditar();
@@ -380,40 +461,27 @@ const hanledFiltro = async (e) => {
                     if(inventarios.data.links){
                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
                     }
-                }
-            }
+    
+                    let elementoDePaginacion = d.querySelectorAll('.page-item');
+                    log(elementoDePaginacion)
+                    elementoDePaginacion.forEach( btnPaginacion => {
+                        btnPaginacion.addEventListener('click', hanledPaginacion);
+                    });
+                }, 1500)
+
+
+                
+                break;
+            case 'limpiarFiltro':
+                    for (const iterator of d.forms) {
+                        if(iterator.id == "formularioFiltro") iterator.reset();
+                    }
+                    hanledLoad();
+                break;
+            default:
+                break;
         }
-
-    }
-
-
-};
-
-const hanledFormulario = async (e) => {
-    if(e.target.id != "cerrarSesion"){
-        e.preventDefault();
-
-        let esquema = {},
-        banderaDeALertar = 0;
-        for (const iterator of e.target) {
-            if(iterator.localName == "input"){
-                if(iterator.value < 0) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent="No se permiten valoeres negativos"; 
-                else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent="", iterator.classList.add(['border-success']);
-                esquema[iterator.id] = parseFloat(iterator.value);
-            }
-        }
-        if(banderaDeALertar) return;
-    
-    
-
-        e.target.innerHTML = spinner;
-    
-        let resultado = await editarProductoDelInventario(e.target.action, esquema);
-        
-        // await getLista();
-        setTimeout(() => {
-            window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
-        }, 500);
+       
     }
 
 };
@@ -421,9 +489,8 @@ const hanledFormulario = async (e) => {
 /** EVENTOS */
 addEventListener('load', hanledLoad);
 elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
-elementoInputFiltroLimpiar.addEventListener('click', hanledFiltro);
-elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
-// elementoInputFiltroCodigo.addEventListener('keyup', hanledFiltro);
+elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
+// elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
 
 
 
@@ -474,6 +541,7 @@ async function cargarEventosDelBotonEliminar(){
         botonEliminar.addEventListener('click', hanledBotonEliminar);
     });
 };
+
 async function cargarEventosDelBotonEditar(){
     let formularios = d.forms;
     for (const iterator of formularios) {

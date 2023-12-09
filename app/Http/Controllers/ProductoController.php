@@ -8,7 +8,8 @@ use App\Models\{
     Producto,
     Helpers,
     Inventario,
-    Marca
+    Marca,
+    Utilidade
 };
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Requests\UpdateProductoRequest;
@@ -57,58 +58,91 @@ class ProductoController extends Controller
     public function getProductosFiltro(HttpRequest $request)
     {
         try {
-            $tasa = $this->data->utilidades[0]->tasa;
+            $tasa = Utilidade::all()[0]->tasa;
 
+           
             // filtramos por la descripcion
             if (request('filtro')) {
-                /** Buscamos por codigo de barra y descripcion */
+                /** Buscamos por codigo de barra */
                 foreach ($request->campo as $key => $campo) {
                     switch ($campo) {
                         case 'codigo':
-                            $resultados = Producto::where("{$campo}", $request->filtro)->get();
-                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-                            /** Le agregamos la informacion de STOCK al producto */
-                            foreach ($resultados as $key => $producto) {
-                                if( count(Inventario::where('codigo', $producto->codigo)->get()) ) {
-                                    $producto['inventario'] = Inventario::where('codigo', $producto->codigo)->get();
-                                }else{
-                                    $producto['inventario'] = [];
+                                $resultados = Producto::where("{$campo}", $request->filtro)->get();
+                                
+                                /** añadimos los datos de inventario */
+                                foreach ($resultados as $key => $producto) {
+                                    $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                                    if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                                    else $producto['inventario'] =  [];
                                 }
+                                
+                                $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                                if (count($resultados)) {
+                                    return response()->json([
+                                        "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIPCION",
+                                        "data" =>  [
+                                            "data" => $resultados,
+                                            "total" => count($resultados)
+                                        ],
+                                        "tasa" => $tasa,
+                                        "estatus" => Response::HTTP_OK
+                                    ], Response::HTTP_OK);
+                                }
+                            break;
+                        case 'descripcion':
+
+                            if($request->id_categoria > 0 && $request->id_marca > 0){
+                         
+                                $resultados = Producto::where([
+                                    "id_categoria" => $request->id_categoria,
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate(15);
+
+                
+                            }elseif ($request->id_categoria > 0){
+                             
+                                    $resultados = Producto::where([
+                                        "id_categoria" => $request->id_categoria,
+                                    ])
+                                    ->where("{$campo}", "like", "%{$request->filtro}%")
+                                    ->orderBy('descripcion', 'asc')->paginate(15);
+                                
+
+                            }elseif ($request->id_marca > 0) {                       
+                                    $resultados = Producto::where([
+                                        "id_marca" => $request->id_marca
+                                    ])
+                                    ->where("{$campo}", "like", "%{$request->filtro}%")
+                                    ->orderBy('descripcion', 'asc')->paginate(15);
+                            }else{
+                                $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
+                            }
+                            
+                            /** añadimos los datos de inventario */
+                            foreach ($resultados as $key => $producto) {
+                                $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                                if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                                else $producto['inventario'] =  [];
                             }
 
+                            /** Obtenemos los datos de marca y de categorias de cada producto */
+                            $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                          
+
                             if (count($resultados)) {
+
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
-                                    "data" =>  [
-                                        "data" => $resultados,
-                                        "total" => count($resultados)
-                                    ],
+                                    "data" => $resultados,
                                     "tasa" => $tasa,
                                     "estatus" => Response::HTTP_OK
                                 ], Response::HTTP_OK);
-                            }
-                            break;
-                        case 'descripcion':
-                            $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->get();
-                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-                            
-                            /** Le agregamos la informacion de STOCK al producto */
-                            foreach ($resultados as $key => $producto) {
-                                if( count(Inventario::where('codigo', $producto->codigo)->get()) ) {
-                                    $producto['inventario'] = Inventario::where('codigo', $producto->codigo)->get();
-                                }else{
-                                    $producto['inventario'] = [];
-                                }
-                            }
-                            
-                            if (count($resultados)) {
-
+                            }else{
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
-                                    "data" => [
-                                        "data" => $resultados,
-                                        "total" => count($resultados)
-                                    ],
+                                    "data" => $resultados,
                                     "tasa" => $tasa,
                                     "estatus" => Response::HTTP_OK
                                 ], Response::HTTP_OK);
@@ -117,7 +151,7 @@ class ProductoController extends Controller
 
                         default:
                             return response()->json([
-                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO EXISTE ESTE PRODUCTO EN LA LISTA DE PRODUCTOS.",
                                 "data" => [
                                     "data" => [],
                                     "total" => 0
@@ -128,12 +162,47 @@ class ProductoController extends Controller
                             break;
                     }
                 }
+            }else{
+                if ($request->id_categoria > 0) {
+                    $resultados = Producto::where([
+                        "id_categoria" => $request->id_categoria,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate(15);
+                }elseif ($request->id_marca > 0) {
+                    $resultados = Producto::where([
+                        "id_marca" => $request->id_marca,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate(15);
+                }else{
+                    return response()->json([
+                        "mensaje" => "El filtro no poseé parametros de busquedas",
+                        "data" => ["data" => []],
+                        "estatus" => Response::HTTP_NOT_FOUND
+                    ], Response::HTTP_NOT_FOUND);
+                }
+                
+                /** añadimos los datos de inventario */
+
+                foreach ($resultados as $key => $producto) {
+                    $datosDeInvenario = Inventario::where('codigo', $producto->codigo)->get();
+                    if(count(  $datosDeInvenario )) $producto['inventario'] =  $datosDeInvenario;
+                    else $producto['inventario'] =  [];
+                }
+
+                $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+              
+                return response()->json([
+                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                    "data" => $resultados,
+                    "tasa" => $tasa,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "ERROR AL FILTRAR LA BUSQUEDA DEL PRODUCTO,");
             return response()->json([
                 "mensaje" => $errorInfo,
-                "data" => [],
+                "data" =>  ["data" => []],
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -141,10 +210,8 @@ class ProductoController extends Controller
 
     public function getProductos(){
         try {
-            $resultados = Producto::where('id', '>', 0)->orderBy('id','desc')->paginate(15);
-           
+            $resultados = Producto::where('id', '>', 0)->orderBy('descripcion','asc')->paginate(15);
             $productos = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-            
             if($productos){
                 return response()->json([
                     "mensaje" => "Consulta de productos Exitosa",
@@ -158,9 +225,6 @@ class ProductoController extends Controller
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             }
-            
-
-
         } catch (\Throwable $th) {
            $mensaje = Helpers::getMensajeError($th, "Error al consultar productos");
             return response()->json([
@@ -212,9 +276,7 @@ class ProductoController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
 
-            $productos = Producto::all();
-            $categorias = Categoria::all();
-            $marcas = Marca::all();
+           
             // Seteamos la imagen
             if($request->file){
                 $url = Helpers::setFile($request);
@@ -223,7 +285,7 @@ class ProductoController extends Controller
                 $request['imagen'] = $this->data->datosDefault['FOTO_PORDEFECTO_PRODUCTO'];
             }
            
-
+           
             // Validamos si el producto tiene stock inicial
             if ($request->cantidad_inicial > 0) {
                 if ($request->costo > 0) {
@@ -242,14 +304,12 @@ class ProductoController extends Controller
                         "fecha_entrada" => date('Y-m-d'),
                     ]);
                 }else{
-                    $mensaje = [
-                        "texto" => "Se requiere del campo costo para procesar el registro",
-                        "input" => "costo"
-                    ];
-                    return view('admin.productos.lista', compact('request', 'mensaje', 'menuSuperior','productos', 'categorias', 'marcas'));
+                    $mensaje = "Se requiere del campo costo para procesar el registro";
+                    $estatus = Response::HTTP_UNAUTHORIZED;
+                    return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
                 }
             }
-           
+            
             // Registramos el producto
             $estatusCrear = Producto::create([
                 "codigo" => $request->codigo,
@@ -260,17 +320,16 @@ class ProductoController extends Controller
                 "fecha_vencimiento" => $request->fecha_vencimiento,
               
             ]);
-            
             $mensaje = $estatusCrear ? "El producto se creo correctamente." : "El producto no se creo";
             $estatus = $estatusCrear ? 201 : 404;
             
-            return $estatusCrear ? redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') )
-            : view('admin.productos.lista', compact('mensaje', 'estatus', 'menuSuperior', $request));
+            return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
             
         } catch (\Throwable $th) {
             //throw $th;
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear el producto, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = "¡El producto no se pudo crear por que el código ya existe!";
+            $estatus = 404;
+            return redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') );
 
         }
 

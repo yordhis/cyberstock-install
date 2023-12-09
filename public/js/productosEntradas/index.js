@@ -559,7 +559,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'ENTRADA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+        factura.fecha = fecha;
         localStorage.setItem('facturaInventario', JSON.stringify(factura));
     }
 
@@ -833,7 +833,7 @@ const hanledBuscarProducto = async (e) => {
     
         let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
         lista='';
-    
+        log(resultado)
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         resultado.data.data.forEach( async (producto) => {
             producto.tasa = resultado.tasa;

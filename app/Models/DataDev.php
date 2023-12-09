@@ -35,6 +35,7 @@ class DataDev
             "DEVOLUCION", // 6
             "INICIALIZACION" // 7
         ];
+        
         $this->tiposSalidas = [
             "VENTA", // 1
             "CONSUMO", // 2
@@ -42,33 +43,33 @@ class DataDev
             "CREDITO", // 4
         ];
 
-        $this->utilidades = Utilidade::all();
-        if (count($this->utilidades)) {
-            $this->utilidades[0]->iva = [ 
-                "sumar" => $this->utilidades[0]->iva / 100 + 1,
-                "restar" => $this->utilidades[0]->iva / 100,
-                "iva" =>  $this->utilidades[0]->iva
-            ];
+        // $this->utilidades = Utilidade::all();
+        // if (count($this->utilidades)) {
+        //     $this->utilidades[0]->iva = [ 
+        //         "sumar" => $this->utilidades[0]->iva / 100 + 1,
+        //         "restar" => $this->utilidades[0]->iva / 100,
+        //         "iva" =>  $this->utilidades[0]->iva
+        //     ];
 
-            if ($this->utilidades[0]->pvp_1 > 0) {
-                $this->utilidades[0]->pvp_1 = [ 
-                    "sumar" => $this->utilidades[0]->pvp_1 / 100 + 1,
-                    "restar" => $this->utilidades[0]->pvp_1 / 100
-                ];
-            }
-            if ($this->utilidades[0]->pvp_2 > 0) {
-                $this->utilidades[0]->pvp_2 = [ 
-                    "sumar" => $this->utilidades[0]->pvp_2 / 100 + 1,
-                    "restar" => $this->utilidades[0]->pvp_2 / 100
-                ];
-            }
-            if ($this->utilidades[0]->pvp_3 > 0) {
-                $this->utilidades[0]->pvp_3 = [ 
-                    "sumar" => $this->utilidades[0]->pvp_3 / 100 + 1,
-                    "restar" => $this->utilidades[0]->pvp_3 / 100
-                ];
-            }
-        }
+        //     if ($this->utilidades[0]->pvp_1 > 0) {
+        //         $this->utilidades[0]->pvp_1 = [ 
+        //             "sumar" => $this->utilidades[0]->pvp_1 / 100 + 1,
+        //             "restar" => $this->utilidades[0]->pvp_1 / 100
+        //         ];
+        //     }
+        //     if ($this->utilidades[0]->pvp_2 > 0) {
+        //         $this->utilidades[0]->pvp_2 = [ 
+        //             "sumar" => $this->utilidades[0]->pvp_2 / 100 + 1,
+        //             "restar" => $this->utilidades[0]->pvp_2 / 100
+        //         ];
+        //     }
+        //     if ($this->utilidades[0]->pvp_3 > 0) {
+        //         $this->utilidades[0]->pvp_3 = [ 
+        //             "sumar" => $this->utilidades[0]->pvp_3 / 100 + 1,
+        //             "restar" => $this->utilidades[0]->pvp_3 / 100
+        //         ];
+        //     }
+        // }
 
         $this->menuSuperior = [
             "inventarios" => [
@@ -158,27 +159,6 @@ class DataDev
             "3" => "Completado",
         ];
 
-        $this->usuario = [
-            "nombre" => "admin",
-            "rol" => "administrador",
-        ];
      }
-
-
-    public function getRespuesta(){
-        return $this->respuesta;
-    }
-
-    public function getNotificaciones(){
-        return $this->notificaciones;
-    }
-
-    public function getMetodosPagos(){
-        return $this->metodosPagos;
-    }
-
-    public function getEstatusText(){
-        return $this->estatus;
-    }
 
 }

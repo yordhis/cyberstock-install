@@ -4,6 +4,7 @@
 
 @section('content')
     <div id="alert"></div>
+    
     <section class="section">
         <div class="row">
 
@@ -19,16 +20,17 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table datatable ">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">N° factura</th>
-                                        <th scope="col">Proveedor</th>
-                                        <th scope="col">Monto</th>
-                                        <th scope="col">Total de articulos</th>
-                                        <th scope="col">Concepto</th>
-                                        <th scope="col">Acciones</th>
+                                        <th scope="col">N° FACTURA</th>
+                                        <th scope="col">CLIENTE</th>
+                                        <th scope="col">MONTO</th>
+                                        <th scope="col">CANTIDAD ARTC.</th>
+                                        <th scope="col">CONCEPTO</th>
+                                        <th scope="col">ESTATUS</th>
+                                        <th scope="col">ACCIONES</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -44,10 +46,12 @@
                                             <td>{{ $factura->total }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
-                                            
+                                            <td class="text-danger">{{ $factura->concepto == "CREDITO" ? "PENDIENTE" : "PAGADO" }}</td>
                                             <td>
-                                                {{-- @include('admin.cobrar.partials.modalEditar') --}}
-                                                {{-- @include('admin.cobrar.partials.modaldialog') --}}
+                                                @include('admin.cobrar.partials.formpagar')
+                                                <a href="{{ route('admin.cuentas.por.cobrar.show', $factura->codigo ) }}"  class="btn btn-success ">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp
@@ -57,7 +61,12 @@
                             </table>
                      
                         <!-- End Table with stripped rows -->
-
+                        
+                        <!-- PAGINACION LARAVEL-->
+                        {{ $cobrar->links(); }}
+                        
+                        <!-- Total de facturas pendientes -->
+                        {{ "Total de facturas por cobrar: " . $cobrar->total() }}
                     </div>
                 </div>
 

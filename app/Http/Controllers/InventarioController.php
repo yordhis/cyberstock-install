@@ -8,11 +8,13 @@ use App\Http\Requests\UpdateInventarioRequest;
 use App\Models\{
     Carrito,
     CarritoInventario,
+    Categoria,
     Cliente,
     DataDev,
     Factura,
     FacturaInventario,
     Helpers,
+    Marca,
     Po,
     Proveedore,
     Utilidade,
@@ -45,7 +47,9 @@ class InventarioController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = FacadesRequest::path();
-            return view("admin.inventarios.lista", compact('menuSuperior', 'pathname'));
+            $categorias = Categoria::all();
+            $marcas = Marca::all();
+            return view("admin.inventarios.lista", compact('menuSuperior', 'pathname', 'categorias', 'marcas'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar inventario, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
@@ -54,8 +58,10 @@ class InventarioController extends Controller
 
     public function getInventarioVendedor(){
         $menuSuperior = $this->data->menuSuperior;
-            $pathname = FacadesRequest::path();
-            return view("admin.inventarios.listaVenedor", compact('menuSuperior', 'pathname'));
+        $categorias = Categoria::all();
+        $marcas = Marca::all();
+        $pathname = FacadesRequest::path();
+        return view("admin.inventarios.listaVenedor", compact('menuSuperior', 'pathname', 'categorias', 'marcas'));
     }
 
     /** API REST FULL */
@@ -84,16 +90,53 @@ class InventarioController extends Controller
                             }
                             break;
                         case 'descripcion':
-                            $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->get();
-                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+
+                            if($request->id_categoria > 0 && $request->id_marca > 0){
+                         
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate(15);
+
+                
+                            }elseif ($request->id_categoria > 0){
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate(15);
+
+                            }elseif ($request->id_marca > 0) {
+                                
+                                $resultados = Inventario::where([
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate(15);
+
+                            }else{
+                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
+                            }
+
+                            
+            
+                            $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                          
+
                             if (count($resultados)) {
 
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
-                                    "data" => [
-                                        "data" => $resultados,
-                                        "total" => count($resultados)
-                                    ],
+                                    "data" => $resultados,
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }else{
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => $resultados,
                                     "tasa" => $tasa,
                                     "estatus" => Response::HTTP_OK
                                 ], Response::HTTP_OK);
@@ -102,7 +145,7 @@ class InventarioController extends Controller
 
                         default:
                             return response()->json([
-                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
                                 "data" => [
                                     "data" => [],
                                     "total" => 0
@@ -113,12 +156,39 @@ class InventarioController extends Controller
                             break;
                     }
                 }
+            }else{
+                if ($request->id_categoria > 0) {
+                    $resultados = Inventario::where([
+                        "id_categoria" => $request->id_categoria,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate(15);
+                }elseif ($request->id_marca > 0) {
+                    $resultados = Inventario::where([
+                        "id_marca" => $request->id_marca,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate(15);
+                }else{
+                    return response()->json([
+                        "mensaje" => "El filtro no poseé parametros de busquedas",
+                        "data" => ["data" => []],
+                        "estatus" => Response::HTTP_NOT_FOUND
+                    ], Response::HTTP_NOT_FOUND);
+                }
+
+                $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+
+                return response()->json([
+                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                    "data" => $resultados,
+                    "tasa" => $tasa,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "ERROR AL FILTRAR LA BUSQUEDA DEL PRODUCTO,");
             return response()->json([
                 "mensaje" => $errorInfo,
-                "data" => [],
+                "data" => ["data" => []],
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -128,30 +198,8 @@ class InventarioController extends Controller
     {
         try {
             $tasa = Utilidade::all()[0]->tasa;
-
-            // filtramos por la descripcion
-            if (request('filtro')) {
-                $resultados = Inventario::where('descripcion', 'like', "%{$request->filtro}%")->orderBy('id', 'desc')->paginate(15);
-                if (count($resultados)) {
-                    $inventarios = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-                    return response()->json([
-                        "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE",
-                        "data" => $inventarios,
-                        "tasa" => $tasa,
-                        "estatus" => Response::HTTP_OK
-                    ], Response::HTTP_OK);
-                } else {
-                    return response()->json([
-                        "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO HAY EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
-                        "data" => $resultados,
-                        "tasa" => $tasa,
-                        "estatus" => Response::HTTP_OK
-                    ], Response::HTTP_OK);
-                }
-            }
-
             // PAGINAMOS LOS PRODUCTOS DEL INVENTARIO
-            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('id', 'desc')->paginate(15), 'id,nombre', 'categorias,marcas');
+            $inventarios = Helpers::setNameElementId(Inventario::where("estatus", ">=", 1)->orderBy('descripcion', 'asc')->paginate(15), 'id,nombre', 'categorias,marcas');
             return response()->json([
                 "mensaje" => "CONSULTA AL INVENTARIO EXITOSA",
                 "data" => $inventarios,
@@ -235,15 +283,12 @@ class InventarioController extends Controller
      */
     public function listaEntradas()
     {
-        $utilidades = $this->data->utilidades;
+    
         $menuSuperior = $this->data->menuSuperior;
-        $pathname = FacadesRequest::path();
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->get();
-
-        
+        ])->paginate(10);
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
@@ -256,7 +301,7 @@ class InventarioController extends Controller
             $entrada->proveedor = Proveedore::where("codigo", $entrada->identificacion)->get();
         }
 
-        return view('admin.entradas.lista', compact('menuSuperior', 'utilidades', 'entradas', 'pathname'));
+        return view( 'admin.entradas.lista', compact('menuSuperior', 'entradas') );
     }
 
     /**
@@ -269,14 +314,14 @@ class InventarioController extends Controller
      */
     public function listaSalidas()
     {
-        $utilidades = $this->data->utilidades;
+    
         $menuSuperior = $this->data->menuSuperior;
-        $pathname = FacadesRequest::path();
         $pos = Po::all()[0];
-
         $salidas = FacturaInventario::where([
             "tipo" => "SALIDA"
-        ])->get();
+        ])->paginate(10);
+        
+        $cliente = [];
 
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
@@ -286,10 +331,16 @@ class InventarioController extends Controller
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
-            $salida->cliente = Cliente::where("identificacion", $salida->identificacion)->get();
-        }
+            count(Cliente::where("identificacion", $salida->identificacion)->get()) 
+                            ? array_push( $cliente, Cliente::where("identificacion", $salida->identificacion)->get()[0])
+                            : array_push( $cliente, ["nombre" => "CLIENTE"]);
 
-        return view('admin.salidas.lista', compact('menuSuperior', 'utilidades', 'salidas', 'pos', 'pathname'));
+            $salida->cliente = $cliente;
+            array_pop($cliente);
+        }
+     
+        return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));
+        
     }
 
     public function crearEntrada(Request $request)
