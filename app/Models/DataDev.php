@@ -80,9 +80,9 @@ class DataDev
                 "Crear Entrada" => "crearEntrada",
             ],
             "productos" => [
-                "General" => "",
-                "Categorias" => "categorias",
-                "Marcas" => "marcas"
+                "productos" => "index",
+                "categorias" => "index",
+                "marcas" => "index"
             ],
             "pos" => [
                 "Pos" => "",

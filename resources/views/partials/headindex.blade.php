@@ -6,15 +6,15 @@
 {{-- SEO --}}
 <meta content="" name="description">
 <meta content="" name="keywords">
-<base href="{{ env('APP_URL') }}" target="objetivo">
+
 <!-- Favicons -->
-<link href="assets/img/logocs.png" rel="icon">
-<link href="assets/img/logo.png" rel="apple-touch-icon">
+<link href="{{ asset('/assets/img/logocs.png') }}" rel="icon">
+<link href="{{ asset('/assets/img/logo.png') }}" rel="apple-touch-icon">
 
-<link href="assets/vendor/bootstrap/css/bootstrap.css" rel="stylesheet" defer>
-<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" defer>
-<link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" defer>
+<!-- ESTILOS DEL LTE -->
+<link href="{{ asset('/assets/vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+<link href="{{ asset('/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+<link href="{{ asset('/assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
 
 
-<!-- Template Main CSS File -->
-{{-- <link href="assets/css/style.css" rel="stylesheet" defer> --}}
+

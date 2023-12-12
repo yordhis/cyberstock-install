@@ -552,13 +552,6 @@
         <span id="observacion">{{ empty($extras[4]) ? '' : $extras[4] }}</span>
         <!-- END Datos Extras -->
     </div>
-
-     {{-- 
-
-    
-     --}}
-
-
 </body>
 
 </html>

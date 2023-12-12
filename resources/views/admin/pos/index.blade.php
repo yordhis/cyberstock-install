@@ -12,11 +12,12 @@
         <div class="row position-relative">
             <div class="col-12">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
-                    <a href="pos/facturas" class="btn btn-primary m-2"  target="_self">
+                    <a href="{{ route('admin.facturas.index') }}" class="btn btn-primary m-2">
                         <i class="bi bi-paypal"></i>
                         Facturas
                     </a>
-                    <a href="pos/clientes" class="btn btn-primary m-2"  target="_self">
+                    
+                    <a href="{{ route('admin.clientes.index') }}" class="btn btn-primary m-2">
                         <i  class="bi bi-person"></i>
                         Clientes
                     </a>

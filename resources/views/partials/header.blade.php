@@ -42,35 +42,40 @@
                         @if (Auth::user()->rol == 1 || Auth::user()->rol == 2)   
                              <!-- Start Components Nav | GENERAL -->
                             <li class="nav-item">
-                                <a class="nav-link p-2 me-2 {{ $subcategoria == "" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.index') }}">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "" ? "border bg-white text-black": 'text-white border-end' }}" 
+                                        href="{{ route('admin.inventarios.index') }}">
                                     <span>GENERAL</span></i>
                                 </a>
                             </li><!-- End Components Nav | GENERAL -->
 
                              <!-- Start Components Nav | MOVIMIENTOS DE SALIDAS -->
                             <li class="nav-item">
-                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaSalidas" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.listaSalidas') }}">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaSalidas" ? "border bg-white text-black": 'text-white border-end' }}" 
+                                        href="{{ route('admin.inventarios.listaSalidas') }}">
                                     <span>SALIDAS</span></i>
                                 </a>
                             </li><!-- End Components Nav | MOVIMIENTOS DE SALIDAS -->
 
                              <!-- Start Components Nav | MOVIMIENTOS DE ENTRADAS -->
                             <li class="nav-item">
-                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaEntradas" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.listaEntradas') }}">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "listaEntradas" ? "border bg-white text-black": 'text-white border-end' }}" 
+                                        href="{{ route('admin.inventarios.listaEntradas') }}">
                                     <span>ENTRADAS</span></i>
                                 </a>
                             </li><!-- End Components Nav | MOVIMIENTOS DE ENTRADAS -->
 
                              <!-- Start Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
                             <li class="nav-item">
-                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearSalida" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.crearSalida') }}">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearSalida" ? "border bg-white text-black": 'text-white border-end' }}" 
+                                        href="{{ route('admin.inventarios.crearSalida') }}">
                                     <span>PROCESAR SALIDA</span></i>
                                 </a>
                             </li><!-- End Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
 
                              <!-- Start Components Nav | PROCESAR MOVIMIENTO DE SALIDA -->
                             <li class="nav-item">
-                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearEntrada" ? "border bg-white text-black": 'text-white border-end' }}" href="{{ route('admin.inventarios.crearEntrada') }}">
+                                <a class="nav-link p-2 me-2 {{ $subcategoria == "crearEntrada" ? "border bg-white text-black": 'text-white border-end' }}" 
+                                        href="{{ route('admin.inventarios.crearEntrada') }}">
                                     <span>PROCESAR ENTRADA</span></i>
                                 </a>
                             </li><!-- End Components Nav | PROCESAR MOVIMIENTO DE ENTRADA -->
@@ -86,11 +91,15 @@
                             @endforeach --}}
                         @endif
                     @else
-                        @foreach ($item as $keyItem => $menu)
+                        @foreach ($item as $keyItem => $menu )
+                                
+                                @php
+                                    $categoria = $subcategoria ? $subcategoria : $categoria;
+                                @endphp
                             <li
-                                class="nav-item me-2 pe-2 {{ $menu == $subcategoria ? 'border p-2 bg-white text-black' : 'text-white border-end' }}">
-                                <a href="{{ $key . '/' . $menu }}" target="_self" class="nav-link">
-                                    {{ $keyItem }}
+                                class="nav-item me-2 pe-2 {{ $keyItem ==  $categoria ? 'border p-2 bg-white text-black' : 'text-white border-end' }}">
+                                <a href="{{ route("admin.{$keyItem}.{$menu}") }}" class="nav-link">
+                                    {{ Str::upper($keyItem)  }}
                                 </a>
                             </li>
                         @endforeach
@@ -118,7 +127,7 @@
 
 
                     <li>
-                        <form action="logout" method="post" class="text-center" target="_self" id="cerrarSesion">
+                        <form action="{{ route('login.logout') }}" method="post" class="text-center" target="_self" id="cerrarSesion">
                             @csrf
                             @method('post')
                             <button type="bottom" class="btn btn-node" >

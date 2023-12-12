@@ -92,8 +92,6 @@
         </div>
     </section>
 
-    <script src="{{ asset('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
-    <script src="{{ asset('/assets/js/main.js') }}" defer></script>
 
     <script src=" {{ asset('/js/main.js') }}" defer></script>
     <script src="{{ asset('/js/inventarios/vendedor.js') }}" defer></script>

@@ -57,10 +57,9 @@ class CategoriaController extends Controller
     public function index()
     {
         try {
-            $categorias = Categoria::all();
-            $pathname = Request::path();
+            $categorias = Categoria::orderBy('nombre', 'asc')->paginate(10);
             $menuSuperior = $this->data->menuSuperior;
-            return view('admin.categorias.lista', compact('menuSuperior', 'categorias', 'pathname'));
+            return view('admin.categorias.lista', compact('menuSuperior', 'categorias'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar las categorias, ");
             return view('errors.404', compact('mensajeError'));

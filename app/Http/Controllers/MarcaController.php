@@ -59,11 +59,12 @@ class MarcaController extends Controller
     {
 
         try {
-            // return "hola";
-            $marcas = Marca::all();
+            $marcas = Marca::orderBy('nombre', 'asc')->paginate(10);
             $menuSuperior = $this->data->menuSuperior;
-            $pathname = Request::path();
-            return view('admin.marcas.lista', compact('menuSuperior', 'marcas', 'pathname'));
+            
+
+
+            return view('admin.marcas.lista', compact('menuSuperior', 'marcas') );
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar las marcas, ");
             return view('errors.404', compact('mensajeError'));

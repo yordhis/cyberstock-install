@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar la marca <span class="text-danger fs-5">{{$marca->nombre}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="/productos/marcas/{{$marca->id}}" method="post" target="_self">
+            <form action="{{ route('admin.marcas.destroy', $marca->id) }}" method="post">
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

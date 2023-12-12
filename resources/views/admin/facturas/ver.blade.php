@@ -46,17 +46,13 @@
     
                           <div class="bg-black m-1 w-100" style="height: 2px;"></div>
                           <!-- Productos -->
-                          {{-- @php
-                                $subtotalAcumulador = 0;
-                            @endphp --}}
+                    
                           @foreach ($factura->carrito as $producto)
                             <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                               <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
                               <div class="p-2 bd-highlight" >Bs {{ floatVal($producto->subtotal) *  $factura->tasa }}</div>
                             </div>
-                            {{-- @php
-                                $subtotalAcumulador = $producto->subtotal *  $factura->tasa + $subtotalAcumulador;
-                            @endphp --}}
+                            
                           @endforeach
     
                           <div class="bg-black m-1 w-100" style="height: 2px;"></div>
@@ -85,7 +81,8 @@
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">IVA:</div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal * $factura->tasa * $utilidades[0]->iva['restar'], 2, ',', '.') }}</div>
+                          
+                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
                           </div>
                           
     
@@ -107,7 +104,7 @@
                           </div>
                           
                           <div class="d-flex justify-content-between w-100 m-2 p-0">
-                            <a href="pos/facturas" class="col-sm-6 col-xs-12  btn btn-outline-danger pt-2" target="_self">VOLVER A LISTA</a>
+                            <a href="{{ route('admin.facturas.index') }}" class="col-sm-6 col-xs-12  btn btn-outline-danger pt-2" target="_self">VOLVER A LISTA</a>
                             {{-- <button type="button" class="col-sm-4 col-xs-12 ms-2 btn btn-outline-warning">
                               <i class="bx bx-pencil"></i>
                               REALIZAR DEVOLUCIÓN
@@ -136,8 +133,10 @@
         </div>
     </section>
 
+    <script src="{{ asset('/js/main.js') }}" defer></script>
+    <script src="{{ asset('/js/facturas/facturaController.js') }}" defer></script>
+    <script src="{{ asset('/js/facturas/ver.js') }}" defer></script>
     
-  
- 
+    
 
 @endsection

@@ -16,7 +16,7 @@
         </div>
      
             <div class="modal-body">
-                <form action="/productos/marcas/{{$marca->id}}" method="post" target="_self" enctype="multipart/form-data"
+                <form action="{{ route('admin.marcas.update', $marca->id) }}" method="post" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('put')

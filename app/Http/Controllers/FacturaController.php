@@ -61,7 +61,7 @@ class FacturaController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
-            $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->get();
+            $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->paginate(10);
            
             if(count($facturas)){
                 foreach ($facturas as $key => $factura) {
@@ -222,32 +222,27 @@ class FacturaController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
-            $facturas= Factura::where('id',$id)->get();
-           
-            if(count($facturas)){
-                foreach ($facturas as $key => $factura) {
+            $factura = Factura::find($id);
+          
+            if($factura){
                     $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
                     $contador = 0;
                     foreach ($factura->carrito as $key => $producto) {
                         $contador += $producto->cantidad;
                     }
                     $factura->totalArticulos = $contador;
-
-                }
-
-                $factura = $facturas[0];
-              
             }else{
                 $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
                 $estatus = 404;
                 return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
             }
           
+
             $pos = count(Po::all()) ? Po::all()[0]: [];
             $pathname = Request::path();
             $pathname = explode('/', $pathname)[0] . '/ver';
            
-            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior', 'pathname' ) );
+            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior' ) );
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

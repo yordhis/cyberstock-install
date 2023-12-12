@@ -19,7 +19,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="productos/categorias" method="post" target="_self" enctype="multipart/form-data"
+            <form action="{{ route('admin.categorias.store') }}" method="post" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('post')

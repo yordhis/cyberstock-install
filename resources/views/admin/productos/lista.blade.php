@@ -80,11 +80,9 @@
         </div>
     </section>
 
-    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/main.js') }}" defer></script>
 
     <script src=" {{ asset('js/main.js') }}" defer></script>
-    <script src="{{ asset('js/partials/alert.js') }}" defer></script>
+
     <script src="{{ asset('js/productos/productoController.js') }}" defer></script>
     <script src="{{ asset('js/productos/categorias/CategoriaController.js') }}" defer></script>
     <script src="{{ asset('js/productos/marcas/MarcaController.js') }}" defer></script>

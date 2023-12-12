@@ -21,7 +21,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table datatable ">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -30,10 +30,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $contador = 1; @endphp
+
                                     @foreach ($marcas as $marca)
                                         <tr>
-                                            <td scope="row">{{ $contador }}</td>
+                                            <td scope="row">{{ $marca->id }}</td>
                                             <td>{{ $marca->nombre }}</td>
                                             <td>
 
@@ -42,14 +42,15 @@
   
                                             </td>
                                         </tr>
-                                        @php $contador++; @endphp
+                                     
                                     @endforeach
                                     
                                 </tbody>
                             </table>
                      
                         <!-- End Table with stripped rows -->
-
+                            {{ $marcas->links() }}
+                            {{ "Total de marcas: " . $marcas->total() }}
                     </div>
                 </div>
 

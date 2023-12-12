@@ -45,8 +45,8 @@
                                                 <td>Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</td>
                                                 <td>REF: {{ number_format($factura->total, 2, ',', '.') }}</td>
                                                 <td> 
-                                                    <a href="facturas/{{ $factura->id }}" target="_self">
-                                                        <i class="bi bi-eye"></i>
+                                                    <a href="{{ route('admin.facturas.show', $factura->id) }}" >
+                                                        <i class="bi bi-eye btn btn-success"></i>
                                                     </a>
                                                     {{-- @include('admin.facturas.partials.modalEditar') --}}
                                                     {{-- @include('admin.facturas.partials.modaldialog') --}}
@@ -68,6 +68,10 @@
                             </table>
                      
                         <!-- End Table with stripped rows -->
+                        <!-- PAGINACION BLADE -->
+                        {{ $facturas->links() }}
+                        {{ "Total de facturas registrados: " . $facturas->total() }}
+                    <!-- CIERRE PAGINACION BLADE -->
 
                     </div>
                 </div>

@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar el categoria <span class="text-danger fs-5">{{$categoria->nombre}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="productos/categorias/{{$categoria->id}}" method="post" target="_self">
+            <form action="{{ route('admin.categorias.destroy', $categoria->id)}}" method="post" >
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
