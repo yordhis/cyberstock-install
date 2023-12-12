@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Planilla de inscripción </title>
-    <link href="assets/css/fuente.css">
+    <link href="{{ asset('assets/css/fuente.css') }}">
 
     {{-- SEO --}}
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <base href="http://academiamaryland.com/" target="objetivo">
+    {{-- <base href="{{ env('URL_APP') }}" target="objetivo"> --}}
     <!-- Favicons -->
-    <link href="assets/img/logo-img-circulo.png" rel="icon">
-    <link href="assets/img/logo-img-circulo.png" rel="apple-touch-icon">
+    <link href="{{ asset('/assets/img/logo-img-circulo.png') }}" rel="icon">
+    <link href="{{ asset('/assets/img/logo-img-circulo.png') }}" rel="apple-touch-icon">
 
    
 
     <!-- Template Main CSS File -->
-    <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/personalizado.css" rel="stylesheet">
+    <link href="{{ asset('/assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('/assets/css/personalizado.css') }}" rel="stylesheet">
 
     <style>
         body{
@@ -459,13 +459,13 @@
             margin-left: 85px;
         }
         /* END Datos Extras */
-        </style>
+    </style>
 
 </head>
 
 <body>
     <div class="caja">
-        <img src="assets/img/planilla.png" alt="planilla pdf" >
+        <img src="{{ asset('assets/img/planilla.png') }}" alt="planilla pdf" >
         
         <span id="codigo"> {{ $inscripcione->codigo ?? '' }} </span>
         <span id="fecha"> {{ $inscripcione->fecha ?? '' }} </span>

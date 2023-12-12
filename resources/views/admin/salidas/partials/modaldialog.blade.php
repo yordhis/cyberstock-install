@@ -1,5 +1,5 @@
  <!-- Modal Dialog Scrollable -->
- <a type="button" class="" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$factura->id}}">
+ <a type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$factura->id}}">
     <i class="bi bi-eye"></i>
  </a>
   <div class="modal fade" id="modalDialogScrollable{{$factura->id}}" tabindex="-1">
@@ -66,7 +66,7 @@
                       
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">IVA:</div>
-                        <div class="p-2 bd-highlight">Usd. {{ number_format($factura->subtotal * $utilidades[0]->iva['restar'], 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight">Usd. {{ number_format($factura->subtotal * $factura->iva, 2, ',', '.') }}</div>
                       </div>
 
                       <p>------------------------------------------------------------------------------</p>
@@ -92,11 +92,11 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CERRAR</button>
 
-          <a href="pos/imprimirFactura/{{$factura->codigo}}" target="_blank" rel="noopener noreferrer">
+          {{-- <a href="pos/imprimirFactura/{{$factura->codigo}}" target="_blank" rel="noopener noreferrer">
             IMPRIMIR
-          </a>
+          </a> --}}
           
         </div>
       </div>

@@ -3,11 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-
 
 class Authenticate extends Middleware
 {
@@ -19,20 +16,9 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        
         if (!$request->expectsJson()) {
-            return route('login.index');
+            return route('login');
         }
-
     }
 
-    // public function handle(Request $request, Closure $next): Response
-    // {
-    //     // if ($request->input('email') !== 'admin') {
-    //         return redirect('login');
-    //     // }
-       
- 
-    //     return $next($request);
-    // }
 }

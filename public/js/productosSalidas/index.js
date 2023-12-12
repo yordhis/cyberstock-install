@@ -34,6 +34,11 @@ metodosPagos = [{
 const componenteTarjetaCliente = (cliente, mensaje) => {
     if(cliente.length){
         cliente = cliente[0];
+        if(!cliente.telefono){
+            cliente.telefono = "no asignado";
+        }else{
+            cliente.telefono = cliente.telefono.substring(4,0) +"-"+ cliente.telefono.substring(4);
+        }
         return `
         <div class="card-body">
             <h5 class="card-title text-danger">Cliente N°: ${cliente.id}</h5>
@@ -41,12 +46,13 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <p class="card-text">
                 <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
                 <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
+                <b>Teléfono:</b> ${cliente.telefono} <br><br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
                 <i class="bi bi-search fs-4"></i>
             </a>
-            <a href="${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
+            <a href="${URL_BASE_APP}/${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
                 <i class="bi bi-pencil-fill fs-4"></i>
             </a>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
@@ -113,6 +119,15 @@ const componenteFormularioAgregarCliente = () => {
             <div class="form-floating m-2">
                 <div id="respuesta-de-validacion"></div>                
             </div>
+
+            <div class="form-floating m-2">
+                <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <label for="floatingInput">TELÉFONO</label>
+                <div class="text-danger validate"></div>
+            </div>
+            <div class="form-floating m-2">
+                <div id="respuesta-de-validacion"></div>                
+            </div>
             <div class="form-floating m-2">
                 <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
                 
@@ -161,6 +176,11 @@ const componenteFormularioEditarCliente = (cliente) => {
                 <div class="form-floating m-2">
                     <input type="number" class="form-control" name="identificacion" value="${cliente.identificacion}" id="floatingInput" placeholder="Ingrese número de identificación.">
                     <label for="floatingInput">RIF O ID</label>
+                    <div class="text-danger validate"></div>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <label for="floatingInput">TELÉFONO</label>
                     <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
@@ -295,7 +315,6 @@ const componenteListaDeProductoEnFactura = (producto) => {
 };
 
 const componenteNumeroDeFactura = (data, nombre) =>{
-    // log(data)
     return `<i class="bi bi-back"></i> N° ${nombre}: ${data.data}`;
 };
 
@@ -306,11 +325,7 @@ const componenteFactura = async (factura) => {
             <label for="floatingInput">Descuento %</label>
         </div>
     
-        <!--<div class="col-sm-3 form-floating mb-3">
-            <input type="number" class="form-control bg-secondary-light" readonly id="floatingInput" placeholder="16" value="16">
-            <label for="floatingInput">IVA %</label>
-        </div>-->
-        <div class="col-sm-6 ">
+        <div class="col-sm-3 ">
             <label for="">F. Fiscal</label> <br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked': ''}>
@@ -320,8 +335,17 @@ const componenteFactura = async (factura) => {
                 <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="desactivarFacturaFiscal" value="no" ${factura.iva == 0 ? 'checked': ''}>
                 <label class="form-check-label" for="inlineRadio2">NO</label>
             </div>
-            <!--<label for="">Fiscal</label>
-            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '': 'checked'}>-->
+        </div>
+
+        <div class="col-sm-3 ">
+            <div class="form-floating">
+                <select class="form-select acciones-factura" name="concepto_salida" id="concepto_salida" aria-label="Tipo de salida">
+                    <option value="${factura.concepto}" selected>${factura.concepto}</option>
+                    <option value="VENTA">VENTA</option>
+                    <option value="CREDITO">CREDITO</option>
+                </select>
+                <label for="concepto_salida">Concepto de salida</label>
+            </div>
         </div>
 
         <div class="col-sm-2 text-black">
@@ -515,7 +539,6 @@ const hanledLoad = async (e) => {
     codigoFactura.innerHTML += '<br>';
     codigoFactura.innerHTML += componenteNumeroDeFactura(resultadoNumeroDeFactura, 'Factura');
 
-    // log(JSON.parse(localStorage.getItem('factura')))
     facturaStorage = JSON.parse(localStorage.getItem('facturaSalida'))
 
     if(facturaStorage){
@@ -543,7 +566,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDay()}`;
+        factura.fecha = fecha;
         localStorage.setItem( 'facturaSalida', JSON.stringify(factura) );
     }
 
@@ -566,7 +589,6 @@ const hanledLoad = async (e) => {
         localStorage.setItem('carritoSalida', JSON.stringify(carritoStorage));
 
         /** Cargamos los datos de la factura */
-        log(factura)
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
 
@@ -594,7 +616,7 @@ const hanledAccionesCliente = async (e) => {
             break;
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner;
-            // log(e.target.parentElement.pathname.substring(1))
+          
             let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
             cargarEventosAccionesDelCliente();
@@ -616,7 +638,6 @@ const hanledBuscarCliente = async (e) => {
         else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
   
         
-        // log(e.target.value)
         /** Se cargar el spinner para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner;
         let cliente = await getCliente( parseInt(e.target.value) );
@@ -648,13 +669,11 @@ const hanledFormulario = async (e) => {
     switch (e.target.id) {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
-                    log(resultado)
                     if(!resultado) return;
                     e.target.innerHTML = spinner;
                     
                     cliente = await storeCliente(resultado);
 
-                    log(cliente)
                     if(cliente.estatus == 401){
                         elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
                         let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
@@ -681,9 +700,8 @@ const hanledFormulario = async (e) => {
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
             e.target.innerHTML = spinner;
-            log(resultado)
+
             cliente = await updateCliente(e.target.action, resultado);
-            log(cliente)
                /** Seteamos el cliente en la factura de local storage */
                factura.identificacion = cliente.data[0].identificacion;
                factura.tipoDocumento = cliente.data[0].tipo;
@@ -732,14 +750,12 @@ const hanledAgregarAFactura = async (e) => {
             resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro);
 
             if(resultado.estatus == 200){
-                log('Producto Obtenido');
                 /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
                 let  classIdentificadora = resultado.data.data[0].codigo + "_data",
                 datosDeSalida = await d.getElementsByClassName(classIdentificadora),
                 esquemaDeDatosDeSalida = {}; // tipo de dato OBJECT
 
                 /** Validamos que la cantida sea agreagada y el costo y pvp detal */
-                log(datosDeSalida)
                 for (const datosSalida of datosDeSalida) {
                     if(datosSalida.name == "cantidad" || datosSalida.name == "precio" ){
         
@@ -757,8 +773,6 @@ const hanledAgregarAFactura = async (e) => {
                 for (const data of datosDeSalida) {
                     esquemaDeDatosDeSalida[data.name] = parseFloat(data.value);
                 }
-
-                log(esquemaDeDatosDeSalida);
                 
                 /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
                 factura.tasa = parseFloat(resultado.tasa);
@@ -828,7 +842,7 @@ const hanledAgregarAFactura = async (e) => {
                 /** Cargamos la factura y sus eventos de acciones del carrito de factura */
                 await cargarDatosDeFactura(carritoActual, factura);
             }else{
-                log(resultado.mensaje);
+                alert(resultado.mensaje);
             }
             break;
     
@@ -854,7 +868,6 @@ const hanledBuscarProducto = async (e) => {
         let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
         lista='';
     
-        log(resultado);
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
     
          resultado.data.data.forEach( async (producto) => {
@@ -881,6 +894,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     banderaDeError = 0,
     facturaActual = '',
     acumuladorSubtotal = 0;
+
+    log(e.target.localName)
+    log(e.target.parentElement.id)
   
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
@@ -888,10 +904,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     }else if(e.target.localName == 'i'){
         codigoProducto = e.target.parentElement.name;
         accion = e.target.parentElement.id;
+    }else if(e.target.localName == 'option'){
+        accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
     }
-
+log(accion)
     switch (accion) {
         case 'editarCantidadFactura':
                 cantidad = prompt('Ingrese nueva cantidad:');
@@ -916,7 +934,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         return producto;
                     }
                     if(producto.codigo_producto == codigoProducto ) {
-                        log(parseFloat(producto.costo));
                         producto.cantidad = parseFloat(cantidad);
                         producto.subtotal = darFormatoDeNumero( quitarFormato(producto.costo) * cantidad );
                         producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
@@ -946,7 +963,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'eliminarProductoFactura':
                 let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
-                log(carritoActualizadoC)
                 localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoC.reverse()));
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
@@ -997,10 +1013,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     
                   
                     return alert("Debes Ingresar un cliente para poder vender");
-                    log(elementoMetodoDePagoModal)
                 }
                
-                log(elementoMetodoDePagoModal.children[0])
                await cargarEventosAccionesDeFactura()
 
             break;
@@ -1061,7 +1075,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         
                             /** Mostramos el dialogo de facturar */
                             if (resultadoDeFacturar.estatus == 201) {
-                                log('entro aqui en la impresion de la factura')
                                 resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
                                 if (resultado) {
         
@@ -1103,16 +1116,17 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             break;
         case 'desactivarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
             break;
         case 'activarFacturaFiscal':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, 0.16, factura.descuento);
             break;
         case 'editarDescuento':
-            log(e.target.value)
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
+            break;
+        case 'concepto_salida':
+                factura.concepto = e.target.value;
+                localStorage.setItem('facturaSalida', JSON.stringify(factura));
             break;
         default:
             break;
@@ -1120,7 +1134,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 };
 
 const hanledAccionesDeMetodoDePago = async (e) => {
-    log(e.target.id)
     let accion = e.target.id,
     elementoMetodoDePago = d.querySelector('#elementoMetodoDePago'),
     metodosActuales = d.querySelectorAll('.metodoAdd'),
@@ -1169,7 +1182,6 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                 /** limpiamos la validacion */
                 e.target.parentElement.parentElement.children[1].children[1].textContent = "";
 
-                log(e.target.parentElement.id);
                 metodosActuales.forEach(element => {
                     if(element.children[2].id  != e.target.parentElement.id){
                         arregloDeMetodosDePago.push({
@@ -1180,13 +1192,13 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                     }
                 });
                 metodosPagos = arregloDeMetodosDePago; 
-                log(metodosPagos)
+              
                 elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
                 elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
                 await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
-            log('agregando tipo de pago')
+           
             /** Limpiamos la validación */
             e.target.parentElement.parentElement.children[1].children[1].textContent = "";
 
@@ -1210,9 +1222,6 @@ const hanledAccionesDeMetodoDePago = async (e) => {
             break;
         case 'montoDelPago':
            
-            log(e.target.value * 1)
-            log(e.target.parentElement.parentElement.children)
-            log(e.target.parentElement.parentElement.children[2].id)
             /** VAlidamos que el dato ingresado sea numero */
             if(e.target.value <= 0) return e.target.parentElement.parentElement.children[1].children[1].textContent="Este campo solo permite números mayor a cero";
             else e.target.parentElement.parentElement.children[1].children[1].textContent = "";
@@ -1314,7 +1323,7 @@ async function cargarEventosDeAgregarProductoAFactura(){
     let elementoAgregarAFactura = d.querySelectorAll('.agregar-producto'),
     elementoCerrarModalCustom = d.querySelectorAll('.cerrar__ModalCustom'),
     elementoInputPrecioRadio = d.querySelectorAll('.acciones-pvp');
-    log(elementoInputPrecioRadio);
+
     /** Cargamos los eventos de cerrar modal */
     elementoCerrarModalCustom.forEach(btnCerrarModal => {
         btnCerrarModal.addEventListener('click', hanledAgregarAFactura);
@@ -1334,6 +1343,7 @@ async function cargarEventosDeAgregarProductoAFactura(){
 async function cargarEventosAccionesDeFactura(){
     let elementoAccionesCarritoFactura = d.querySelectorAll('.acciones-factura'),
     elementoMetodoDePagoAcciones = d.querySelectorAll('.acciones-pagos');
+
     elementoAccionesCarritoFactura.forEach(acciones => {
         if(acciones.localName == "input") acciones.addEventListener('change', hanledAccionesDeCarritoFactura);
         else acciones.addEventListener('click', hanledAccionesDeCarritoFactura);
@@ -1387,7 +1397,6 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     carritoActual.forEach(producto => {
         acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
     });
-    log(acumuladorSubtotal)
     factura.iva = iva; 
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;

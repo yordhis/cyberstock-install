@@ -80,48 +80,7 @@ class FacturaController extends Controller
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
     }
-
-    public function listaFacturaPorPagar(){
-        $pathname = Request::path();
-        $menuSuperior = $this->data->menuSuperior;
-
-        $pagar = FacturaInventario::where([
-            "tipo" => 'ENTRADA',
-            "concepto" => 'CREDITO',
-        ])->get();
-
-        foreach ($pagar as $key => $value) {
-           $value['proveedor']= Proveedore::where('codigo', $value->identificacion)->get();
-           $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
-            $contador = 0;
-           foreach($value['carrito'] as $cantidade){
-            $value['totalArticulos'] += $cantidade->cantidad; 
-           }
-        }
-        // return $pagar;
-        return view('admin.pagar.lista', compact('pagar', 'menuSuperior', 'pathname'));
-    }
-
-    public function listaFacturaPorCobrar(){
-        $pathname = Request::path();
-        $menuSuperior = $this->data->menuSuperior;
-
-        $cobrar = Factura::where([
-            "tipo" => 'SALIDA',
-            "concepto" => 'CREDITO',
-        ])->get();
-
-        foreach ($cobrar as $key => $value) {
-           $value['cliente']= Cliente::where('identificacion', $value->identificacion)->get();
-           $value['carrito'] = Carrito::where('codigo', $value->codigo)->get();
-            $contador = 0;
-           foreach($value['carrito'] as $cantidade){
-            $value['totalArticulos'] += $cantidade->cantidad; 
-           }
-        }
-        // return $cobrar;
-        return view('admin.cobrar.lista', compact('cobrar', 'menuSuperior', 'pathname'));
-    }
+  
 
     public function getFactura($codigoFactura){
         try {
@@ -182,15 +141,7 @@ class FacturaController extends Controller
             // return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
     
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    
 
     /**
      * Store a newly created resource in storage.

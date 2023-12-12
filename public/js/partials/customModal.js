@@ -13,7 +13,7 @@ const hanledOpenModal = (e) => {
 
 const hanledCloseModal = (e) => {
     e.preventDefault();
-    log(e.target.parentElement)
+    // log(e.target.parentElement)
     // e.target.parentElement.children[1].classList.remove('modal--show')
     // log(e.target.parentElement.children[1].classList)
     // element.classList.add('modal--show');

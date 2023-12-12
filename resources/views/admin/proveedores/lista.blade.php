@@ -25,7 +25,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table datatable ">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -38,10 +38,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $contador = 1; @endphp
+                                 
                                     @foreach ($proveedores as $proveedore)
                                         <tr>
-                                            <th scope="row">{{ $contador }}</th>
+                                            <th scope="row">{{ $proveedore->id }}</th>
                                             <td>{{ $proveedore->tipo_documento }}-{{ $proveedore->codigo }}</td>
                                             <td>{{ $proveedore->empresa }}</td>
                                             <td>{{ $proveedore->contacto }}</td>
@@ -59,12 +59,14 @@
                                                 
                                             </td>
                                         </tr>
-                                        @php $contador++; @endphp
+                                    
                                     @endforeach
                                     
                                 </tbody>
                             </table>
-                     
+                            
+                            {{ $proveedores->links() }}
+                            {{ "Total de proveedores registrados: " . $proveedores->total() }}
                         <!-- End Table with stripped rows -->
 
                     </div>
@@ -75,10 +77,6 @@
 
 
         </div>
-    </section>
-
-    
-  
+    </section>  
  
-
 @endsection

@@ -1,6 +1,8 @@
 console.log("conectado al master");
-const URL_BASE = `/api`,
-URL_BASE_APP = ``,
+
+const URL_BASE = `${window.location.protocol}//${window.location.host}/api`,
+URL_BASE_APP = `${window.location.protocol}//${window.location.host}`,
+URL_PATHNAME = `${window.location.pathname}`,
 d = document,
 log = console.log,
 VENTA = {

@@ -19,7 +19,7 @@
             <form action="/productos/facturas/{{$factura->id}}" method="post" target="_self">
             @csrf
             @method('delete')
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 <button type="submit" class="btn btn-primary">Si, proceder a eliminar.</button>
             </form>
         </div>

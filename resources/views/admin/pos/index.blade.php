@@ -4,11 +4,7 @@
 
 
 @section('content')
-    @isset($respuesta)
-        @include('partials.alert')
-    @endisset
-    <div id="alert">
-    </div>
+
 
    
     <div class="container-fluid ">
@@ -150,8 +146,16 @@
             </div>
         </div>
     </div>
-
-
+    
+    <!-- SCRIPT DE APP -->
+  
+    <script src="{{ asset('/js/main.js') }}" defer></script>
+    <script src="{{ asset('/js/partials/customModal.js') }}" defer></script>
+    <script src="{{ asset('/js/inventarios/inventarioController.js') }}" defer></script>
+    <script src="{{ asset('/js/facturas/facturaController.js') }}" defer></script>
+    <script src="{{ asset('/js/clientes/clienteController.js') }}" defer></script>
+    <script src="{{ asset('/js/pos/index.js') }}" defer></script>
+    <!-- CIERRE ! SCRIPT DE APP -->
 
 
 @endsection

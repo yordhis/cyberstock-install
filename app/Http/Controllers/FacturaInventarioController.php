@@ -24,19 +24,6 @@ class FacturaInventarioController extends Controller
     {
         try {
             
-            // $carrito = CarritoInventario::where('codigo', $request->codigo)->get();
-            // if(count($carrito)){
-            //     $resultado = FacturaInventario::create($request->all());
-            //     $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
-            //     $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
-            // }else{
-            //     return response()->json([
-            //         "mensaje" => "La factura no puede ser procesa porque no poseé productos facturados",
-            //         "data" =>  [], 
-            //         "estatus" =>Response::HTTP_NOT_FOUND 
-            //     ],Response::HTTP_NOT_FOUND);
-            // }
-
             $resultado = FacturaInventario::create($request->all());
             $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
             $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
@@ -125,13 +112,13 @@ class FacturaInventarioController extends Controller
                 "identificacion" => $request->identificacion, // numero de documento
                 "subtotal" => $request->subtotal, // se guarda en divisas
                 "total" => $request->total,
-                           "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
-                           "iva" => $request->iva, // impuesto
-                           "tipo" => $request->tipo, // fiscal o no fialcal
-                           "concepto" => $request->concepto, // venta, compra ...
-                           "descuento" => $request->descuento, // descuento
-                           "fecha" => $request->fecha, // fecha venta, compra ...
-                           "metodos" => $request->metodos
+                "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                "iva" => $request->iva, // impuesto
+                "tipo" => $request->tipo, // fiscal o no fialcal
+                "concepto" => $request->concepto, // venta, compra ...
+                "descuento" => $request->descuento, // descuento
+                "fecha" => $request->fecha, // fecha venta, compra ...
+                "metodos" => $request->metodos
             ]);
        
             $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";

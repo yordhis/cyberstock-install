@@ -19,7 +19,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table datatable ">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -34,13 +34,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $contador = 1; @endphp
+                                  
                                     @foreach ($salidas as $factura)
                                         <tr>
-                                            <td scope="row">{{ $contador }}</td>
+                                            <td scope="row">{{ $factura->id  }}</td>
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
-                                            <td>{{ $factura->cliente[0]->nombre }}</td>
+                                            <td>{{ $factura->cliente[0]['nombre'] }}</td>
                                             <td>{{ $factura->total }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
@@ -52,13 +52,19 @@
   
                                             </td>
                                         </tr>
-                                        @php $contador++; @endphp
+                                      
                                     @endforeach
                                     
                                 </tbody>
                             </table>
                      
                         <!-- End Table with stripped rows -->
+
+                        <!-- PAGINACION LARAVEL-->
+                        {{ $salidas->links(); }}
+                        
+                        <!-- Total de facturas pendientes -->
+                        {{ "Total de movimientos: " . $salidas->total() }}
 
                     </div>
                 </div>
@@ -71,6 +77,7 @@
     </section>
 
     
+    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
   
  
 

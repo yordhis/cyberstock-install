@@ -29,7 +29,7 @@ class ClienteController extends Controller
     public function index()
     {
         try {
-            $clientes = Cliente::all();
+            $clientes = Cliente::paginate(10);
             $pathname = Request::path();
       
             $menuSuperior = $this->data->menuSuperior;
@@ -162,16 +162,7 @@ class ClienteController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
+  
     /**
      * Store a newly created resource in storage.
      *
@@ -185,29 +176,30 @@ class ClienteController extends Controller
 
             $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
             if(count($clienteExiste)){
-                $mensaje = "El cliente Ya existe.";
+                $mensaje = "El cliente no se registro, porque el número de cédula ya existe.";
                 $estatus = 401;
             }else{
                 $estatusCrear = Cliente::create($request->all());
                 $mensaje = $estatusCrear ? "El cliente se creo correctamente." : "El cliente no se creo";
                 $estatus = $estatusCrear ? 201 : 404;
             }
-
+            
             if($request->formulario == "modalCrearCliente"){
                 return $estatusCrear ? redirect()->route( 'admin.pos.index', compact('mensaje', 'estatus') )
                 : view('admin.pos.index', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $request));
             }
-
+            
             if($request->formulario == "modalCrearClienteSalida"){
                 $identificacion = $estatusCrear->identificacion;
                 return redirect()->route( 'admin.inventarios.crearSalida', compact('mensaje', 'estatus', 'identificacion') );
             }
-
-            return $estatusCrear ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )
-            : view('admin.clientes.lista', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $request));
+            
+            
+            return redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus'));
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al crear la cliente, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = "Error al intentar registrar al cliente";
+            $estatus = 404;
+            return redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') );
         }
     }
 
