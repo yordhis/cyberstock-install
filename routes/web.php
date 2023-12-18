@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/inventarios/listaSalidas', [InventarioController::class, "listaSalidas"])->name('admin.inventarios.listaSalidas');
         Route::get('/inventarios/crearEntrada', [InventarioController::class, "crearEntrada"])->name('admin.inventarios.crearEntrada');
         Route::get('/inventarios/crearSalida', [InventarioController::class, "crearSalida"])->name('admin.inventarios.crearSalida');
+        Route::delete('/inventarios/eliminarFacturaInventario/{codigo}', [InventarioController::class, "eliminarFacturaInventario"])->name('admin.inventarios.eliminarFacturaInventario');
         Route::resource('/inventarios', InventarioController::class)->names('admin.inventarios');
         
         /** Rutas de productos */

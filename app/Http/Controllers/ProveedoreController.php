@@ -155,10 +155,8 @@ class ProveedoreController extends Controller
     public function index()
     {
         $proveedores = Proveedore::paginate(10);
-       
-        $pathname  = Request::path();
         $menuSuperior = $this->data->menuSuperior;
-        return view('admin.proveedores.lista', compact('menuSuperior', 'proveedores', 'pathname'));
+        return view('admin.proveedores.lista', compact('menuSuperior', 'proveedores'));
     }
 
     /**

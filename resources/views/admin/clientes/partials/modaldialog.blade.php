@@ -1,6 +1,6 @@
  <!-- Modal Dialog Scrollable -->
- <a type="button" class="" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$cliente->id}}">
-    <i class="bi bi-eye"></i>
+ <a  class="text-white" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$cliente->id}}">
+    <i class="bi bi-eye btn btn-success"></i>
  </a>
   <div class="modal fade" id="modalDialogScrollable{{$cliente->id}}" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">

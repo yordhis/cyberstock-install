@@ -25,11 +25,13 @@ const componenteFila = (data) => {
             <tr>
                 <td>${data.numero}</td>
                 <td>${data.codigo}</td>
-                <td>${data.descripcion}</td>
+                <td style="max-width:200px;">${data.descripcion}</td>
                 <td>${data.cantidad}</td>
-                <td>${data.costo}</td>
-                <td>${darFormatoDeNumero(quitarFormato(data.pvp))} Bs</td>
-                <td>${data.pvpUsd} $</td>
+                <td>REF ${darFormatoDeNumero(data.costo)}</td>
+                <td>
+                    BS ${darFormatoDeNumero(data.pvp)} <br>
+                    REF ${darFormatoDeNumero(data.pvpUsd)}
+                </td>
                 <td>${data.marca}</td>
                 <td>${data.categoria}</td>
         
@@ -104,17 +106,17 @@ const componenteModalVer = (data) => {
                                 </div>
 
                                 <div class="col-md-12 label"> 
-                                <span class="text-primary">Costo: REF</span> ${ data.costo } <br>
-                                <span class="text-primary">Costo: Bs</span> ${ data.costoBs } <br>
+                                <span class="text-primary">Costo: REF</span> ${ darFormatoDeNumero(data.costo) } <br>
+                                <span class="text-primary">Costo: Bs</span> ${ darFormatoDeNumero(data.costoBs) } <br>
                                 <hr>
-                                <span class="text-primary">PVP: REF</span> ${ data.pvpUsd } <br>
-                                <span class="text-primary">PVP:Bs</span> ${ data.pvp } <br>
+                                <span class="text-primary">PVP: REF</span> ${ darFormatoDeNumero(data.pvpUsd) } <br>
+                                <span class="text-primary">PVP:Bs</span> ${ darFormatoDeNumero(data.pvp) } <br>
                                 <hr>
-                                <span class="text-primary">PVP 2: REF</span> ${ data.pvpUsd_2 } <br>
-                                <span class="text-primary">PVP 2:Bs</span> ${ data.pvp_2 } <br>
+                                <span class="text-primary">PVP 2: REF</span> ${ darFormatoDeNumero(data.pvpUsd_2) } <br>
+                                <span class="text-primary">PVP 2:Bs</span> ${ darFormatoDeNumero(data.pvp_2) } <br>
                                 <hr>
-                                <span class="text-primary">PVP 3: REF</span> ${ data.pvpUsd_3 } <br>
-                                <span class="text-primary">PVP 3:Bs</span> ${ data.pvp_3 } <br>
+                                <span class="text-primary">PVP 3: REF</span> ${ darFormatoDeNumero(data.pvpUsd_3) } <br>
+                                <span class="text-primary">PVP 3:Bs</span> ${ darFormatoDeNumero(data.pvp_3) } <br>
                                 <hr>
                                 </div>
 
@@ -321,71 +323,6 @@ const hanledPaginacion = async (e) => {
     }
 };
 
-// const hanledFiltro = async (e) => {
-//     // Limpiar filtro
-//     if(e.target.id == "filtro-limpiar"){
-//         elementoInputFiltroDescripcion.value = '';
-//         await getLista();
-//         await cargarEventosDelBotonEliminar();
-//         await cargarEventosDelBotonEditar();
-//     } 
-    
-//     // validamos los keyup para no filtrar 
-//     if (e.key == "Enter" ){
-//         if(!e.target.value.trim().length){
-//             hanledLoad();
-//             return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
-//         }
-    
-//         if(e.target.id.split('-')[1] == 'limpiar'){
-//             elementoSpanInvalido.forEach(element => element.textContent = null);
-//             elementoInputFiltroDescripcion.value = null;
-//             elementoInputFiltroCodigo.value = null;
-//             await getLista();
-//             /** Activamos los eventos del boton eliminar */
-//             await cargarEventosDelBotonEliminar();
-//             await cargarEventosDelBotonEditar();
-    
-//         }else{
-//             elementoSpanInvalido.forEach(element => element.textContent = null);
-//             let filtro = {
-//                 filtro: `${e.target.value.trim()}`,
-//                 campo: ['codigo', ' descripcion'],
-//             };
-        
-//             if(e.target.value){
-//                 elementoTablaPaginacion.innerHTML = '';
-//                 elementoTablaCuerpo.innerHTML = spinner;
-//                 let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-//                 // log(inventarios);
-//                 if(!inventarios.data){
-//                     elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
-//                 }else{
-//                     elementoTablaCuerpo.innerHTML='';
-                    
-//                     await inventarios.data.data.forEach( element => {
-//                         element.tasa = inventarios.tasa;
-//                         elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
-//                     });
-                    
-//                     /** Activamos los eventos del boton eliminar */
-//                     await cargarEventosDelBotonEliminar();
-//                     await cargarEventosDelBotonEditar();
-            
-//                     if(inventarios.data.links){
-//                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
-//                     }
-//                 }
-//             }
-//         }
-
-//     }
-
-
-// };
-
-// const hanledPaginacionFiltro =
-
 const hanledFormulario = async (e) => {
     if(e.target.id != "cerrarSesion"){
         e.preventDefault();
@@ -482,10 +419,6 @@ const hanledFormulario = async (e) => {
 addEventListener('load', hanledLoad);
 elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
 elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
-// elementoInputFiltroDescripcion.addEventListener('keyup', hanledFiltro);
-
-
-
 
 
 /** FUNCIONES O UTILIDADES EXTRAS */
@@ -497,14 +430,14 @@ function adaptadorDeProducto(data){
         codigo: data.codigo,
         descripcion: data.descripcion,
         cantidad: data.cantidad,
-        costo: darFormatoDeNumero(quitarFormato( data.costo )),
-        costoBs: darFormatoDeNumero( quitarFormato(data.costo) * data.tasa ),
-        pvp: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp)) ),
-        pvpUsd:  darFormatoDeNumero(quitarFormato(data.pvp)),
-        pvp_2: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_2)) ),
-        pvpUsd_2:  darFormatoDeNumero( quitarFormato(data.pvp_2) ),
-        pvp_3: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_3)) ),
-        pvpUsd_3:  darFormatoDeNumero(quitarFormato(data.pvp_3)),
+        costo: data.costo,
+        costoBs: data.costo * data.tasa ,
+        pvp: data.tasa * data.pvp,
+        pvpUsd: data.pvp,
+        pvp_2: data.tasa * data.pvp_2,
+        pvpUsd_2: data.pvp_2,
+        pvp_3: data.tasa * data.pvp_3,
+        pvpUsd_3: data.pvp_3,
         marca: data.id_marca.nombre,
         imagen: data.imagen,
         fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),

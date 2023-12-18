@@ -50,7 +50,9 @@
                                                     </a>
                                                     {{-- @include('admin.facturas.partials.modalEditar') --}}
                                                     {{-- @include('admin.facturas.partials.modaldialog') --}}
-                                                    {{-- @include('admin.facturas.partials.modal') --}}
+                                                   
+                                                        @include('admin.facturas.partials.modal')
+                                                  
 
                                                 </td>
                                             </tr>
@@ -83,8 +85,8 @@
         </div>
     </section>
 
-    
-  
+    <script src="{{ asset('/js/main.js') }}" defer></script>
+    <script src="{{ asset('/js/utilidad/autorizacion.js')}}" defer><script>
  
 
 @endsection

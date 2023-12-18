@@ -39,13 +39,13 @@
                                             <td scope="row">{{ $contador }}</td>
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
-                                            <td>{{ $factura->proveedor[0]->empresa }}</td>
+                                            <td>{{ $factura->proveedor[0]->empresa ?? 'Proveedor' }}</td>
                                             <td>{{ $factura->total }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
                                             
                                             <td>
-                                                {{-- @include('admin.entradas.partials.modalEditar') --}}
+                                                @include('admin.entradas.partials.modalEliminar')
                                                 @include('admin.entradas.partials.modaldialog')
                                             </td>
                                         </tr>

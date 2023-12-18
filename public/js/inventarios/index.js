@@ -25,11 +25,14 @@ const componenteFila = (data) => {
             <tr>
                 <td>${data.numero}</td>
                 <td>${data.codigo}</td>
-                <td>${data.descripcion}</td>
+                <td style="max-width:200px;">${data.descripcion}</td>
                 <td>${data.cantidad}</td>
-                <td>${data.costo}</td>
-                <td>${darFormatoDeNumero(quitarFormato(data.pvp))} Bs</td>
-                <td>${data.pvpUsd} $</td>
+                <td>REF ${darFormatoDeNumero(data.costo)}</td>
+                <td>
+                    BS ${darFormatoDeNumero(data.pvp)} <br>
+                    REF ${darFormatoDeNumero(data.pvpUsd)}
+                </td>
+                
                 <td>${data.marca}</td>
                 <td>${data.categoria}</td>
                 
@@ -112,17 +115,17 @@ const componenteModalVer = (data) => {
                                 </div>
 
                                 <div class="col-md-12 label"> 
-                                <span class="text-primary">Costo: REF</span> ${ data.costo } <br>
-                                <span class="text-primary">Costo: Bs</span> ${ data.costoBs } <br>
+                                <span class="text-primary">Costo: REF</span> ${ darFormatoDeNumero(data.costo) } <br>
+                                <span class="text-primary">Costo: Bs</span> ${ darFormatoDeNumero(data.costoBs) } <br>
                                 <hr>
-                                <span class="text-primary">PVP: REF</span> ${ data.pvpUsd } <br>
-                                <span class="text-primary">PVP:Bs</span> ${ data.pvp } <br>
+                                <span class="text-primary">PVP: REF</span> ${ darFormatoDeNumero(data.pvpUsd) } <br>
+                                <span class="text-primary">PVP:Bs</span> ${ darFormatoDeNumero(data.pvp) } <br>
                                 <hr>
-                                <span class="text-primary">PVP 2: REF</span> ${ data.pvpUsd_2 } <br>
-                                <span class="text-primary">PVP 2:Bs</span> ${ data.pvp_2 } <br>
+                                <span class="text-primary">PVP 2: REF</span> ${ darFormatoDeNumero(data.pvpUsd_2) } <br>
+                                <span class="text-primary">PVP 2:Bs</span> ${ darFormatoDeNumero(data.pvp_2) } <br>
                                 <hr>
-                                <span class="text-primary">PVP 3: REF</span> ${ data.pvpUsd_3 } <br>
-                                <span class="text-primary">PVP 3:Bs</span> ${ data.pvp_3 } <br>
+                                <span class="text-primary">PVP 3: REF</span> ${ darFormatoDeNumero(data.pvpUsd_3) } <br>
+                                <span class="text-primary">PVP 3:Bs</span> ${ darFormatoDeNumero(data.pvp_3) } <br>
                                 <hr>
                                 </div>
 
@@ -149,7 +152,7 @@ const componenteModalVer = (data) => {
 
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
             </div>
@@ -177,7 +180,7 @@ const componenteModalEliminar = (data) => {
                         </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-danger btn-eliminar" id="${ data.id }">Si, Proceder a eleminar</button>
                     </div>
             </div>
@@ -505,14 +508,14 @@ function adaptadorDeProducto(data){
         codigo: data.codigo,
         descripcion: data.descripcion,
         cantidad: data.cantidad,
-        costo: darFormatoDeNumero(quitarFormato( data.costo )),
-        costoBs: darFormatoDeNumero( quitarFormato(data.costo) * data.tasa ),
-        pvp: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp)) ),
-        pvpUsd:  darFormatoDeNumero(quitarFormato(data.pvp)),
-        pvp_2: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_2)) ),
-        pvpUsd_2:  darFormatoDeNumero( quitarFormato(data.pvp_2) ),
-        pvp_3: darFormatoDeNumero( (data.tasa * quitarFormato(data.pvp_3)) ),
-        pvpUsd_3:  darFormatoDeNumero(quitarFormato(data.pvp_3)),
+        costo:  data.costo,
+        costoBs: data.costo * data.tasa,
+        pvp: data.tasa * data.pvp,
+        pvpUsd:  data.pvp,
+        pvp_2:  data.tasa * data.pvp_2,
+        pvpUsd_2: data.pvp_2,
+        pvp_3: data.tasa * data.pvp_3,
+        pvpUsd_3:  data.pvp_3,
         marca: data.id_marca.nombre,
         imagen: data.imagen,
         fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),

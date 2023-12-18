@@ -1,6 +1,6 @@
 <!-- Vertically centered Modal -->
 <a type="button" class="nav-item " data-bs-toggle="modal" data-bs-target="#modalEditar{{ $proveedore->id }}">
-    <i class="bx bx-pencil text-warning fs-5"></i>
+    <i class="bi bi-pencil btn btn-warning "></i>
 </a>
 
 
@@ -14,7 +14,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="/proveedores/{{ $proveedore->id }}" method="post" target="_self" enctype="multipart/form-data"
+            <form action="{{ route('admin.proveedores.update', $proveedore->id)}}" method="post" target="_self" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('put')

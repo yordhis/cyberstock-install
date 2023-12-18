@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     FacturaController,
     FacturaInventarioController,
     InventarioController,
+    LoginController,
     MarcaController,
     PoController,
     ProductoController,
@@ -34,6 +35,9 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
+
+    /** AUTORIZACION */
+    Route::post('verificarClave', [LoginController::class, 'verificarClave'])->name('api.verificarClave');
 
     /** EMPRESA */
     Route::get('getEmpresa', [PoController::class, 'getEmpresa'])->name('api.empresa');

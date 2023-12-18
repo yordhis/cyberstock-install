@@ -68,7 +68,6 @@
                                     <th scope="col">Stock</th>
                                     <th scope="col">Costo</th>
                                     <th scope="col">PVP</th>
-                                    <th scope="col">PVP USD</th>
                                     <th scope="col">Marca</th>
                                     <th scope="col">Categoria</th>
                         

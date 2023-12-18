@@ -12,6 +12,7 @@ use App\Models\{
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -22,6 +23,21 @@ class Helpers extends Model
 
     public static $productos;
     public static $fechaCuota;
+
+
+    public static function registrarMovimientoDeUsuario($request, $codigo="", $observacion=""){
+        Monitore::create([
+            'usuario' => Auth::user()->email,  // email
+            'nombre' => Auth::user()->nombre, 
+            'transaccion' => $request->path(), 
+            'codigo' =>  $codigo,
+            'observacion' => $observacion,
+            'ubicacion' => $request->url(), 
+            'dispositivo' => $request->ip(), 
+            'fecha' => Carbon::now()
+        ]);
+        return true;
+    }
 
     public static function setNameElementId($datos, $campos, $tables){
        
@@ -37,6 +53,7 @@ class Helpers extends Model
         }
         return $datos;
     }
+
 
    
     public static function setFechasHorasNormalizadas($datos)

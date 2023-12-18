@@ -6,6 +6,7 @@
 
 
 
+
 <div class="modal fade" style="" id="modalCrear" tabindex="-1"  >
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -15,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="/pos/clientes" method="post" target="_self" enctype="multipart/form-data"
+            <form action="{{ route('admin.clientes.store') }}" method="post" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('post')
@@ -83,6 +84,7 @@
                                 <div class="invalid-feedback">Por favor,  Ingrese identificacion </div>
 
                                 @error('identificacion')
+                                    <br>
                                     <span class="text-danger">
                                         {{ $message }}
                                     </span>

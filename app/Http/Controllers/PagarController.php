@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\{
     CarritoInventario,
     DataDev,
+    Factura,
     FacturaInventario,
     Proveedore
 };
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PagarController extends Controller
 {
@@ -65,7 +67,28 @@ class PagarController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $facturaInventario = FacturaInventario::where('codigo', $request->codigo)->get();
+        $factura = Factura::where('codigo', $request->codigo)->get();
+        if($factura){
+
+            $estatus = $factura[0]->update(["concepto" => "COMPRA"]);
+            $estatus = $facturaInventario[0]->update([
+                "observacion" => $request->observacion,
+                "concepto" => "COMPRA"
+            ]);
+
+            $mensaje = $estatus ? "El pago de la factura se porceso correctamente!": "No se registro el pago";
+
+            return redirect()->route('admin.cuentas.por.pagar.index', [
+                "mensaje" => $mensaje,
+                "estatus" => Response::HTTP_OK
+            ]);
+        }else{
+            return redirect()->route('admin.cuentas.por.pagar.index', [
+                "mensaje" => "El código de la factura no esta registrado.",
+                "estatus" => Response::HTTP_NOT_FOUND
+            ]);
+        }
     }
 
     /**

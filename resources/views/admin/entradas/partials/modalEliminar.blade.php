@@ -1,11 +1,11 @@
 
         
 <!-- Vertically centered Modal -->
-<a type="button" class="text-danger" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$carrito->id}}">
-    <i class="bi bi-trash"></i>
+<a type="button" class="text-danger" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$factura->id}}">
+    <i class="bi bi-trash btn btn-danger"></i>
 </a>
 
-<div class="modal fade" id="verticalycentered{{$carrito->id}}" tabindex="-1">
+<div class="modal fade" id="verticalycentered{{$factura->id}}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
         <div class="modal-header">
@@ -13,10 +13,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            ¿Esta seguro que desea eliminar el producto del carrito <span class="text-danger fs-5">{{$carrito->descripcion}}</span>? 
+            ¿Esta seguro que desea eliminar la factura  de compra del proveedor: <span class="text-danger fs-5">{{$factura->proveedor[0]->empresa ?? 'Proveedor'}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="carritoInventario/{{$carrito->codigo}}/{{$carrito->codigo_producto}}" method="post" target="_self">
+            <form action="{{ route('admin.inventarios.eliminarFacturaInventario', $factura->codigo) }}" method="post">
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

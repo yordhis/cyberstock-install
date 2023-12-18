@@ -7,8 +7,11 @@ use App\Http\Requests\StoreCategoriaRequest;
 use App\Http\Requests\UpdateCategoriaRequest;
 use App\Models\DataDev;
 use App\Models\Helpers;
+use App\Models\Monitore;
 use App\Models\Producto;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
 class CategoriaController extends Controller
@@ -67,16 +70,6 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreCategoriaRequest  $request
@@ -84,11 +77,14 @@ class CategoriaController extends Controller
      */
     public function store(StoreCategoriaRequest $request)
     {
-        try {
+        try {  
             $estatusCrear = Categoria::create($request->all());
     
             $mensaje = $estatusCrear ? "La categoria se creo correctamente." : "La categoria no se creo";
             $estatus = $estatusCrear ? 201 : 404;
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario($request, $estatus,"Acción de crear categoria ({$request->nombre})");
             
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
@@ -100,27 +96,6 @@ class CategoriaController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Categoria  $categoria
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Categoria $categoria)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Categoria  $categoria
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Categoria $categoria)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -135,7 +110,10 @@ class CategoriaController extends Controller
             $estatusActualizar = $categoria->update($request->all());
     
             $mensaje = $estatusActualizar ? "La categoria se actualizó correctamente." : "Los cambios no se guardaron!";
-            $estatus = $estatusActualizar ? 201 : 404;
+            $estatus = $estatusActualizar ? 200 : 404;
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario($request,$estatus,"Acción de actualizar categoria ({$request->nombre})");
             
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
@@ -156,6 +134,7 @@ class CategoriaController extends Controller
     public function destroy(Categoria $categoria)
     {
         try {
+
             $categoriaEnUso = Producto::where("id_categoria", $categoria->id)->get();
             if(count($categoriaEnUso)){
                 $mensaje = "La categoria esta en uso y no puede ser eliminada.";
@@ -166,11 +145,15 @@ class CategoriaController extends Controller
             $estatusEliminar = $categoria->delete();
     
             $mensaje = $estatusEliminar ? "La categoria se eliminó correctamente." : "No se pudo eliminar la catgoria";
-            $estatus = $estatusEliminar ? 201 : 404;
+            $estatus = $estatusEliminar ? 200 : 404;
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario(request(), $estatus,"Acción de eliminar categoria ({$categoria->nombre})");
+
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
-            return $estatusEliminar ? redirect()->route( 'admin.categorias.index', compact('mensaje', 'estatus') )
-            : view('admin.categorias.lista', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $categoria));
+            return redirect()->route( 'admin.categorias.index', compact('mensaje', 'estatus') );
+
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al Eliminar la categoria, ");
             return view('errors.404', compact('mensajeError'));

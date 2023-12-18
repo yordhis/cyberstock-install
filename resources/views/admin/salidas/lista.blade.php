@@ -47,7 +47,7 @@
                                             <td>{{ $factura->fecha }}</td>
                                             <td>
 
-                                                {{-- @include('admin.salidas.partials.modalEditar') --}}
+                                                @include('admin.salidas.partials.modalEliminar')
                                                 @include('admin.salidas.partials.modaldialog')
   
                                             </td>

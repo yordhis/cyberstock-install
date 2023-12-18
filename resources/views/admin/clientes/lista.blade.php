@@ -34,7 +34,7 @@
                                             <tr>
                                                 <td scope="row">{{ $cliente->id }}</td>
                                                 <td>{{ $cliente->nombre }}</td>
-                                                <td>{{ number_format($cliente->identificacion, 0, ',', '.') ?? '' }}</td>
+                                                <td>{{  number_format($cliente->identificacion, 0, ',', '.') ?? '' }}</td>
                                                 <td>{{ $cliente->telefono ?? 'No registrado.' }}</td>
                                             
                                                 <td>

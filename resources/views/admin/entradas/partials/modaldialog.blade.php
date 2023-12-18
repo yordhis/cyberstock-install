@@ -6,7 +6,7 @@
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Informacion de factura</h5>
+          <h5 class="modal-title">Informacion de factura de compra</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -21,7 +21,7 @@
                     <div class="text-center">
                       {{-- <p class="p-0 fs-5">{{ $factura->iva > 0 ? "SENIAT" : '' }}</p> --}}
                       <p class="p-0 fs-5">Proveedor</p>
-                      <p class="p-0 m-0 fs-4">{{ $factura->proveedor[0]->empresa ?? '' }}</p>
+                      <p class="p-0 m-0 fs-4">{{ $factura->proveedor[0]->empresa ?? 'El proveedor fue eliminado' }}</p>
                       <p class="p-0 m-0 fs-6">{{  $factura->proveedor[0]->tipo_documento ?? '' }}-{{ $factura->proveedor[0]->codigo ?? '' }}</p>
                       <p class="p-0 m-0 fs-6">{{ $factura->proveedor[0]->direccion ?? '' }}</p>
                      
@@ -72,6 +72,15 @@
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">TOTAL:</div>
                         <div class="p-2 bd-highlight">USD {{ number_format($factura->total, 2, ',', '.') }}</div>
+                      </div>
+                    
+                      <p>------------------------------------------------------------------------------</p>
+                      
+                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                        <div class="p-2 bd-highlight"><b>OBSERVACIÓN DE PAGO</b></div>
+                        <div class="p-2 bd-highlight">
+                          {{ $factura->observacion ?? 'No hay observación' }}
+                        </div>
                       </div>
 
                   

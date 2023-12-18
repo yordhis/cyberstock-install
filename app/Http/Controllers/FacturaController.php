@@ -281,6 +281,17 @@ class FacturaController extends Controller
      */
     public function destroy(Factura $factura)
     {
-        //
+        try {
+            Carrito::where('codigo', $factura->codigo)->delete();
+            $factura->delete();
+
+            return redirect()->route('admin.facturas.index',[
+                "mensaje" => "Factura eliminada correctamente",
+                "estatus" => Response::HTTP_OK
+            ]);
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar ELIMINAR factura, ");
+            return response()->view('errors.404', compact("errorInfo"), 404);
+        }
     }
 }

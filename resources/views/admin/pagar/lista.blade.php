@@ -23,11 +23,13 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">N° factura</th>
+                                        <th scope="col">N° Movimiento</th>
+                                        <th scope="col">N° Factura</th>
                                         <th scope="col">Proveedor</th>
                                         <th scope="col">Monto</th>
                                         <th scope="col">Total Art.</th>
                                         <th scope="col">Concepto</th>
+                                        <th scope="col">Estatus</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
@@ -37,17 +39,19 @@
                                         <tr>
                                             <td scope="row">{{ $contador }}</td>
                                             <td>{{ $factura->codigo }}</td>
+                                            <td>{{ $factura->codigo_factura }}</td>
                                             <td>
-                                                {{ $factura->proveedor[0]->empresa }} <br>
-                                                {{ $factura->proveedor[0]->telefono }}
+                                                {{ $factura->proveedor[0]->empresa  ?? 'Proveedor'}} <br>
+                                                {{ $factura->proveedor[0]->telefono ?? ''}}
                                             </td>
                                             <td>{{ $factura->total }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
+                                            <td class="text-danger">{{ $factura->concepto == "CREDITO" ? "PENDIENTE" : "PAGADO" }}</td>
                                             
                                             <td>
-                                                {{-- @include('admin.entradas.partials.modalEditar') --}}
-                                                {{-- @include('admin.entradas.partials.modaldialog') --}}
+                                                @include('admin.pagar.partials.formpagar')
+                                                @include('admin.entradas.partials.modaldialog')
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp

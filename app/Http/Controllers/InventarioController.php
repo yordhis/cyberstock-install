@@ -24,6 +24,7 @@ use App\Models\{
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\URL;
 
 class InventarioController extends Controller
 {
@@ -298,7 +299,9 @@ class InventarioController extends Controller
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $entrada->totalArticulos = $totalArticulos;
-            $entrada->proveedor = Proveedore::where("codigo", $entrada->identificacion)->get();
+            $entrada->proveedor = count(Proveedore::where("codigo", $entrada->identificacion)->get()) 
+                                ? Proveedore::where("codigo", $entrada->identificacion)->get() 
+                                : [] ;
         }
 
         return view( 'admin.entradas.lista', compact('menuSuperior', 'entradas') );
@@ -370,7 +373,29 @@ class InventarioController extends Controller
         }
     }
 
-    
+    /** Eliminar factura de inventario */
+
+    public function eliminarFacturaInventario($codigo){
+        try {
+            CarritoInventario::where('codigo', $codigo)->delete();
+            FacturaInventario::where('codigo', $codigo)->delete();
+
+            $parametros = [
+                    "mensaje" => "La factura de inventario se elimino",
+                    "estatus" => Response::HTTP_OK
+            ];
+            $pathnamePrevio = explode("/",url()->previous())[count(explode("/",url()->previous()))-1];
+            if(count(explode("?", $pathnamePrevio)) == 2) $pathnamePrevio = explode("?", $pathnamePrevio)[0];
+            return  redirect()->route("admin.inventarios.{$pathnamePrevio}", $parametros);
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar eliminar factura de inventario. ");
+            $pathnamePrevio = explode("/",url()->previous())[count(explode("/",url()->previous()))-1];
+            return  redirect()->route("admin.inventarios.{$pathnamePrevio}", [
+                "mensaje" => $errorInfo,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        }
+    }
 
 
     /**

@@ -1,6 +1,6 @@
  <!-- Modal Dialog Scrollable -->
  <a type="button" class="" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$proveedore->id}}">
-    <i class="bi bi-eye text-info"></i>
+    <i class="bi bi-eye btn btn-success"></i>
  </a>
   <div class="modal fade" id="modalDialogScrollable{{$proveedore->id}}" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">

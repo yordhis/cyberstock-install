@@ -1,8 +1,8 @@
 
         
 <!-- Vertically centered Modal -->
-<a type="button" class="text-warning" data-bs-toggle="modal" data-bs-target="#modalEditarCliente{{$cliente->id}}">
-    <i class="bi bi-pencil "></i>
+<a  class="text-white" data-bs-toggle="modal" data-bs-target="#modalEditarCliente{{$cliente->id}}">
+    <i class="bi bi-pencil btn btn-warning"></i>
 </a>
     
 
@@ -16,7 +16,7 @@
         </div>
      
             <div class="modal-body">
-                <form action="/pos/clientes/{{$cliente->id}}" method="post" target="_self" enctype="multipart/form-data"
+                <form action=" {{ route('admin.clientes.update', $cliente->id) }}" method="post" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('put')

@@ -75,6 +75,16 @@
                         <div class="p-2 bd-highlight">TOTAL:</div>
                         <div class="p-2 bd-highlight">Usd. {{ number_format($factura->total, 2, ',', '.') }}</div>
                       </div>
+                   
+                      <p>------------------------------------------------------------------------------</p>
+                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                        <div class="p-2 bd-highlight">
+                          <b>OBSERVACIÓN DE PAGO</b>
+                        </div>
+                        <div class="p-2 bd-highlight">
+                          {{ $factura->observacion ?? 'No hay observación'}}
+                        </div>
+                      </div>
                  
 
                   

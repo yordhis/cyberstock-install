@@ -1,8 +1,8 @@
 
         
 <!-- Vertically centered Modal -->
-<a type="button" class="text-primary" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$proveedore->id}}">
-    <i class="bi bi-trash"></i>
+<a type="button" class="text-white" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$proveedore->id}}">
+    <i class="bi bi-trash btn btn-danger"></i>
 </a>
 
 <div class="modal fade" id="verticalycentered{{$proveedore->id}}" tabindex="-1">
@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar el proveedore <span class="text-danger fs-5">{{$proveedore->nombre}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="proveedores/{{$proveedore->id}}" method="post" target="_self">
+            <form action="{{ route('admin.proveedores.destroy', $proveedore->id) }}" method="post">
             @csrf
             @method('delete')
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
