@@ -288,7 +288,7 @@ class InventarioController extends Controller
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->paginate(10);
+        ])->orderBy('codigo', 'desc')->paginate(10);
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
@@ -319,7 +319,7 @@ class InventarioController extends Controller
         $pos = Po::all()[0];
         $salidas = FacturaInventario::where([
             "tipo" => "SALIDA"
-        ])->paginate(10);
+        ])->orderBy('codigo_factura', 'desc')->paginate(10);
         
         $cliente = [];
 

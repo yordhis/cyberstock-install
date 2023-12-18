@@ -305,7 +305,7 @@ const componenteFactura = async (factura) => {
             <input type="number" class="form-control bg-secondary-light" readonly id="floatingInput" placeholder="16" value="16">
             <label for="floatingInput">IVA %</label>
         </div>-->
-        <div class="col-sm-6 ">
+        <div class="col-sm-3 ">
             <label for="">F. Fiscal</label> <br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked': ''}>
@@ -317,6 +317,17 @@ const componenteFactura = async (factura) => {
             </div>
             <!--<label for="">Fiscal</label>
             <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '': 'checked'}>-->
+        </div>
+
+        <div class="col-sm-3 ">
+            <div class="form-floating">
+                <select class="form-select acciones-factura" name="concepto_entrada" id="concepto_entrada" aria-label="Tipo de entrada">
+                    <option value="${factura.concepto}" selected>${factura.concepto}</option>
+                    <option value="COMPRA">COMPRA</option>
+                    <option value="CREDITO">CREDITO</option>
+                </select>
+                <label for="concepto_entrada">Concepto de entrada</label>
+            </div>
         </div>
 
         <div class="col-sm-2 text-black">
@@ -508,7 +519,7 @@ const componenteMetodoDePago  = async (factura) => {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-primary acciones-factura" id="vender">Facturar Entrada</button>
                     </div>
 
@@ -559,7 +570,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'ENTRADA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = fecha;
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
         localStorage.setItem('facturaInventario', JSON.stringify(factura));
     }
 
@@ -867,8 +878,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
+    }else if(e.target.localName == 'option'){
+        accion = e.target.parentElement.id;
     }
-
 
     switch (accion) {
         case 'editarCantidadFactura':
@@ -1052,14 +1064,13 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                          if ( resultadoDeFacturar.estatus == 201 ) {
                             resultadoConfirm = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
                             if (resultadoConfirm) {
-                                    imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
-                                // imprimirElemento(htmlTicket(resultadoDeFacturar.data));
                                 
-                                resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                                if (resultadoOtraCapia) {
-                                    imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
-                                    // imprimirElemento(htmlTicket(resultadoDeFacturar.data));
-                                }
+                                imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
+                               
+                                // resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
+                                // if (resultadoOtraCapia) {
+                                //     imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
+                                // }
                                 /** Eliminamos la factura del Storagr */
                                 localStorage.removeItem('carritoInventario');
                                 localStorage.removeItem('facturaInventario');
@@ -1093,6 +1104,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         case 'editarDescuento':
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
+        case 'concepto_entrada':
+            factura.concepto = e.target.value;
+            localStorage.setItem('facturaInventario', JSON.stringify(factura));
+        break;
         default:
             break;
     }

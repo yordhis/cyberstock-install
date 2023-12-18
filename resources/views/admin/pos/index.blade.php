@@ -10,6 +10,7 @@
     <div class="container-fluid ">
        
         <div class="row position-relative">
+            {{-- Botenes cliente - factura --}}
             <div class="col-12">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
                     <a href="{{ route('admin.facturas.index') }}" class="btn btn-primary m-2">
@@ -23,6 +24,7 @@
                     </a>
                 </div>
             </div>
+            
             {{-- Cliente --}}
             <div class="col-sm-2 col-xs-12">
 

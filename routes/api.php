@@ -14,6 +14,7 @@ use App\Http\Controllers\{
     FacturaInventarioController,
     InventarioController,
     MarcaController,
+    PoController,
     ProductoController,
     ProveedoreController,
     ReporteController
@@ -33,6 +34,9 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
+
+    /** EMPRESA */
+    Route::get('getEmpresa', [PoController::class, 'getEmpresa'])->name('api.empresa');
 
     /** REPORTES */
     Route::post('storeReportes', [ReporteController::class, 'storeReportes'])->name('storeReportes');

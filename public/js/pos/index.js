@@ -30,6 +30,7 @@ metodosPagos = [{
 
 
 /** COMPONENTES */
+/** CLIENTE */
 const componenteTarjetaCliente = (cliente, mensaje) => {
 
 
@@ -202,7 +203,9 @@ const componenteFormularioEditarCliente = (cliente) => {
         return componenteTarjetaCliente([], 'No se pudo obtener la data del cliente.')
     }
 };
+/** CIERRE CLIENTE */
 
+/** PRODUCTOS */
 const componenteListaDeProductoFiltrados = (producto) => {
    
     if (producto.estatus == 0) {
@@ -253,7 +256,9 @@ const componenteAgregarCantidadDeProductoModal = (producto) =>{
         </section>
     `;
 };
+/** CIERRE PRODUCTOS */
 
+/** FACTURA */
 const componenteListaDeProductoEnFactura = (producto) => {
     if (producto.estatus == 0) {
         return `
@@ -340,8 +345,10 @@ const componenteFactura = async (factura) => {
         </div>
     `;
 };
+/** CIERRE FACTURA */
 
 
+/** MODAL METODOS DE PAGO Y VUELTO */
 const componenteVueltoForm = () => {
     return `
         <div class="metodoAdd mt-2 row g-3">
@@ -473,7 +480,7 @@ const componenteMetodoDePago  = async (factura) => {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-primary acciones-factura" id="vender">Facturar</button>
                     </div>
 
@@ -482,6 +489,7 @@ const componenteMetodoDePago  = async (factura) => {
         </div>
     `;
 };
+/** CIERRE MODAL METODOS DE PAGO Y VUELTO */
 
 
 
@@ -514,7 +522,7 @@ const hanledLoad = async (e) => {
          factura.tipo = 'SALIDA';
          factura.iva = 0.16;
          let fecha = new Date();
-         factura.fecha = fecha;
+         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
          localStorage.setItem('factura', JSON.stringify(factura));
 
         /** CLIENTE */
@@ -537,7 +545,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = fecha;
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
         localStorage.setItem('factura', JSON.stringify(factura));
      
     }

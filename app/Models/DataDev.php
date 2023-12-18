@@ -84,12 +84,6 @@ class DataDev
                 "categorias" => "index",
                 "marcas" => "index"
             ],
-            "pos" => [
-                "Pos" => "",
-                "Facturas" => "facturas",
-                "Clientes" => "clientes",
-                
-            ]
         ];
 
         $this->respuesta=[

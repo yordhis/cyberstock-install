@@ -98,7 +98,7 @@ const htmlTicketSalidaV1 = (factura) => {
     return `
         <div class="ticket" id="ticket">
         
-            <img src="${factura.pos.imagen}" alt="Logotipo">
+            <img src="${factura.pos.imagen}" class="img" alt="Logotipo">
         
         
         <p class="centrado">
@@ -109,6 +109,12 @@ const htmlTicketSalidaV1 = (factura) => {
         </p>
         <table>
             <thead>
+                <tr>
+                    <th colspan="2" class="producto">CLIENTE: ${factura.razon_social}</th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="producto">RIF: ${factura.identificacion}</th>
+                </tr>
                 <tr>
                     <th class="producto">N° FACTURA</th>
                     <th class="precio">${factura.codigo_factura}</th>
@@ -164,6 +170,7 @@ const htmlTicketSalidaV1 = (factura) => {
 
 /** TICKET DE ENTRADA */
 const htmlTicketEntrada = (factura) => {
+    log(factura)
     // Declaracion de variables
     let carritoHtml = '', 
     descuentoHtml = '';
@@ -174,9 +181,9 @@ const htmlTicketEntrada = (factura) => {
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
-                <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
-
-                <td class="precio">USD ${   darFormatoDeNumero( producto.subtotal ) }</td>
+                <td class="producto" style="font-size: 12px;">${producto.cantidad} X ${producto.descripcion}</td>
+                <td class="" style="font-size: 12px; text-align: left;">${darFormatoDeNumero(producto.costo)}</td>
+                <td class="precio" style="font-size: 12px;">USD ${   darFormatoDeNumero( producto.subtotal ) }</td>
             </tr>
         `;
     });
@@ -187,7 +194,7 @@ const htmlTicketEntrada = (factura) => {
             <tr>
                 <td class="producto">IVA </td>
 
-                <td class="precio"> USD ${ darFormatoDeNumero( factura.subtotal  * factura.iva )  }</td>
+                <td colspan="2" class="precio"> USD ${ darFormatoDeNumero( factura.subtotal  * factura.iva )  }</td>
             </tr>
         `;
     }
@@ -197,7 +204,7 @@ const htmlTicketEntrada = (factura) => {
         descuentoHtml = ` 
             <tr>
                 <td class="producto">Descuento ${factura.descuento}%</td>
-                <td class="precio">USD ${ darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) }</td>
+                <td colspan="2" class="precio">USD ${ darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) }</td>
             </tr>
         `;
     }
@@ -206,33 +213,48 @@ const htmlTicketEntrada = (factura) => {
     return `
         <div class="ticket" id="ticket">
         
-            <img src="${factura.pos.imagen}" alt="Logotipo">
-        
-        
         <p class="centrado">
-            <br>${factura.pos.empresa}
-            <br>${factura.pos.codigo}
-            <br>${factura.pos.direccion}
-            
+            FACTURA DE COMPRA
         </p>
         <table>
             <thead>
                 <tr>
-                    <th class="producto">FACTURA DE ENTRADA</th>
-        
-                    <th class="precio">${factura.codigo}</th>
+                    <th class="producto">CÓDIGO ENTRADA</th>
+                    <th colspan="2" class="precio">${factura.codigo}</th>
                 </tr>
+                <tr>
+                    <th class="producto">CONCEPTO DE ENTRADA</th>
+                    <th colspan="2" class="precio">${factura.concepto}</th>
+                </tr>
+
+                <tr>
+                    <th class="producto">CÓDIGO FACTURA</th>
+                    <th colspan="2" class="precio">${factura.codigo_factura}</th>
+                </tr>
+                
+                <tr>
+                    <th class="producto">PROVEEDOR:</th>   
+                    <th colspan="2" class="precio">${factura.pos.empresa}</th>
+                </tr>
+
+                <tr>
+                    <th class="producto">RIF:</th>                  
+                    <th colspan="2" class="precio">${factura.pos.tipo_documento}-${factura.pos.codigo}</th>
+                </tr>
+
                 <tr>
                     <th class="producto">FECHA</th>
-        
-                    <th class="precio">${factura.fecha}
-                    </th>
+                    <th colspan="2" class="precio">${factura.fecha}</th>
                 </tr>
+
                 <tr>
                     <th class="producto">HORA</th>
-        
-                    <th class="precio">${factura.hora}
-                    </th>
+                    <th colspan="2" class="precio">${factura.hora}</th>
+                </tr>
+                <tr>
+                    <th class="producto"  style="font-size: 12px;">CANTIDAD/DESCRIPCIÓN</th>
+                    <th class=""  style="font-size: 12px;  text-align: left;">C/U</th>
+                    <th class="precio" style="font-size: 12px;">SUBTOTAL</th>
                 </tr>
                 
             </thead>
@@ -248,7 +270,7 @@ const htmlTicketEntrada = (factura) => {
                         SUB-TOTAL <br>
                     </td>
         
-                    <td class="precio"><br> USD  ${ darFormatoDeNumero( parseFloat(factura.subtotal ) ) }</td>
+                    <td colspan="2" class="precio"><br> USD  ${ darFormatoDeNumero( parseFloat(factura.subtotal ) ) }</td>
                 </tr>
               
                 ${descuentoHtml}
@@ -258,17 +280,13 @@ const htmlTicketEntrada = (factura) => {
                 <tr>
                     <td class="producto">TOTAL</td>
         
-                    <td class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.total ) ) }</td>
+                    <td colspan="2" class="precio"> USD ${ darFormatoDeNumero( parseFloat(factura.total ) ) }</td>
                 </tr>
               
                 
             </tbody>
         </table>
         
-        
-        <p class="centrado">
-            ¡FACTURA DE COMPRA !
-        </p>
         </div>
       `;
 };

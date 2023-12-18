@@ -61,9 +61,6 @@ class MarcaController extends Controller
         try {
             $marcas = Marca::orderBy('nombre', 'asc')->paginate(10);
             $menuSuperior = $this->data->menuSuperior;
-            
-
-
             return view('admin.marcas.lista', compact('menuSuperior', 'marcas') );
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar las marcas, ");

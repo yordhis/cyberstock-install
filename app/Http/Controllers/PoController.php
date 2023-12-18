@@ -10,6 +10,7 @@ use App\Models\DataDev;
 use App\Models\Factura;
 use App\Models\Helpers;
 use App\Models\Po;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class PoController extends Controller
@@ -115,6 +116,26 @@ class PoController extends Controller
             }
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar POS, ");
             return view('errors.404', compact('mensajeError'));
+        }
+    }
+
+
+    /** API REST FULL */
+
+    public function getEmpresa(){
+        $empresa = Po::find(1);
+        if($empresa){
+            return response()->json([
+                "mensaje" => "Consulta de datos de la empresa exitosa",
+                "data" => $empresa,
+                "estatus" => Response::HTTP_OK
+            ], Response::HTTP_OK);
+        }else{
+            return response()->json([
+                "mensaje" => "La configuración inicial del empresa es requerida, dirijase al menu seleccione configuración de POS y configure los datos de su empresa.",
+                "data" => [],
+                "estatus" => Response::HTTP_UNAUTHORIZED
+            ], Response::HTTP_UNAUTHORIZED);
         }
     }
 

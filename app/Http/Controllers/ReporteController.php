@@ -7,10 +7,12 @@ use App\Models\{
     DataDev,
     Factura,
     Inventario,
+    Po,
     Producto
 };
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 
 class ReporteController extends Controller
@@ -24,8 +26,7 @@ class ReporteController extends Controller
 
     public function index(){
         $menuSuperior = $this->data->menuSuperior;
-        $pathname = FacadesRequest::path();
-        return view('admin.reportes.index', compact('menuSuperior', 'pathname'));
+        return view('admin.reportes.index', compact('menuSuperior'));
     }
 
 
@@ -35,40 +36,63 @@ class ReporteController extends Controller
         $reporte = [];
 
         switch ($request->tipo) {
-            case 'dia':
-                $resultados = Factura::whereDate('fecha', $request->rango['inicio'] )->get();
-                return response()->json([
-                    "mensaje" => "Consulta por fecha personalizada exitosa.",
-                    "data" => $resultados,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-                break;
 
-            case 'mensual':
-                 $resultados = Factura::whereYear('fecha', explode('-', $request->rango['inicio'])[0] )
-                ->whereMonth('fecha', '=', explode('-', $request->rango['inicio'])[1] ) // inicio mes
+            case 'reporteDelDia':
+                $reporte = Factura::whereDate('fecha', '=', explode('T', $request->rango['inicio'])[0] )
+                ->where('concepto', '=', 'VENTA')
                 ->get();
-                return response()->json([
-                    "mensaje" => "Consulta de reporte mensual exitosa.",
-                    "data" => $resultados,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-                break;
-
-            case 'personalizado':
-            
-                $resultados = Factura::whereDate('fecha', '>=',$request->rango['inicio'] )
-                ->whereDate('fecha', '<=', $request->rango['fin'] )
-                ->get();
-
-                foreach ($resultados as $key => $factura) {
-                    $carrito = Carrito::where('codigo', $factura->codigo)->get();
-                    foreach ($carrito as $key => $producto) {
-                        $producto['costoProveedor'] = Inventario::select('costo')->find($producto->id)->costo;
-                        array_push($reporte, $producto);
-                    }
+                
+                foreach ($reporte as $key => $factura) {
+                    $totalArticulos = Carrito::select('cantidad')
+                    ->where("codigo", $factura->codigo)
+                    ->sum('cantidad');
+                    $factura['cantidad_articulos'] = $totalArticulos;
                 }
-              
+            
+                break;
+            case 'reporteDelDiaDetallado':
+                    $resultados = Factura::whereDate('fecha', '=', explode('T', $request->rango['inicio'])[0] )
+                    ->where('concepto', "=", "VENTA")
+                    ->get();
+                    foreach ($resultados as $key => $factura) {
+                        $carrito = Carrito::where('codigo', $factura->codigo)->get();
+                        foreach ($carrito as $key => $producto) {
+                            $producto['costoProveedor'] = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get()[0]->costo;
+                            // $producto['costoProveedor'] = Inventario::select('costo')->find($producto->codigo_producto)->costo;
+                            $producto['iva'] = $factura->iva;
+                            array_push($reporte, $producto);
+                        }
+                    }
+                break;
+
+            case 'storeReportes':
+                    $reporte = Factura::whereDate('fecha', '>=',$request->rango['inicio'] )
+                    ->whereDate('fecha', '<=', $request->rango['fin'] )
+                    ->where('concepto', "=", "VENTA")
+                    ->get();
+
+                    foreach ($reporte as $key => $factura) {
+                        $totalArticulos = Carrito::select('cantidad')
+                        ->where("codigo", $factura->codigo)
+                        ->sum('cantidad');
+                        $factura['cantidad_articulos'] = $totalArticulos;
+                    }
+                break;
+
+            case 'storeReportesDetallado':
+                    $resultados = Factura::whereDate('fecha', '>=',$request->rango['inicio'] )
+                    ->whereDate('fecha', '<=', $request->rango['fin'] )
+                    ->where('concepto', "=", "VENTA")
+                    ->get();
+
+                    foreach ($resultados as $key => $factura) {
+                        $carrito = Carrito::where('codigo', $factura->codigo)->get();
+                        foreach ($carrito as $key => $producto) {
+                            $producto['costoProveedor'] = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get()[0]->costo;
+                            $producto['iva'] = $factura->iva;
+                            array_push($reporte, $producto);
+                        }
+                    }
                 break;
             
             default:
@@ -78,7 +102,7 @@ class ReporteController extends Controller
 
         /** RESPUESTA */
         return response()->json([
-            "mensaje" => "Consulta por fecha personalizada exitosa.",
+            "mensaje" => "Datos de venta optenidos exitosamente. ->" . $request->tipo,
             "data" => $reporte,
             "estatus" => Response::HTTP_OK
         ], Response::HTTP_OK);

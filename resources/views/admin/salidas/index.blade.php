@@ -16,7 +16,7 @@
         <div class="row position-relative">
             <div class="col-12">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
-                    <a href="inventarios/listaSalidas" class="btn btn-primary m-2"  target="_self">
+                    <a href="{{ route('admin.inventarios.listaSalidas') }}" class="btn btn-primary m-2"  target="_self">
                         <i class="bi bi-paypal"></i>
                         Facturas Mayoreo
                     </a>

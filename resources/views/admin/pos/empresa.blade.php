@@ -27,7 +27,7 @@
                                     <p class="text-center text-danger small">Rellene todos los campos</p>
                                 </div>
 
-                                <form action="/pos/{{ $po->id }}" method="post" target="_self"
+                                <form action="{{ route('admin.pos.update', $po->id) }}" method="post" 
                                     enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
                                     @csrf
                                     @method('put')

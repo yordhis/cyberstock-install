@@ -508,7 +508,7 @@ const componenteMetodoDePago  = async (factura) => {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-primary acciones-factura" id="vender">Facturar</button>
                     </div>
 
@@ -566,7 +566,7 @@ const hanledLoad = async (e) => {
         factura.tipo = 'SALIDA';
         factura.iva = 0.16;
         let fecha = new Date();
-        factura.fecha = fecha;
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
         localStorage.setItem( 'facturaSalida', JSON.stringify(factura) );
     }
 
@@ -1413,7 +1413,6 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 
        /** Obtenemos el elemento del componente M-pagos */
        let elementoMetodoDePago = d.querySelector('#elementoMetodoDePago');
-       console.log(metodosPagos);
        elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
 
     await cargarEventosAccionesDeFactura()

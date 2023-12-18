@@ -12,11 +12,20 @@
 
  
     <div class="container-fluid ">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <a href="productos" class="btn btn-primary m-2 p-2" target="_self">Crear Producto</a>
-        </div>
 
         <div class="row position-relative">
+            <div class="col-12">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
+                    <a href="{{ route('admin.productos.index') }}" class="btn btn-primary m-2">
+                        <i class="bi bi-paypal"></i>
+                        Crear Producto
+                    </a>
+                    
+                    
+                </div>
+            </div>
+
+
             {{-- Proveedor --}}
             <div class="col-sm-2 col-xs-12">
 
