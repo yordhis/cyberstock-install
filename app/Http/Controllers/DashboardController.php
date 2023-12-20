@@ -35,7 +35,6 @@ class DashboardController extends Controller
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
-            $pathname = Request::path();
             // Datos de las estadisticas
             $datosDash = [
                 "totalProductos" => Inventario::count(),
@@ -53,7 +52,7 @@ class DashboardController extends Controller
                
             ];
             // return $datosDash;
-            return view('admin.dashboard', compact('menuSuperior', 'pathname', 'datosDash'));
+            return view('admin.dashboard', compact('menuSuperior', 'datosDash'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar datos del dashboard, ");
             return view('errors.404', compact('mensajeError'));

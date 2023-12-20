@@ -81,7 +81,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
             
              /** registramos movimiento al usuario */
-             Helpers::registrarMovimientoDeUsuario($request);
+             Helpers::registrarMovimientoDeUsuario($request, 200, "Inicio de sesión.");
 
             return redirect()->intended('panel');
         }
@@ -100,7 +100,7 @@ class LoginController extends Controller
     public function logout(Request $request, Redirector $redirect)
     {
         /** registramos movimiento al usuario */
-        Helpers::registrarMovimientoDeUsuario($request);
+        Helpers::registrarMovimientoDeUsuario($request, 200, "Cerro sesión");
         // Eliminamos la session
         Auth::logout();
         $request->session()->invalidate();

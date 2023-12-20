@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     InventarioController,
     LoginController,
     MarcaController,
+    NotificacioneController,
     PoController,
     ProductoController,
     ProveedoreController,
@@ -35,6 +36,9 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
+
+    /** NOTIFICACIONES */
+    Route::get('/getNotificaciones', [NotificacioneController::class, 'getNotificaciones'])->name('api.notificaciones');
 
     /** AUTORIZACION */
     Route::post('verificarClave', [LoginController::class, 'verificarClave'])->name('api.verificarClave');

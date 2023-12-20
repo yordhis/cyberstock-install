@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     InventarioController,
     LoginController,
     MarcaController,
+    NotificacioneController,
     PagarController,
     PoController,
     ProductoController,
@@ -47,6 +48,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout')
 Route::middleware(['auth'])->group(function () {
     /** RUTAS DE PANEL */
         Route::get('/panel', [DashboardController::class, 'index'])->name('admin.panel.index');
+   
+    /** RUTAS DE PANEL */
+        Route::delete('/eliminarTodoNotificaciones', [NotificacioneController::class, 'destroyAll'])->name('admin.notificaciones.destroyAll');
+        Route::put('/marcaComoLeidoTodo', [NotificacioneController::class, 'marcaComoLeidoAll'])->name('admin.notificaciones.marcaComoLeidoAll');
+        Route::resource('/notificaciones', NotificacioneController::class)->names('admin.notificaciones');
 
     /** ADMINISTRADOR */
         /** RUTAS DE FACTURAS */

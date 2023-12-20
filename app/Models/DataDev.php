@@ -43,33 +43,6 @@ class DataDev
             "CREDITO", // 4
         ];
 
-        // $this->utilidades = Utilidade::all();
-        // if (count($this->utilidades)) {
-        //     $this->utilidades[0]->iva = [ 
-        //         "sumar" => $this->utilidades[0]->iva / 100 + 1,
-        //         "restar" => $this->utilidades[0]->iva / 100,
-        //         "iva" =>  $this->utilidades[0]->iva
-        //     ];
-
-        //     if ($this->utilidades[0]->pvp_1 > 0) {
-        //         $this->utilidades[0]->pvp_1 = [ 
-        //             "sumar" => $this->utilidades[0]->pvp_1 / 100 + 1,
-        //             "restar" => $this->utilidades[0]->pvp_1 / 100
-        //         ];
-        //     }
-        //     if ($this->utilidades[0]->pvp_2 > 0) {
-        //         $this->utilidades[0]->pvp_2 = [ 
-        //             "sumar" => $this->utilidades[0]->pvp_2 / 100 + 1,
-        //             "restar" => $this->utilidades[0]->pvp_2 / 100
-        //         ];
-        //     }
-        //     if ($this->utilidades[0]->pvp_3 > 0) {
-        //         $this->utilidades[0]->pvp_3 = [ 
-        //             "sumar" => $this->utilidades[0]->pvp_3 / 100 + 1,
-        //             "restar" => $this->utilidades[0]->pvp_3 / 100
-        //         ];
-        //     }
-        // }
 
         $this->menuSuperior = [
             "inventarios" => [
@@ -135,17 +108,6 @@ class DataDev
             "Domingo"
         ];
 
-        $this->notificaciones = [
-            "total" => 5,
-            "data"=>[
-                ["descripcion"=>"Franklin Pago", "tipo"=>"Pago"],
-                ["descripcion"=>"Franklin 2 Pago", "tipo"=>"Pago"],
-                ["descripcion"=>"Franklin 3 Pago", "tipo"=>"Pago"],
-                ["descripcion"=>"Franklin 4 Pago", "tipo"=>"Pago"],
-                ["descripcion"=>"Franklin 5 Pago", "tipo"=>"Pago"]
-            ]
-        ];
-
         $this->estatus = [
             "0" => "Eliminado",
             "1" => "Activo",
@@ -154,5 +116,7 @@ class DataDev
         ];
 
      }
+
+     
 
 }

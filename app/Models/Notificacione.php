@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Notificacione extends Model
 {
     use HasFactory;
-   
     protected $fillable = [
-        "cedula",
-        "descripcion",
-        "fecha"
+        'codigo',
+        'descripcion', 
+        'cantidad', 
+        'almacen', 
+        'concepto_notificacion',
+        'estatus',
     ];
-
-
 }
