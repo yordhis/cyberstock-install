@@ -12,6 +12,7 @@ class CreateInventariosTable extends Migration
      *
      * @return void
      */
+
     public function up()
     {
         Schema::create('inventarios', function (Blueprint $table) {
@@ -25,7 +26,7 @@ class CreateInventariosTable extends Migration
             $table->string("pvp", 11)->nullable();
             $table->string("pvp_2", 11)->nullable();
             $table->string("pvp_3", 11)->nullable();
-            $table->string("imagen", 255)->default(DataDev::$datosDefault['FOTO_PORDEFECTO_PRODUCTO']);
+            $table->string("imagen", 255)->default('/storage/fotos/producto.jpg');
             $table->string("fecha_entrada", 85)->nullable();
             // $table->string("fecha_vencimiento", 85)->nullable();
             $table->string("estatus", 11)->default(1); // activo
