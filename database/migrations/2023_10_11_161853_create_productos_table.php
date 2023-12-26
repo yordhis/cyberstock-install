@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DataDev;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +21,7 @@ class CreateProductosTable extends Migration
             // $table->string("costo", 55)->nullable();
             // $table->float("utilidad_personalizada", 13)->default(0);
             // $table->string("cantidad_inicial", 11)->nullable();
-            $table->string("imagen", 255)->default(FOTO_PORDEFECTO_PRODUCTO);
+            $table->string("imagen", 255)->default(DataDev::$datosDefault['FOTO_PORDEFECTO_PRODUCTO']);
             $table->string("id_marca", 11)->nullable();
             $table->string("id_categoria", 11)->nullable();
             $table->string("fecha_vencimiento", 155)->nullable();
