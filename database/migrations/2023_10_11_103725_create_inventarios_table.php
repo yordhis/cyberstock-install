@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DataDev;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -24,7 +25,7 @@ class CreateInventariosTable extends Migration
             $table->string("pvp", 11)->nullable();
             $table->string("pvp_2", 11)->nullable();
             $table->string("pvp_3", 11)->nullable();
-            $table->string("imagen", 255)->default(FOTO_PORDEFECTO_PRODUCTO);
+            $table->string("imagen", 255)->default(DataDev::$datosDefault['FOTO_PORDEFECTO_PRODUCTO']);
             $table->string("fecha_entrada", 85)->nullable();
             // $table->string("fecha_vencimiento", 85)->nullable();
             $table->string("estatus", 11)->default(1); // activo
