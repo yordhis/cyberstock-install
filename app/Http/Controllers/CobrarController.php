@@ -72,6 +72,9 @@ class CobrarController extends Controller
 
         $mensaje = $estatus ? "El pago de la factura se porceso correctamente!": "No se registro el pago";
 
+        /** registramos movimiento al usuario */
+        Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de Eliminar facturar de inventario (entra/salida), código de factura: ({$facturaInventario[0]->codigo_factura})");
+
         return redirect()->route('admin.cuentas.por.cobrar.index', [
             "mensaje" => $mensaje,
             "estatus" => Response::HTTP_OK

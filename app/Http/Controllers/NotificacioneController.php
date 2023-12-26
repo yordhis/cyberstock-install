@@ -42,6 +42,8 @@ class NotificacioneController extends Controller
         }
      }
 
+     /** CIERRE API REST FULL */
+
     /**
      * Display a listing of the resource.
      *

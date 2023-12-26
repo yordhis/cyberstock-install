@@ -81,7 +81,7 @@ class CategoriaController extends Controller
             $estatusCrear = Categoria::create($request->all());
     
             $mensaje = $estatusCrear ? "La categoria se creo correctamente." : "La categoria no se creo";
-            $estatus = $estatusCrear ? 201 : 404;
+            $estatus = $estatusCrear ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
 
             /** registramos movimiento al usuario */
             Helpers::registrarMovimientoDeUsuario($request, $estatus,"Acción de crear categoria ({$request->nombre})");
@@ -110,7 +110,7 @@ class CategoriaController extends Controller
             $estatusActualizar = $categoria->update($request->all());
     
             $mensaje = $estatusActualizar ? "La categoria se actualizó correctamente." : "Los cambios no se guardaron!";
-            $estatus = $estatusActualizar ? 200 : 404;
+            $estatus = $estatusActualizar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
 
             /** registramos movimiento al usuario */
             Helpers::registrarMovimientoDeUsuario($request,$estatus,"Acción de actualizar categoria ({$request->nombre})");
@@ -145,7 +145,7 @@ class CategoriaController extends Controller
             $estatusEliminar = $categoria->delete();
     
             $mensaje = $estatusEliminar ? "La categoria se eliminó correctamente." : "No se pudo eliminar la catgoria";
-            $estatus = $estatusEliminar ? 200 : 404;
+            $estatus = $estatusEliminar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
 
             /** registramos movimiento al usuario */
             Helpers::registrarMovimientoDeUsuario(request(), $estatus,"Acción de eliminar categoria ({$categoria->nombre})");

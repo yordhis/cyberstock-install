@@ -122,7 +122,7 @@ const componenteModalVer = (data) => {
 
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
             </div>
@@ -150,7 +150,7 @@ const componenteModalEliminar = (data) => {
                         </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-danger btn-eliminar" id="${ data.id }">Si, Proceder a eleminar</button>
                     </div>
             </div>

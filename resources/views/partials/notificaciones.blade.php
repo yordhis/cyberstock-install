@@ -26,3 +26,5 @@
    
 
 </li><!-- End Notification Nav -->
+
+<script src="{{ asset('/js/notificaciones/notificaciones.js') }}" defer></script>

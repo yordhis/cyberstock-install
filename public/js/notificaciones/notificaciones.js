@@ -1,4 +1,4 @@
-const componenteFila = (data) =>{
+const componenteFilaNotificaciones = (data) =>{
     return `
         <li class="notification-item">
             <i class="bi bi-exclamation-circle text-warning"></i>
@@ -24,9 +24,9 @@ const hanledNotificaciones = async (e) =>{
     elementoTotalNotificaciones.innerHTML = "...";
 
     resultados = await getNotificaciones();
-    
+  
     resultados.data.forEach(item => {
-        lista.innerHTML += componenteFila(item)
+        lista.innerHTML += componenteFilaNotificaciones(item)
     });
 
     elementoTotalNotificaciones.textContent = resultados.total;

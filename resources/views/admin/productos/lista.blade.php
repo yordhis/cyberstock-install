@@ -3,7 +3,10 @@
 @section('title', 'Lista de Productos')
 
 @section('content')
+
+    @include('partials.alert')
     <div id="alert"></div>
+
     <section class="section">
         <div class="row">
 

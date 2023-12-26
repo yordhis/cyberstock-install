@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  @laravelPWA
   @include('partials.head')
 </head>
 
@@ -18,6 +19,7 @@
     </div>
   </main><!-- End #main -->
 
+             
   {{-- <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a> --}}
 
  @include('partials.footerTwo')

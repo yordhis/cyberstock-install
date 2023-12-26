@@ -9,6 +9,9 @@
     if ($categoria == 'LISTAFACTURAPORCOBRAR') {
       $categoria = 'FACTURAS POR COBRAR';
     }
+    if ($categoria == 'FORMULARIOEDITARPRODUCTO') {
+      $categoria = 'FORMULARIO EDITAR PRODUCTO';
+    }
 
     if (isset($url[2])) {
         $subcategoria = $url[2];

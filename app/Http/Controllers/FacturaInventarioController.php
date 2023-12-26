@@ -66,15 +66,15 @@ class FacturaInventarioController extends Controller
 
                     $totalArticulos = $totalArticulos  + $producto->cantidad;
                 } 
+
                 $resultado['pos'] = Proveedore::where('codigo',  $request->identificacion)->get()[0];
-
-                
-
                 $resultado['carrito'] = $carritos;
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
-                
                 $resultado['totalArticulo']  = $totalArticulos;
+
+               
+
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 
@@ -142,8 +142,8 @@ class FacturaInventarioController extends Controller
                 $resultado['cliente'] = Cliente::where('identificacion', $request->identificacion)->get()[0];
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
-                
                 $resultado['totalArticulo']  = $totalArticulos;
+
                 return response()->json([
                     "mensaje" => $mensaje,
                     "data" =>  $resultado, 

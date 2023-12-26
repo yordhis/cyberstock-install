@@ -13,7 +13,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
-        "nesbot/carbon": "^2.69"
+        "nesbot/carbon": "^2.69",
+        "silviolleite/laravelpwa": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",

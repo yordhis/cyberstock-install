@@ -103,13 +103,13 @@
                        </div>
        
                        {{-- Imagen --}}
-                       <div class="col-12 text-start mt-2">
+                       <div class="col-xs-12 col-sm-8 text-start mt-2">
                            <label for="foto" class="form-label ">Subir Foto del producto (Opcional)</label>
                            <input type="file" name="file" class="form-control " id="foto">
                            <div class="invalid-feedback">Ingrese una imagen valida</div>
                        </div>
-                       <div class="col-12 mt-2 ">
-                           {{-- <img src="{{ $producto->imagen ?? '' }}" alt="imagen" class="img-thumbnail"> --}}
+                       <div class="col-xs-12 col-sm-4 mt-2 ">
+                           <img src="{{ $producto->imagen ?? '' }}" alt="imagen" class="img-thumbnail w-100">
                        </div>
        
                        <div class="col-12">
@@ -153,10 +153,10 @@
        
                                <input type="number" name="costo" step="any" class="form-control" id="costo"
                                    placeholder="Ingrese costo proveedor" value="{{ $producto->inventario->costo ?? '' }}">
-                               @isset($mensaje)
+                               {{-- @isset($mensaje)
                                <div class="{{ $mensaje['input'] == 'costo' ? 'text-danger' : "" }}">{{ $mensaje['input'] ==
                                    'costo' ? $mensaje['texto'] : '' }} </div>
-                               @endisset
+                               @endisset --}}
        
                                @error('costo')
                                <span class="text-danger">

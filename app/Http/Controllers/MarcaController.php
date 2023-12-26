@@ -81,7 +81,10 @@ class MarcaController extends Controller
             $estatusCrear = Marca::create($request->all());
     
             $mensaje = $estatusCrear ? "La marca se creo correctamente." : "La marca no se creo";
-            $estatus = $estatusCrear ? 201 : 404;
+            $estatus = $estatusCrear ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario($request, $estatus,  $mensaje . " ({$request->nombre}).");
             
             return $estatusCrear ? redirect()->route( 'admin.marcas.index', compact('mensaje', 'estatus') )
             : view('admin.marcas.lista', compact('mensaje', 'estatus', 'menuSuperior', $request));
@@ -104,8 +107,11 @@ class MarcaController extends Controller
             $estatusActualizar = $marca->update($request->all());
     
             $mensaje = $estatusActualizar ? "La marca se actualizó correctamente." : "La marca no se actualizó";
-            $estatus = $estatusActualizar ? 201 : 404;
+            $estatus = $estatusActualizar ?Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             
+              /** registramos movimiento al usuario */
+              Helpers::registrarMovimientoDeUsuario($request, $estatus, $mensaje . " ({$marca->nombre})." );
+
             return $estatusActualizar ? redirect()->route( 'admin.marcas.index', compact('mensaje', 'estatus') )
             : view('admin.marcas.lista', compact('mensaje', 'estatus', 'menuSuperior', $request));
         } catch (\Throwable $th) {
@@ -133,7 +139,10 @@ class MarcaController extends Controller
             $estatusEliminar = $marca->delete();
     
             $mensaje = $estatusEliminar ? "La marca se Eliminó correctamente." : "La marca no se eliminó";
-            $estatus = $estatusEliminar ? 201 : 404;
+            $estatus = $estatusEliminar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+
+             /** registramos movimiento al usuario */
+             Helpers::registrarMovimientoDeUsuario(request(), $estatus, $mensaje . " ({$marca->nombre}).");
             
             return $estatusEliminar ? redirect()->route( 'admin.marcas.index', compact('mensaje', 'estatus') )
             : view('admin.marcas.lista', compact('mensaje', 'estatus', 'menuSuperior', $marca));

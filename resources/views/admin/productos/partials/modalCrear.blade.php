@@ -6,7 +6,7 @@
 
 
 
-<div class="modal fade {{ isset($request->codigo) ? "show" : ""}} " style="{{ isset($request->codigo) ? "display: block;" : "display: none;"}}" id="modalCrear" tabindex="-1"  >
+<div class="modal fade" id="modalCrear" tabindex="-1"  >
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -98,7 +98,7 @@
                         </div>
 
                          {{-- inputs Fecha de vencimiento --}}
-                         {{-- <div class="col-12 text-start mt-2">
+                         <div class="col-12 text-start mt-2">
                             <label for="yourUsername" class="form-label">Fecha de vencimiento (Opcional)</label>
                             <div class="input-group has-validation">
     
@@ -111,7 +111,7 @@
                                 >
                                 <div class="invalid-feedback">Por favor ingrese El Fecha de vencimiento! </div>
                             </div>
-                        </div> --}}
+                        </div>
 
                         {{-- Imagen --}}
                         <div class="col-12 text-start mt-2">

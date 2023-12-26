@@ -248,7 +248,6 @@ class InventarioController extends Controller
     public function deleteProductoDelInventario($id)
     {
         try {
-
             $estatus = Inventario::where('id', $id)->delete();
             if ($estatus) {
                 return response()->json([
@@ -264,7 +263,7 @@ class InventarioController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
         } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error al intentar elimianr un producto del inventario, ");
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar eliminar un producto del inventario, ");
             return response()->json([
                 "mensaje" => $errorInfo,
                 "data" => [],
@@ -346,6 +345,7 @@ class InventarioController extends Controller
         
     }
 
+    /** renderiza la vista del pos de compra */
     public function crearEntrada(Request $request)
     {
         try {
@@ -374,7 +374,6 @@ class InventarioController extends Controller
     }
 
     /** Eliminar factura de inventario */
-
     public function eliminarFacturaInventario($codigo){
         try {
             CarritoInventario::where('codigo', $codigo)->delete();
@@ -386,6 +385,10 @@ class InventarioController extends Controller
             ];
             $pathnamePrevio = explode("/",url()->previous())[count(explode("/",url()->previous()))-1];
             if(count(explode("?", $pathnamePrevio)) == 2) $pathnamePrevio = explode("?", $pathnamePrevio)[0];
+
+            /** registramos movimiento al usuario - probado*/
+            Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de Eliminar facturar de inventario (entra/salida), código de movimiento: ({$codigo})");
+
             return  redirect()->route("admin.inventarios.{$pathnamePrevio}", $parametros);
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar eliminar factura de inventario. ");
@@ -410,6 +413,11 @@ class InventarioController extends Controller
             $inventario->delete();
             $mensaje = "Se Eliminó correctamente";
             $estatus = 200;
+
+             /** registramos movimiento al usuario */
+             Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,
+             "Acción de Eliminar producto del inventario, codigo del producto ({$inventario->codigo})");
+
             return redirect()->route('admin.inventarios.index', compact('mensaje', 'estatus'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar eliminar producto del inventario, ");

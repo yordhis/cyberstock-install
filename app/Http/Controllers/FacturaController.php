@@ -28,31 +28,8 @@ class FacturaController extends Controller
         $this->data = new DataDev();
     }
 
-
-    /** API */
-
-    public function getCodigoFactura($tabla){
-        try {
-            $codigo = Helpers::getCodigo($tabla);
-            return response()->json([
-                "mensaje" => "Consulta de codigo de factura exitoso",
-                "estatus" => Response::HTTP_OK,
-                "data" => $codigo
-            ], Response::HTTP_OK);
-            
-        } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar el codigo de la factura,");
-            return response()->json([
-                "mensaje" => $errorInfo,
-                "data" => [],
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
     /**
-     * Display a listing of the resource.
+     * DESPLIEGA LA LISTA DE FACTURAS
      *
      * @return \Illuminate\Http\Response
      */
@@ -80,8 +57,126 @@ class FacturaController extends Controller
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
     }
-  
 
+    /**
+     * DESPLIEGA LA VISTA DE LA FACTURA DE MANERA ESPESIFICA
+     *
+     * @param  \App\Models\Factura  $factura
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        try {
+            $menuSuperior = $this->data->menuSuperior;
+            $utilidades = $this->data->utilidades;
+            $factura = Factura::find($id);
+          
+            if($factura){
+                    $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
+                    $contador = 0;
+                    foreach ($factura->carrito as $key => $producto) {
+                        $contador += $producto->cantidad;
+                    }
+                    $factura->totalArticulos = $contador;
+            }else{
+                $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
+                $estatus = 404;
+                return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
+            }
+          
+
+            $pos = count(Po::all()) ? Po::all()[0]: [];
+            $pathname = Request::path();
+            $pathname = explode('/', $pathname)[0] . '/ver';
+           
+            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior' ) );
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
+            return response()->view('errors.404', compact("errorInfo"), 404);
+        }
+
+    }
+
+       /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Factura  $factura
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Factura $factura)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateFacturaRequest  $request
+     * @param  \App\Models\Factura  $factura
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateFacturaRequest $request, Factura $factura)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Factura  $factura
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Factura $factura)
+    {
+        try {
+            Carrito::where('codigo', $factura->codigo)->delete();
+            $factura->delete();
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de eliminar factura ({$factura->codigo})");
+
+            return redirect()->route('admin.facturas.index',[
+                "mensaje" => "Factura eliminada correctamente",
+                "estatus" => Response::HTTP_OK
+            ]);
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error al intentar ELIMINAR factura, ");
+            return response()->view('errors.404', compact("errorInfo"), 404);
+        }
+    }
+
+
+
+    /** API REST FULL */
+    /** 
+     * OBTIENE EL ULTIMO CODIGO DE FACTUAS O LA TABLA DESEADA
+     * @param tabla string
+     * @return \Illuminate\Http\Response string (codigo) 
+     */
+    public function getCodigoFactura($tabla){
+        try {
+            $codigo = Helpers::getCodigo($tabla);
+            return response()->json([
+                "mensaje" => "Consulta de codigo de factura exitoso",
+                "estatus" => Response::HTTP_OK,
+                "data" => $codigo
+            ], Response::HTTP_OK);
+            
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar el codigo de la factura,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /** 
+     * OBTIENE TODOS LOS DATOS DE LA FACTURA POR MEDIO DEL CODIGO
+     * @param codigoFactura - string
+     * @return \Illuminate\Http\Response object (factura) 
+     */
     public function getFactura($codigoFactura){
         try {
            
@@ -121,35 +216,15 @@ class FacturaController extends Controller
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR  
             ], Response::HTTP_INTERNAL_SERVER_ERROR ); 
         }
-
-            // $pathname = Request::path();
-            //  return view('admin.facturas.ticket', 
-            //      compact(
-            //         'factura', 
-            //         'pos',
-            //         'utilidades'
-            //  ));
-       
-            // $pdf = PDF::loadView(
-            //     'admin.facturas.ticket',
-            //     compact(
-            //         'factura', 
-            //         'pos',
-            //         'utilidades'
-            //     )
-            // );
-            // return $pdf->download("{$factura->codigo}-{$factura->identificacion}-{$factura->created_at}.pdf");
-    
     }
     
 
     /**
-     * Store a newly created resource in storage.
+     * REGISTRAR FACTURA
      *
      * @param  \App\Http\Requests\StoreFacturaRequest  $request
      * @return \Illuminate\Http\Response
      */
-
     public function store(HttpRequest $request){
 
         try {
@@ -182,9 +257,9 @@ class FacturaController extends Controller
                 $resultado['pos'] = Po::all()[0];
                 $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
                 $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
-                
                 $resultado['totalArticulo']  = $totalArticulos;
-                
+
+
                 return response()->json([
                      "mensaje" => "Factura registrada correctamente",
                      "data" => $resultado,
@@ -211,87 +286,7 @@ class FacturaController extends Controller
     }   
 
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        try {
-            $menuSuperior = $this->data->menuSuperior;
-            $utilidades = $this->data->utilidades;
-            $factura = Factura::find($id);
-          
-            if($factura){
-                    $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
-                    $contador = 0;
-                    foreach ($factura->carrito as $key => $producto) {
-                        $contador += $producto->cantidad;
-                    }
-                    $factura->totalArticulos = $contador;
-            }else{
-                $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
-                $estatus = 404;
-                return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
-            }
-          
+    /** CIERRE DE LA API REST FULL */
 
-            $pos = count(Po::all()) ? Po::all()[0]: [];
-            $pathname = Request::path();
-            $pathname = explode('/', $pathname)[0] . '/ver';
-           
-            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior' ) );
-        } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
-            return response()->view('errors.404', compact("errorInfo"), 404);
-        }
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Factura $factura)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateFacturaRequest  $request
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateFacturaRequest $request, Factura $factura)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Factura $factura)
-    {
-        try {
-            Carrito::where('codigo', $factura->codigo)->delete();
-            $factura->delete();
-
-            return redirect()->route('admin.facturas.index',[
-                "mensaje" => "Factura eliminada correctamente",
-                "estatus" => Response::HTTP_OK
-            ]);
-        } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error al intentar ELIMINAR factura, ");
-            return response()->view('errors.404', compact("errorInfo"), 404);
-        }
-    }
+ 
 }
