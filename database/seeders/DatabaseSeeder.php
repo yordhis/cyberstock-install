@@ -27,13 +27,13 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(PermisoSeeder::class);
         $this->call(RolPermisoSeeder::class);
-        // $this->call(InventarioSeeder::class);
         $this->call(UtilidadeSeeder::class);
-        $this->call(MarcaSeeder::class);
-        $this->call(CategoriaSeeder::class);
+        $this->call(PoSeeder::class);
+        // $this->call(InventarioSeeder::class);
+        // $this->call(MarcaSeeder::class);
+        // $this->call(CategoriaSeeder::class);
         // $this->call(ProductoSeeder::class);
         // $this->call(ClienteSeeder::class);
-        $this->call(PoSeeder::class);
         
     }
 }

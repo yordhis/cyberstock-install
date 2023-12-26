@@ -17,8 +17,7 @@ class PoSeeder extends Seeder
         $pos = new Po();
         $pos->empresa = "Nombre Empresa"; 
         $pos->rif = "J-0000000-0"; 
-        $pos->direccion = "Av. 23 de Enero"; 
-        $pos->imagen = LOGO_PORDEFECTO;
+        $pos->direccion = "BARINAS - VENEZUELA"; 
         $pos->save(); 
     }
 }
