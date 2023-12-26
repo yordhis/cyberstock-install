@@ -25,7 +25,7 @@ class CreateProveedoresTable extends Migration
             $table->string("correo")->nullable();
             $table->string("edad")->nullable();
             $table->string("nacimiento")->nullable();
-            $table->string("imagen")->default(FOTO_PORDEFECTO);
+            $table->string("imagen")->default('/storage/fotos/default.jpg');
             $table->string("estatus")->default(1);
             $table->timestamps();
         });

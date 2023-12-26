@@ -19,7 +19,7 @@ class CreatePosTable extends Migration
             $table->string("rif")->nullable();
             $table->string("direccion")->nullable();
             $table->string("postal")->default(5201); // codigo postal
-            $table->string("imagen")->default(LOGO_PORDEFECTO); // logo
+            $table->string("imagen")->default('/storage/fotos/logo-default.png'); // logo
             $table->string("estatusImagen")->default(0); // logo
             $table->timestamps();
         });
