@@ -1,4 +1,4 @@
-log('producto controller activo');
+log('conectado producto controller');
 // Registrar producto en la DB
 const storeProducto = async (product) => {
     await fetch(`${URL_BASE}/productos`, {
