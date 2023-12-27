@@ -469,8 +469,8 @@ class ProductoController extends Controller
     public function getProductos(){
         try {
             $resultados = Producto::where('id', '>', 0)->orderBy('descripcion','asc')->paginate(15);
-            $productos = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
-            if($productos){
+            if(count($resultados)){
+                $productos = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
                 return response()->json([
                     "mensaje" => "Consulta de productos Exitosa",
                     "data"=>  $productos, 
@@ -479,7 +479,7 @@ class ProductoController extends Controller
             }else{
                 return response()->json([
                     "mensaje" => "No hay resultados",
-                    "data"=>  $productos, 
+                    "data"=>  $resultados, 
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             }
