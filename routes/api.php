@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     InventarioController,
     LoginController,
     MarcaController,
+    MonitoreController,
     NotificacioneController,
     PoController,
     ProductoController,
@@ -39,6 +40,9 @@ Route::group(['middleware' => ['cors']], function () {
 
     /** NOTIFICACIONES */
     Route::get('/getNotificaciones', [NotificacioneController::class, 'getNotificaciones'])->name('api.notificaciones');
+    
+    /** MONITORES (MOVIMIENTOS DE USUARIOS) */
+    Route::get('/setMovimiento', [MonitoreController::class, 'setMovimiento'])->name('api.monitores.setMovimiento');
 
     /** AUTORIZACION */
     Route::post('verificarClave', [LoginController::class, 'verificarClave'])->name('api.verificarClave');
