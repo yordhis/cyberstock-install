@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('remember_token', 255)->nullable();
             $table->string('rol', 55)->default(3);
             $table->text('password')->nullable();
-            $table->text('foto')->default('/storage/fotos/default.jpg');
+            $table->text('foto')->default('/assets/img/default.jpg');
             $table->timestamps();
         });
     }

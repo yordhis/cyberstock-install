@@ -26,7 +26,7 @@ class CreateInventariosTable extends Migration
             $table->string("pvp", 11)->nullable();
             $table->string("pvp_2", 11)->nullable();
             $table->string("pvp_3", 11)->nullable();
-            $table->string("imagen", 255)->default('/storage/fotos/producto.jpg');
+            $table->string("imagen", 255)->default('/assets/img/producto.jpg');
             $table->string("fecha_entrada", 85)->nullable();
             // $table->string("fecha_vencimiento", 85)->nullable();
             $table->string("estatus", 11)->default(1); // activo
