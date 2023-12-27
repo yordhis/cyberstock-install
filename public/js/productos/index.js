@@ -321,70 +321,6 @@ const hanledPaginacion = async (e) => {
     }
 };
 
-// const hanledFiltro = async (e) => {
-//     // si se hizo click en limpiar filtro
-  
-//     if(e.target.id == "filtro-limpiar"){
-//         elementoInputFiltroDescripcion.value = '';
-//         await getLista();
-//         await cargarEventosDelBotonEliminar();
-//         await cargarEventosDelBotonEditar();
-//     } 
-
-//     // validamos los keyup para no filtrar 
-//     if (e.key == "Enter" ){
-//         if(!e.target.value.trim().length){
-//             hanledLoad();
-//             return e.target.parentElement.children[2].textContent = 'Ingrese un dato que no sea vacio';    
-//         }
-    
-//         if(e.target.id.split('-')[1] == 'limpiar'){
-//             elementoSpanInvalido.forEach(element => element.textContent = null);
-//             elementoInputFiltroDescripcion.value = null;
-//             elementoInputFiltroCodigo.value = null;
-//             await getLista();
-//             /** Activamos los eventos del boton eliminar */
-//             await cargarEventosDelBotonEliminar();
-//             await cargarEventosDelBotonEditar();
-    
-//         }else{
-//             elementoSpanInvalido.forEach(element => element.textContent = null);
-//             let filtro = {
-//                 filtro: `${e.target.value.trim()}`,
-//                 campo: ['codigo', ' descripcion'],
-//             };
-        
-//             if(e.target.value){
-//                 elementoTablaPaginacion.innerHTML = '';
-//                 elementoTablaCuerpo.innerHTML = spinner;
-//                 let inventarios = await getProductosFiltro(`${URL_BASE}/getInventariosFiltro`,  filtro);
-           
-//                 if(!inventarios.data){
-//                     elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
-//                 }else{
-//                     elementoTablaCuerpo.innerHTML='';
-                    
-//                     await inventarios.data.data.forEach( element => {
-//                         element.tasa = inventarios.tasa;
-//                         elementoTablaCuerpo.innerHTML +=  componenteFila(adaptadorDeProducto(element));
-//                     });
-                    
-//                     /** Activamos los eventos del boton eliminar */
-//                     await cargarEventosDelBotonEliminar();
-//                     await cargarEventosDelBotonEditar();
-            
-//                     if(inventarios.data.links){
-//                         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
-//                     }
-//                 }
-//             }
-//         }
-
-//     }
-
-
-// };
-
 const hanledFormulario = async (e) => {
    
     if(e.target.id != "cerrarSesion" && e.target.id != 'crearProductoLaravel'){
@@ -484,8 +420,7 @@ function adaptadorDeProducto(data){
 
 async function getLista(url = `${URL_BASE}/getProductos`){
     elementoTablaCuerpo.innerHTML = spinner;
-    let inventarios = await getProductos(url),
-    lista = ``;
+    let inventarios = await getProductos(url);
 
     if(!inventarios.data.data.length){
         elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})

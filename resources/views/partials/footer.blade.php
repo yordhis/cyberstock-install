@@ -18,21 +18,21 @@
   <script src="{{ asset('/assets/js/main.js') }}" defer></script>
   <script src="{{ asset('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
 
-  <!-- PWA Script -->
-  <script src="{{ asset('/sw.js') }}"></script>
-  <script>
-     if ("serviceWorker" in navigator) {
-        // Register a service worker hosted at the root of the
-        // site using the default scope.
-        navigator.serviceWorker.register("/sw.js").then(
-        (registration) => {
-           console.log("El registro del trabajador de servicios fue exitoso:", registration);
-        },
-        (error) => {
-           console.error(`Error en el registro del trabajador del servicio: ${error}`);
-        },
-      );
-    } else {
-       console.error("Service workers are not supported.");
-    }
-  </script>
+<!-- PWA Script -->
+<script src="{{ asset('/sw.js') }}" ></script>
+<script>
+   if ("serviceWorker" in navigator) {
+      // Register a service worker hosted at the root of the
+      // site using the default scope.
+      navigator.serviceWorker.register("/sw.js").then(
+      (registration) => {
+         console.log("El registro del trabajador de servicios fue exitoso:", registration);
+      },
+      (error) => {
+         console.error(`Error en el registro del trabajador del servicio: ${error}`);
+      },
+    );
+  } else {
+     console.error("Service workers are not supported.");
+  }
+</script>
