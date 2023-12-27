@@ -61,7 +61,7 @@ class CobrarController extends Controller
     public function store(Request $request)
     {
        $facturaInventario = FacturaInventario::where('codigo', $request->codigo)->get();
-       $factura = Factura::where('codigo', $request->codigo)->get();
+       $factura = Factura::where('codigo', $facturaInventario[0]->codigo_factura)->get();
        if($factura){
 
         $estatus = $factura[0]->update(["concepto" => "VENTA"]);
@@ -97,11 +97,11 @@ class CobrarController extends Controller
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
-            $facturas = FacturaInventario::where('codigo_factura', $id)->get();
+            $facturas = FacturaInventario::where('codigo', $id)->get();
            
             if(count($facturas)){
                 foreach ($facturas as $key => $factura) {
-                    $factura->carrito = CarritoInventario::where('codigo_factura', $factura->codigo)->get();
+                    $factura->carrito = CarritoInventario::where('codigo', $factura->codigo)->get();
                     $contador = 0;
                     foreach ($factura->carrito as $key => $producto) {
                         $contador += $producto->cantidad;

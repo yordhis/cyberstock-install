@@ -821,11 +821,10 @@ const hanledBuscarProducto = async (e) => {
     
         let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
         lista='';
-        log(resultado)
+        
         if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
     
-         resultado.data.data.forEach( async (producto) => {
-            
+        resultado.data.data.forEach( async (producto) => {
             producto.tasa = resultado.tasa;
             lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
         });

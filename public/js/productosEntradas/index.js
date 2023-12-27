@@ -17,7 +17,7 @@ factura = {
         total:'',
         tasa:'', // tasa en el momento que se hizo la transaccion
         iva:'', // impuesto
-        tipo:'', // fiscal o no fialcal
+        tipo:'ENTRADA', // 
         concepto:'', // venta, compra ...
         descuento:'', // descuento
         fecha:'', // fecha venta, compra ...

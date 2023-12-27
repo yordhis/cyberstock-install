@@ -80,7 +80,7 @@ class InventarioController extends Controller
                             $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
                             if (count($resultados)) {
                                 return response()->json([
-                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CODIGO",
                                     "data" =>  [
                                         "data" => $resultados,
                                         "total" => count($resultados)

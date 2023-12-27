@@ -68,10 +68,9 @@ class PagarController extends Controller
     public function store(Request $request)
     {
         $facturaInventario = FacturaInventario::where('codigo', $request->codigo)->get();
-        $factura = Factura::where('codigo', $request->codigo)->get();
-        if($factura){
+       
+        if(count($facturaInventario)){
 
-            $estatus = $factura[0]->update(["concepto" => "COMPRA"]);
             $estatus = $facturaInventario[0]->update([
                 "observacion" => $request->observacion,
                 "concepto" => "COMPRA"
