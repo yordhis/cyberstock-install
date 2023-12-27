@@ -17,7 +17,7 @@
 <link href="{{ asset('/assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
 
 <!-- PWA assets -->
-<meta name="theme-color" content="#6777ef"/>
+<meta name="theme-color" content="#6777ef">
 <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
 <link rel="manifest" href="{{ asset('/manifest.json') }}">
 

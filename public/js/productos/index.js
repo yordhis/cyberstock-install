@@ -1,4 +1,4 @@
-log('conectado a productos')
+log('conectado a productos');
 /** VARIABLES */
 let elementoTablaCuerpo = d.querySelector('#lista'),
 elementoInputFiltroDescripcion = d.querySelector('#filtro-descripcion'),
