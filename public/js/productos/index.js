@@ -422,7 +422,7 @@ async function getLista(url = `${URL_BASE}/getProductos`){
     elementoTablaCuerpo.innerHTML = spinner;
     let inventarios = await getProductos(url);
 
-    if(!inventarios.data.data.length){
+    if(!inventarios.data.length){
         elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
     }else{
         elementoTablaCuerpo.innerHTML='';
