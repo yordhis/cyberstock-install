@@ -1,4 +1,3 @@
-
 // Registrar producto en la DB
 const storeProducto = async (product) => {
     await fetch(`${URL_BASE}/productos`, {
@@ -13,7 +12,7 @@ const storeProducto = async (product) => {
     .then((response) => {
         console.log("Success:", response)
     });
-}
+};
 
 const deleteProducto = async (idProduct) => {
     return await fetch(`${URL_BASE}/productos/${idProduct}`, {
@@ -26,7 +25,7 @@ const deleteProducto = async (idProduct) => {
     .then((res) => res.json() )
     .catch((error) => error )
     .then((response) => response );
-}
+};
 
 const updateProducto = async (url, data) => {
     return await fetch(url, {
@@ -54,6 +53,7 @@ const getProductosFiltro = async ( url, filtro ) => {
     .then(data => data)
 };
 
+// retorna todos los productos
 const getProductos = async (url) => {
 
     return  await    fetch(url, {
@@ -66,10 +66,8 @@ const getProductos = async (url) => {
                     .then(response => response.json())
                     .catch(err => err)
                     .then(data => data)    
-}
+};
      
-
-
 const getProducto = (barcode) => {
 
     return new Promise(  (resolve, reject)=>{
@@ -95,18 +93,7 @@ const getProducto = (barcode) => {
     // .then((res) => res.json())
     // .catch((error) => console.error("Error:", error))
     // .then((response) =>  response);
-}
+};
 
-const showProducto = async (idProduct) => {
-    await fetch(`${URL_BASE}/productos/${idProduct}`, {
-        method: "GET", // or 'PUT'
-        // body: JSON.stringify(idProduct), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-    })
-    .then((res) => res.json())
-    .catch((error) => console.error("Error:", error))
-    .then((response) =>  response);
-}
+
 
