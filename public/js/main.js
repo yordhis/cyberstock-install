@@ -11,7 +11,7 @@ VENTA = {
 },
 spinner = `
     <div class="spinner-border text-success" role="status" id="spinnerGlobal">
-    <span class="visually-hidden">CARGANDO...</span>
+        <span class="visually-hidden">CARGANDO...</span>
     </div>
 `;
 
