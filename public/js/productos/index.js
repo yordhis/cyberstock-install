@@ -421,8 +421,13 @@ function adaptadorDeProducto(data){
 async function getLista(url = `${URL_BASE}/getProductos`){
     elementoTablaCuerpo.innerHTML = spinner;
     let inventarios = await getProductos(url);
+    log(inventarios);
 
-    if(!inventarios.data.length){
+    if(typeof(inventarios.data.data) == 'undefined'){
+        return elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
+    }
+    
+    if(!inventarios.data.data.length){
         elementoTablaCuerpo.innerHTML =  componenteFila({estatus: 0})
     }else{
         elementoTablaCuerpo.innerHTML='';

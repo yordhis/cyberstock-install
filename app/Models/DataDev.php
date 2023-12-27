@@ -25,9 +25,9 @@ class DataDev
      public function __construct(){
 
         $this->datosDefault = [
-            "FOTO_PORDEFECTO" => "/storage/fotos/default.jpg",
-            "FOTO_PORDEFECTO_PRODUCTO" => "/storage/fotos/producto.jpg",
-            "LOGO_PORDEFECTO" => "/storage/fotos/logo-default.png",
+            "FOTO_PORDEFECTO" => "/assets/img/default.jpg",
+            "FOTO_PORDEFECTO_PRODUCTO" => "/assets/img/producto.jpg",
+            "LOGO_PORDEFECTO" => "/assets/img/logo-default.png",
         ];
         
         $this->tiposEntradas = [
