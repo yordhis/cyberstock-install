@@ -169,6 +169,7 @@ return [
         /*
          * Application Service Providers...
          */
+        Ladumor\LaravelPwa\PWAServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
@@ -232,6 +233,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         "PDF" => Barryvdh\DomPDF\Facade\Pdf::class,
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
+        'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
 
     ],
 

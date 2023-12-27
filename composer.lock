@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0adeaa6257b84a0245b199ebe558b41a",
+    "content-hash": "dac3e7fece9ffbaa349cc44dbe812e91",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3342,56 +3342,6 @@
             "time": "2021-12-11T13:40:54+00:00"
         },
         {
-            "name": "silviolleite/laravelpwa",
-            "version": "2.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/silviolleite/laravel-pwa.git",
-                "reference": "5f7135d2ee870af01793c9fdf6b1b932b546e20e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/silviolleite/laravel-pwa/zipball/5f7135d2ee870af01793c9fdf6b1b932b546e20e",
-                "reference": "5f7135d2ee870af01793c9fdf6b1b932b546e20e",
-                "shasum": ""
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "LaravelPWA\\Providers\\LaravelPWAServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "LaravelPWA\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Silvio Luis Leite",
-                    "email": "silviolleite@gmail.com"
-                }
-            ],
-            "description": "Looks like an app, feels like an app, but NOT an app.",
-            "keywords": [
-                "laravel",
-                "php",
-                "progressive web apps",
-                "pwa"
-            ],
-            "support": {
-                "issues": "https://github.com/silviolleite/laravel-pwa/issues",
-                "source": "https://github.com/silviolleite/laravel-pwa/tree/2.0.3"
-            },
-            "time": "2020-08-20T12:19:16+00:00"
-        },
-        {
             "name": "swiftmailer/swiftmailer",
             "version": "v6.3.0",
             "source": {
@@ -6481,6 +6431,63 @@
                 "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
             },
             "time": "2020-07-09T08:09:16+00:00"
+        },
+        {
+            "name": "ladumor/laravel-pwa",
+            "version": "v0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shailesh-ladumor/laravel-pwa.git",
+                "reference": "1867899d6916803aef7ea02f489597555cc4ab02"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shailesh-ladumor/laravel-pwa/zipball/1867899d6916803aef7ea02f489597555cc4ab02",
+                "reference": "1867899d6916803aef7ea02f489597555cc4ab02",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": ">=5.4",
+                "php": ">=5.6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "\\Ladumor\\LaravelPwa\\PWAServiceProvider"
+                    ],
+                    "aliases": {
+                        "LaravelPwa": "Ladumor\\LaravelPwa\\LaravelPwa"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ladumor\\LaravelPwa\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Shailesh Ladumor",
+                    "email": "shaileshmladumor@gmail.com"
+                }
+            ],
+            "description": "this package used for the make pwa website.",
+            "keywords": [
+                "laravel",
+                "laravel-pwa",
+                "php",
+                "pwa-laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/shailesh-ladumor/laravel-pwa/issues",
+                "source": "https://github.com/shailesh-ladumor/laravel-pwa/tree/v0.0.4"
+            },
+            "time": "2023-09-02T13:09:30+00:00"
         },
         {
             "name": "laravel-lang/lang",
