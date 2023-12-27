@@ -479,7 +479,7 @@ class ProductoController extends Controller
             }else{
                 return response()->json([
                     "mensaje" => "No hay resultados",
-                    "data"=>  $resultados, 
+                    "data"=>  [], 
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             }
