@@ -14,17 +14,6 @@
     <div class="container-fluid ">
 
         <div class="row position-relative">
-            <div class="col-12">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
-                    <a href="{{ route('admin.productos.index') }}" class="btn btn-primary m-2">
-                        <i class="bi bi-paypal"></i>
-                        Crear Producto
-                    </a>
-                    
-                    
-                </div>
-            </div>
-
 
             {{-- Proveedor --}}
             <div class="col-sm-2 col-xs-12">
@@ -38,20 +27,10 @@
                 </div>
 
                 {{-- Tarjeta del proveedor --}}
-                <div class="card" style="height: 25.5rem; width: 100%;" id="tarjetaCliente"></div>
+                <div class="card" style="height: auto; width: 100%;" id="tarjetaCliente"></div>
 
                 {{-- Tarjeta del usuario --}}
-                <div class="card" style="height: 11rem; width: 100%;">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">Usuario ID: {{ Auth::user()->id ?? 'User no definido' }}</h5>
-                
-                        <p class="card-text" style="">
-                            <b>Usuario:</b> {{ Auth::user()->nombre ?? 'User no definido' }} <br>
-                            <b>Fecha y Hora:</b> {{ date('d/m/Y - h:m:sa') }}
-                        </p>
-                    </div>
-                </div>
-                
+                @include('partials.tarjetavendedor')
 
             </div> {{-- Cierre proveedor --}}
 

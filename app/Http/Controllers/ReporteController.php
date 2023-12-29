@@ -57,8 +57,10 @@ class ReporteController extends Controller
                     foreach ($resultados as $key => $factura) {
                         $carrito = Carrito::where('codigo', $factura->codigo)->get();
                         foreach ($carrito as $key => $producto) {
-                            $producto['costoProveedor'] = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get()[0]->costo;
-                            // $producto['costoProveedor'] = Inventario::select('costo')->find($producto->codigo_producto)->costo;
+                            $costo = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get();
+                            $producto['costoProveedor'] = count($costo) 
+                                                        ? $costo[0]['costo']
+                                                        : 0;
                             $producto['iva'] = $factura->iva;
                             array_push($reporte, $producto);
                         }
@@ -88,7 +90,10 @@ class ReporteController extends Controller
                     foreach ($resultados as $key => $factura) {
                         $carrito = Carrito::where('codigo', $factura->codigo)->get();
                         foreach ($carrito as $key => $producto) {
-                            $producto['costoProveedor'] = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get()[0]->costo;
+                            $costo = Inventario::select('costo')->where('codigo', $producto->codigo_producto)->get();
+                            $producto['costoProveedor'] = count($costo) 
+                                                        ? $costo[0]['costo']
+                                                        : 0;
                             $producto['iva'] = $factura->iva;
                             array_push($reporte, $producto);
                         }

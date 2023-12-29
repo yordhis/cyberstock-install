@@ -7,25 +7,9 @@
 
 
    
-    <div class="container-fluid ">
+    <div class="container-fluid">
        
         <div class="row position-relative">
-            {{-- Botenes cliente - factura --}}
-            <div class="col-12">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
-                    <a href="{{ route('admin.facturas.index') }}" class="btn btn-primary m-2">
-                        <i class="bi bi-paypal"></i>
-                        Facturas
-                    </a>
-                    
-                    <a href="{{ route('admin.clientes.index') }}" class="btn btn-primary m-2">
-                        <i  class="bi bi-person"></i>
-                        Clientes
-                    </a>
-                </div>
-            </div>
-            
-            {{-- Cliente --}}
             <div class="col-sm-2 col-xs-12">
 
                 {{--  Boton de salir --}}
@@ -37,20 +21,12 @@
                 </div>
 
                 {{-- Tarjeta del cliente --}}
-                <div class="card" style="height: 25.5rem; width: 100%;" id="tarjetaCliente">       
-                </div>
+                <div class="card" style="height: auto; width: 100%;" id="tarjetaCliente"></div>
+                {{-- CIERRE Tarjeta del cliente --}}
 
                 {{-- Tarjeta del vendedor --}}
-                <div class="card" style="height: 11rem; width: 100%;">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">Vendedor ID: {{ Auth::user()->id }}</h5>
-                
-                        <p class="card-text" style="">
-                            <b>Usuario:</b> {{ Auth::user()->nombre }} <br>
-                            <b>Fecha y Hora:</b> {{ date('d/m/Y - h:m:sa') }}
-                        </p>
-                    </div>
-                </div>
+                @include('partials.tarjetavendedor')
+                {{-- CIERRE Tarjeta del vendedor --}}
                 
 
             </div> {{-- Cierre cliente --}}

@@ -267,8 +267,8 @@ const hanledLoad = async (e) => {
 const hanledBotonEliminar = async (e) => {
     e.preventDefault();
  
-    // Asignamos el spinner
-    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+    // Asignamos el spinner()
+    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
 
     // Ocultamos el boton eliminar al hacer la solicitud de eliminar
     e.target.parentElement.children[1].classList.add('d-none');
@@ -291,7 +291,7 @@ const hanledPaginacion = async (e) => {
     if(e.target.href){
         if(e.target.href.includes('getProductosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
-            elementoTablaCuerpo.innerHTML = spinner;
+            elementoTablaCuerpo.innerHTML = spinner();
          
             let inventarios = await getProductosFiltro(`${e.target.href}`,  config);
         
@@ -348,7 +348,7 @@ const hanledFormulario = async (e) => {
 
                 let inventarios = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`,  config);
                 log(inventarios);
-                elementoTablaCuerpo.innerHTML = spinner;
+                elementoTablaCuerpo.innerHTML = spinner();
 
                 /** Si no hay datos entregamos un estatus 0 */
                 if(!inventarios.data.data.length) return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
@@ -419,7 +419,7 @@ function adaptadorDeProducto(data){
 };
 
 async function getLista(url = `${URL_BASE}/getProductos`){
-    elementoTablaCuerpo.innerHTML = spinner;
+    elementoTablaCuerpo.innerHTML = spinner();
     let inventarios = await getProductos(url);
     log(inventarios);
 

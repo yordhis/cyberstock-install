@@ -9,46 +9,44 @@ VENTA = {
     id:1,
     name: "VENTA"
 },
-spinner = `
-    <div class="spinner-border text-success" role="status" id="spinnerGlobal">
+spinner = (clases = "text-primary") => `
+    <div class="spinner-border ${clases}" role="status" id="spinnerGlobal">
         <span class="visually-hidden">CARGANDO...</span>
     </div>
 `;
 
-const componenteAlerta = (mensaje, estatus) => {
+const componenteAlerta = (mensaje, estatus, clasesExtras = "") => {
     let estatusText = '',
     icono = '';
 
     switch (estatus) {
         case 200:
-            estatusText = "alert-success"
-            icono = '#check-circle-fill';
+            estatusText = "alert-success";
+            icono = 'bx bxs-check-circle';
             break;
         case 404:
             estatusText = "alert-danger";
-            icono = '#exclamation-triangle-fill';
+            icono = 'bx bx-x';
             break;
         case 401:
             estatusText = "alert-warning";
-            icono = '#exclamation-triangle-fill';
+            icono = 'bx bxs-message-alt-error';
             break;
         case 500:
             estatusText = "alert-danger";
-            icono = '#check-circle-fill';
+            icono = 'bx bxs-coffee-alt';
             break;
         default:
             estatusText = "alert-primary";
-            icono = '#exclamation-triangle-fill';
+            icono = 'bx bxs-message-alt-error';
             break;
     }
 
 
     return `
         <div class="alert ${estatusText} d-flex align-items-center alertaGlobal" role="alert" id="alertaGlobal">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
-                <use xlink:href="${icono}"/></svg>
-            <div>
-                ${mensaje}
+                <i class='${icono} ${clasesExtras}' ></i>
+                <p class='${clasesExtras}'> ${mensaje} </p>
             </div>
         </div>
     `;

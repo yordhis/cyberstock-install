@@ -551,8 +551,8 @@ const hanledLoad = async (e) => {
         factura = facturaStorage;
 
         /** CLIENTE */
-        elementoTarjetaCliente.innerHTML = spinner;
-        listaDeProductosEnFactura.innerHTML = spinner;
+        elementoTarjetaCliente.innerHTML = spinner();
+        listaDeProductosEnFactura.innerHTML = spinner();
         if(factura.identificacion.length != 0){
             resultadoProveedor = await getProveedor(factura.identificacion);
         }
@@ -575,7 +575,7 @@ const hanledLoad = async (e) => {
     }
 
     /** Cargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
+    elementoFactura.innerHTML = spinner();
 
     /** Validamos si el carrito tiene productos para cargarlos a la factura */
     carritoStorage =  localStorage.getItem('carritoInventario')  ? JSON.parse(localStorage.getItem('carritoInventario')) : [];
@@ -623,7 +623,7 @@ const hanledAccionesCliente = async (e) => {
             cargarEventosDeFormularios();
             break;
         case 'activarFormEditarCliente':
-            elementoTarjetaCliente.innerHTML = spinner;
+            elementoTarjetaCliente.innerHTML = spinner();
 
             let proveedor = await getProveedor(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(proveedor.data);
@@ -645,8 +645,8 @@ const hanledBuscarProveedor = async (e) => {
         if(!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo es obligatorio!");
         else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
   
-        /** Se cargar el spinner para mostrar que esta procesando */
-        elementoTarjetaCliente.innerHTML = spinner;
+        /** Se cargar el spinner() para mostrar que esta procesando */
+        elementoTarjetaCliente.innerHTML = spinner();
         let cliente = await getProveedor( parseInt(e.target.value) );
 
         /** Validamos si no hay data del cliente */
@@ -677,7 +677,7 @@ const hanledFormulario = async (e) => {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
                     if(!resultado) return;
-                    e.target.innerHTML = spinner;
+                    e.target.innerHTML = spinner();
                     
                     proveedor = await storeProveedor(resultado);
 
@@ -706,7 +706,7 @@ const hanledFormulario = async (e) => {
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
-            e.target.innerHTML = spinner;
+            e.target.innerHTML = spinner();
             proveedor = await updateProveedor(e.target.action, resultado);
                /** Seteamos el proveedor en la factura de local storage */
                factura.identificacion = proveedor.data[0].codigo;
@@ -839,7 +839,7 @@ const hanledBuscarProducto = async (e) => {
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         
-        elementoTotalProductos.innerHTML = spinner;
+        elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
     
         let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
@@ -952,7 +952,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     
                 elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
                 setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
+                    elementoAlertas.innerHTML=spinner();
                     window.location.href = `${URL_BASE_APP}/inventarios/crearEntrada`;
                 }, 2500);
             }else{
@@ -971,12 +971,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 /** Eliminamos la factura y el carrito del almacen local */
                     localStorage.removeItem('carritoInventario');
                     localStorage.removeItem('facturaInventario');
-    
-                elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
-                setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
+                    e.target.innerHTML = spinner('text-white');
                     window.location.href = `${URL_BASE_APP}/inventarios`;
-                }, 1500);
             }
 
             break;
@@ -1052,7 +1048,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     });
 
                     /** MOSTRAR QUE ESTA CARGANDO  */
-                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+                    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
 
                     /** FACTURAR LA ENTRADA */
                     setTimeout(async ()=>{
@@ -1390,7 +1386,7 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
     /** Recargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
+    elementoFactura.innerHTML = spinner();
     elementoFactura.innerHTML = await componenteFactura(factura);
 
        /** Cargamos el modal de metodos de pago */
