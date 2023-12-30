@@ -1039,6 +1039,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         
                         /** Mostramos el dialogo de facturar */
                          if (resultadoDeFacturar.estatus == 201) {
+                                /** Eliminamos la factura del Storagr */
+                                localStorage.removeItem('carrito');
+                                localStorage.removeItem('factura');
                                 /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
                                 e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
                                 e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');

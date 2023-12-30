@@ -530,7 +530,8 @@ const componenteMetodoDePagoModal  = async (factura) => {
 const componenteBotonesDeImpresion = () =>{
     return `
         <div class="d-grid gap-2">
-            <button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibre">IMPRIMIR FORMATO FORMULA LIBRE</button>
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibreFactura">IMPRIMIR FORMATO FORMULA LIBRE FACTURA</button>
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibre">IMPRIMIR FORMATO FORMULA LIBRE NOTA</button>
             <button class="btn btn-primary acciones-factura" type="button" id="imprimirTicket">IMPRIMIR TICKET</button>
             <button class="btn btn-danger acciones-factura" type="button" id="finalizarFacturacion">FINALIZAR</button>
         </div>
@@ -1044,12 +1045,16 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
             break;
         case 'imprimirFormulaLibre':
-                log('imprimiendo formula libre')
+                log('imprimiendo formula libre NOTA')
                 imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
+              break;
+        case 'imprimirFormulaLibreFactura':
+                log('imprimiendo formula libre FACTURA')
+                imprimirElementoFormulaLibre(formulaLibreFacturaHtml(resultadoDeFacturar.data));
               break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
-                imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
+                imprimirElemento(htmlTicket(resultadoDeFacturar.data));
             break;
         case 'finalizarFacturacion':
                 log('finalizando facturacion')
@@ -1199,10 +1204,6 @@ const procesarFactura = async (e) => {
     /** declaracion de variables */
     let abonado = 0,
     resultadoDefacturarCarrito = '';
-    // e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
-    // e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
-    // e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
-    // await cargarEventosAccionesDeFactura()
 
     /** validamos que halla productos en la factura */
     if(JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
@@ -1256,6 +1257,9 @@ const procesarFactura = async (e) => {
                     
                     /** Mostramos el dialogo de facturar */
                         if (resultadoDeFacturar.estatus == 201) {
+                            /** Eliminamos la factura del Storagr */
+                            localStorage.removeItem('carritoSalida');
+                            localStorage.removeItem('facturaSalida');
                             /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
                             e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
                             e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');

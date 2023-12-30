@@ -475,7 +475,7 @@ const getFacturaES = async (url, data) => {
     .then((response) => response )
 };
 
-/** BUSCA LAS FACTURA POR SI CODIGO */
+/** BUSCA LAS FACTURA POR SU CODIGO */
 const getFactura = async (codigoFactura) => {
     return await fetch(`${URL_BASE}/getFactura/${codigoFactura}`, {
         method: "GET", // or 'PUT'
@@ -574,108 +574,75 @@ const imprimirElementoFormulaLibre = (elemento) => {
     ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
     ventana.document.write(`<style>
             * {
-            margin-top: 8%;
+            margin-top: 7%;
             font-size: 12px;
             font-family: 'Times New Roman';
-        }
+            }
 
-        body{
-            margin: 0;
-            position: relative;
-            min-height: 100vh;
-        }
+            body{
+                margin: 0;
+                position: relative;
+                min-height: 100vh;
+            }
 
-        .img{
-            width: 100px;
-        }
+            .img{
+                width: 100px;
+            }
 
 
-        td,
-        th,
-        tr,
-        table {
-            padding: 5px;
-            /* border-top: 1px solid rgb(27, 25, 25); */
-            border-collapse: collapse;
-            max-height: 90%;
-        }
+            td,
+            th,
+            tr,
+            table {
+                padding: 2px;
+                /* border-top: 1px solid rgb(27, 25, 25); */
+                border-collapse: collapse;
+                width: 60em;
+            }
 
-        .table-totales{
-            position: absolute;
-            bottom: 10em;
-            width: 100%;
-        }
+            
+            td.descripcion{
+                padding: 5px;
+                font-size: 10px;
+                max-width: 150px;
+            }
 
-        th.titulo{
-            padding-left: 35px;
-            text-align: left;
-            font-size: 25px;
-        }
+            th.numero,
+            td.numero{
+                padding: 5px;
+                width: auto;
+                max-width: 150px;
+            }
 
-        tr.border {
-            border-top: 1px solid rgb(27, 25, 25);
-            border-bottom: 1px solid rgb(27, 25, 25);
-        }
+            .table-totales{
+                padding: 2px;
+                position: absolute;
+                bottom: 15em;
+                width: 60em;
+            }
 
-        td.descripcion,
-        th.descripcion {
-            text-align: left;
-            width: auto;
-            max-width: 350px;
-            text-align: left;
-        }
+            .text__left{
+                text-align: left;
+            }
+            .text__right{
+                text-align: right;
+            }
 
-        td.codigo,
-        th.codigo {
-            text-align: left;
-            width: auto;
-            max-width: 70px;
-            text-align: left;
-        }
+            tr.border {
+                border-top: 1px solid rgb(27, 25, 25);
+                border-bottom: 1px solid rgb(27, 25, 25);
+            }
 
-        td.descripcion-producto,
-        th.descripcion-producto {
-            font-size: 11px;
-            text-align: left;
-            width: 400px;
-            max-width: 450px;
-            text-align: left;
-        }
+            .red{
+                color: brown;
+            }
 
-        td.numero,
-        th.numero {
-            text-align: right;
-        }
+            .centrado {
+                margin: 0%;
+                text-align: center;
+                align-content: center;
+            }
 
-        td.total-bruto{
-            text-align: right;
-        }
-        td.total-neto{
-            text-align: right;
-        }
-
-        .red{
-            color: brown;
-        }
-
-        .centrado {
-            margin: 0%;
-            text-align: center;
-            align-content: center;
-        }
-
-        .ticket {
-            width: 325px;
-            max-width: 355px;
-        }
-
-        img {
-            max-width: 150px;
-            width: 150px;
-            margin-top: 3%;
-            margin-bottom: 0%;
-            padding-left: 28%;
-        }
     </style>`);
     ventana.document.write('</head><body >');
     ventana.document.write(elemento);
@@ -687,7 +654,125 @@ const imprimirElementoFormulaLibre = (elemento) => {
     return true;
 };
 
-/** REPORTE GENERAL DEL DIA */
+/** FORMULA LIBRE - FACTURA */
+const formulaLibreFacturaHtml = (factura) => {
+    let metodosDePagoHtml = ``,
+    carritoHtml="",
+    ivaHtml="",
+    descuentoHtml="",
+    [dia,mes,anio] = factura.fecha.split('-');
+
+    let fecha = new Date(anio,mes-1,dia).toLocaleString('ves', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    hora = new Date(anio,mes-1,dia).toLocaleTimeString('ves');
+
+    
+    /** RECORREMOS EL CARRITO DE COMPRA */
+    // Recorremos el carrito
+    factura.carrito.forEach(producto => {
+        carritoHtml+=`
+            <tr>
+                <td class="text__left numero">${producto.codigo_producto}</td>
+                <td class="text__left descripcion">${producto.descripcion}</td>
+                <td class="text__right numero">${producto.cantidad} </td>
+                <td class="text__right numero">${ darFormatoDeNumero(producto.costo * factura.tasa) } </td>
+                <td class="text__right numero">${  darFormatoDeNumero( producto.subtotal * factura.tasa) }</td>
+            </tr>
+        `;
+    });
+    
+    // Verificacamos si se aplico el impuesto
+        ivaHtml = `
+            <td class="text__right">
+                IVA 16%: 
+                ${ darFormatoDeNumero( factura.subtotal  * 0.16 * factura.tasa )  } 
+            </td>
+        `;
+    
+
+    // Verificamos si se aplico un descuento
+ 
+        descuentoHtml = ` 
+                <td class="text__right">
+                    DESCUENTO ${factura.descuento}%:  
+                    ${ factura.descuento > 0 
+                        ? darFormatoDeNumero( ( (factura.subtotal * factura.tasa) * (factura.descuento/100) ) )
+                        : 0 
+                    } 
+                </td>
+        `;
+
+
+    return `
+    <table class="table">
+    <thead>
+        
+        <tr class="border">
+            <th colspan="3" class="text__left">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
+            <th colspan="2" class="text__right descripcion">FACTURA | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span></th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text__left">
+                N° CÉDULA: ${factura.cliente.tipo}-${factura.cliente.identificacion}
+                / N° TELÉFONO: ${factura.cliente.telefono ? factura.cliente.telefono : "" }
+            </th>
+            <th colspan="2" class="text__right descripcion">CÓDIGO CLIENTE: <span class="red">000${factura.cliente.id}</span></th>    
+        </tr>
+        <tr>
+            <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion : ""}</span></th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text__left">
+                VENDEDOR:JUAN RAMIREZ
+                / N° TELÉFONO: 0414-3534569
+            </th>
+        </tr>
+        <tr>
+            <th colspan="5" class="text__left">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
+        </tr>
+        <tr class="border">
+            <th class="text__left numero">CODIGO</th>
+            <th class="text__left descripcion">DESCRIPCIÓN</th>
+            <th class="text__right numero">CANTIDAD</th>
+            <th class="text__right numero">C/U</th>
+            <th class="text__right numero">SUBTOTAL</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${carritoHtml}
+    </tbody>
+</table>
+
+<table class="table-totales">
+
+        <tr class="border">
+            <td colspan="2" class="text__left">CANTIDAD DE ITEMS: ${ factura.carrito.length } </td>
+            <td class="text__right">SUBTOTAL: ${darFormatoDeNumero( factura.subtotal * factura.tasa )} </td>
+        </tr>
+        <tr class="border">
+            <td colspan="2">BULTOS:</td>
+            ${descuentoHtml}
+        </tr>
+        <tr class="border">
+            <td colspan="2">TRANSPORTE:</td>
+            ${ivaHtml}
+        </tr>
+        <tr class="border">
+            <td colspan="3" class="text__right">
+                    TOTAL: ${darFormatoDeNumero( factura.iva > 0 
+                        ? factura.total * factura.tasa 
+                        : factura.total * factura.tasa * 1.16 )} 
+            </td>
+        </tr>
+        <tr class="border">
+            <td colspan="3" class="centrado">${factura.pos.direccion} </td>
+        </tr>
+        
+
+</table>
+    `;
+};
+
+/** FORMULA LIBRE - NOTA DE ENTREGA */
 const formulaLibreHtml = (factura) => {
     let metodosDePagoHtml = ``,
     carritoHtml="",
@@ -701,80 +786,74 @@ const formulaLibreHtml = (factura) => {
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
-                <td class="codigo">${producto.codigo_producto}</td>
-                <td class="descripcion-producto">${producto.descripcion}</td>
-                <td class="numero">${producto.cantidad} </td>
-                <td class="numero">${ darFormatoDeNumero(producto.costo) } </td>
-                <td class="numero">${  darFormatoDeNumero( producto.subtotal ) }</td>
+                <td class="text__left">${producto.codigo_producto}</td>
+                <td class="text__left">${producto.descripcion}</td>
+                <td class="text__right">${producto.cantidad} </td>
+                <td class="text__right">${ darFormatoDeNumero( producto.costo ) } </td>
+                <td class="text__right">${ darFormatoDeNumero( producto.subtotal ) }</td>
             </tr>
         `;
     });
-    
-    // Verificacamos si se aplico el impuesto
-    if( factura.iva > 0 ){
-        ivaHtml = `
-            <td class="total-bruto">
-                IVA 16%: 
-                ${ darFormatoDeNumero( factura.subtotal  * factura.iva )  } 
-            </td>
-        `;
-    }
 
-    // Verificamos si se aplico un descuento
-    if(factura.descuento > 0){
+    // descuento
         descuentoHtml = ` 
-                <td class="total-bruto">
+                <td class="text__right">
                     DESCUENTO ${factura.descuento}%:  
-                    ${ darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) } 
+                    ${ factura.descuento > 0 
+                        ? darFormatoDeNumero( (factura.subtotal * (factura.descuento/100)) ) 
+                        : 0
+                    } 
                 </td>
         `;
-    }
+    
 
 
     return `
     <table class="table">
-    <thead>
-        
-        <tr class="border">
-            <th class="descripcion">CLIENTE:</th>
-            <th class="descripcion">${factura.cliente.nombre.toUpperCase()}</th>
-            <th colspan="3" class="numero">FACTURA | <span class="red">CONTADO</span></th>
-        </tr>
-        <tr>
-            <th class="descripcion">N° CÉDULA:</th>
-            <th class="descripcion">
-                ${factura.cliente.tipo}-${factura.cliente.identificacion}
-                / N° TELÉFONO: ${factura.cliente.telefono ? factura.cliente.telefono : "" }
-            </th>
-            <th colspan="3" class="numero">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion : ""}</span></th>
-        </tr>
-        <tr>
-            <th class="descripcion">VENDEDOR:</th>
-            <th class="descripcion">
-                JUAN RAMIREZ
-                / N° TELÉFONO: 0414-3534569
-            </th>
-            <th colspan="3" class="numero">FECHA DE EMISIÓN: <span class="">${fecha}</span></th>
+        <thead>
+            
+            <tr class="border">
+                <th colspan="3"  class="text__left">
+                    CLIENTE: ${factura.cliente.nombre.toUpperCase()}
+                </th>
+            
+                <th colspan="2" class="text__right">NOTA | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span></th>
+            </tr>
+            <tr>
+                <th colspan="3" class="text__left">
+                    N° CÉDULA: ${factura.cliente.tipo}-${factura.cliente.identificacion}
+                    / N° TELÉFONO: ${factura.cliente.telefono ? factura.cliente.telefono : "" }
+                </th>
+                <th colspan="2" class="text__right">CÓDIGO CLIENTE: <span class="red">000${factura.cliente.id}</span></th>
+            </tr>
+            <tr>
+                <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion : ""}</span></th>
+            </tr>
+            <tr>
+                <th colspan="3" class="text__left">
+                    VENDEDOR:  JUAN RAMIREZ
+                    / N° TELÉFONO: 0414-3534569
+                </th>
+                <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
+            </tr>
+            <tr class="border">
+                <th class="text__left">CODIGO</th>
+                <th class="text__left">DESCRIPCIÓN</th>
+                <th class="text__right">CANTIDAD</th>
+                <th class="text__right">C/U</th>
+                <th class="text__right">SUBTOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${carritoHtml}
+        </tbody>
+    </table>
 
-        </tr>
-        <tr class="border">
-            <th class="codigo">CODIGO</th>
-            <th class="descripcion">DESCRIPCIÓN</th>
-            <th class="numero">CANTIDAD</th>
-            <th class="numero">C/U</th>
-            <th class="numero">SUBTOTAL</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${carritoHtml}
-    </tbody>
-</table>
-
-<table class="table-totales">
+    <table class="table-totales">
 
         <tr class="border">
-            <td colspan="2" class="descripcion">CANTIDAD DE ITEMS: ${ factura.carrito.length} </td>
-            <td class="total-bruto">SUBTOTAL: ${factura.subtotal} </td>
+            <td colspan="2" class="text__left">CANTIDAD DE ITEMS: ${ factura.carrito.length} </td>
+            <td class="text__right">SUBTOTAL: ${darFormatoDeNumero( factura.subtotal )} </td>
         </tr>
         <tr class="border">
             <td colspan="2">BULTOS:</td>
@@ -782,77 +861,17 @@ const formulaLibreHtml = (factura) => {
         </tr>
         <tr class="border">
             <td colspan="2">TRANSPORTE:</td>
-            ${ivaHtml}
+            <td colspan="3" class="text__right">TOTAL: ${darFormatoDeNumero( factura.subtotal - (factura.subtotal * factura.descuento) )} </td>
+        
         </tr>
-        <tr class="border">
-            <td colspan="3" class="total-bruto">TOTAL: ${factura.total} </td>
-        </tr>
+    
         <tr class="border">
             <td colspan="3" class="centrado">${factura.pos.direccion} </td>
         </tr>
         
 
-</table>
+    </table>
     `;
-
-    // return `
-    //         <table class="table">
-    //             <thead>
-                  
-    //                 <tr>
-    //                     <th colspan="2" class="descripcion">
-    //                         FECHA: <br> 
-    //                         ${fecha} Hora: ${hora}
-    //                     </th>
-                        
-    //                     <th class="descripcion">VENDEDOR:</th>
-    //                     <th colspan="" class="descripcion">MOTO SPORT LA ROCA</th>
-    //                     <th colspan="" class="descripcion">TIPO: ${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto}</th>
-                       
-                        
-    //                 </tr>
-    //                 <tr>
-    //                     <th colspan="5" class="titulo">
-    //                         CLIENTE: ${factura.cliente.nombre.toUpperCase()} <br>
-    //                         C.I.: ${factura.cliente.identificacion} <br>
-    //                         DIRECCIÓN: ${factura.cliente.direccion ? factura.cliente.direccion : "No asignado." } <br>
-    //                         TELÉFONO: ${factura.cliente.telefono ? factura.cliente.telefono : "No asignado." } <br>
-    //                         CORREO: ${factura.cliente.correo ? factura.cliente.correo : "No poseé." } 
-    //                     </th>
-    //                 </tr>
-    //                 <tr class="border">
-    //                     <th class="descripcion">CÓDIGO</th>
-    //                     <th class="descripcion">DESCRIPCIÓN</th>
-    //                     <th class="numero">CANT.</th>
-    //                     <th class="numero">C/U</th>
-    //                     <th class="numero">SUBTOTAL</th>
-    //                 </tr>
-    //             </thead>
-    //             <tbody>
-
-    //                 ${carritoHtml}
-                
-
-    //             </tbody>
-
-    //             <tfoot >
-    //                 <tr class="border">
-    //                     <td colspan="4" class="total-bruto">TOTAL BRUTO:</td>
-    //                     <td  class="numero"> ${darFormatoDeNumero(factura.subtotal)} </td>
-    //                 </tr>
-
-    //                 ${descuentoHtml}
-                    
-    //                 ${ivaHtml}
-
-    //                 <tr class="border">
-    //                     <td colspan="4" class="total-bruto">TOTAL BRUTO:</td>
-    //                     <td  class="numero"> ${darFormatoDeNumero(factura.total)} </td>
-    //                 </tr>
-
-    //             </tfoot>
-    //         </table>
-    // `;
 };
 
 /** FORMAS DE PAGO TOTALIZADAS*/
