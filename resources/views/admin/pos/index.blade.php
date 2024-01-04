@@ -10,15 +10,8 @@
     <div class="container-fluid">
        
         <div class="row position-relative">
+            
             <div class="col-sm-2 col-xs-12">
-
-                {{--  Boton de salir --}}
-                <div class="card"  style=" height: 4.5rem; width: 100%;">
-                    <button class="btn btn-danger fs-3 h-100 acciones-factura" id="salirDelPos">
-                        <i class='bx bx-reply-all'></i> 
-                        Salir
-                    </button>
-                </div>
 
                 {{-- Tarjeta del cliente --}}
                 <div class="card" style="height: auto; width: 100%;" id="tarjetaCliente"></div>
@@ -73,8 +66,8 @@
             </div> {{-- CIERRE Filtro de productos --}}
 
             {{-- Factura --}}
-            <div class="col-sm-6 col-xs-12">
-                <div class="card" style=" height: 45rem; width: 100%;">
+            <div class="col-sm-5 col-xs-12">
+                <div class="card" style=" height: auto; width: 100%;">
                     {{-- alertas o mensaje de respuestas --}}
                     <div class="position-relative">
                         <div class="position-absolute top-0 end-0" id="alertas">
@@ -92,7 +85,7 @@
 
                         </div>
                     </div>
-                    <div class="card-body table-responsive" style="height: 25rem; overflow: auto;">
+                    <div class="card-body" style="height: 25rem; overflow: auto;">
                        <table class="table ">
                             <thead>
                                 <tr>
@@ -118,11 +111,56 @@
                
             </div> {{-- CIERRE Factura --}}
 
-            {{-- Metodos de pago --}}
-            <div class="col-sm-8" id="elementoMetodoDePagoModal">
-               
-  
+            {{-- MAs botones --}}
+            <div class="col-sm-1 col-xs-12 card">
+                <div class="row">
+                    {{--  Boton de salir --}}
+                    <div class="col-sm-12 acciones-factura">
+                        <button class="btn btn-danger w-100 my-2" id="salirDelPos">
+                            <i class='bx bx-reply-all fs-3'></i> 
+                            <p> Salir</p>
+                        </button>
+                    </div>
+    
+                    {{--  Boton de DEVOLUCIÓN --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-primary w-100 my-2" id="realizarDevolucion">
+                            <i class='bx bx-transfer-alt fs-3'></i>
+                            <p> Devolución </p>
+                        </button>
+                    </div>
+        
+                    {{--  Boton de COLOCAR EN ESPERA LA FACTURA --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-primary  w-100 my-2" 
+                            id="facturaEnEspera" >
+                            <i class='bx bxs-hourglass-top fs-3'></i> 
+                            <p> Guardar </p> 
+                        </button>
+                    </div>
+                    {{--  Boton de CARGAR FACTURA EN ESPERA PARA FACTURAR --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-info  w-100 my-2" 
+                            id="cargarFactura" >
+                            <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
+                            <p id="mensajeDeEspera"> En espera </p> 
+                        </button>
+                    </div>
+
+                    {{--  Boton de ELIMINAR FACTURA DE ESPERA --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-warning  w-100 my-2" 
+                            id="limpiarBorrador" >
+                            <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
+                            <p> Limpiar </p> 
+                        </button>
+                    </div>
+                </div>
             </div>
+
+
+            {{-- Metodos de pago --}}
+            <div class="col-sm-8" id="elementoMetodoDePagoModal"></div>
         </div>
     </div>
     

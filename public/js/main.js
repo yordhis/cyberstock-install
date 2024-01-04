@@ -44,9 +44,10 @@ const componenteAlerta = (mensaje, estatus, clasesExtras = "") => {
 
 
     return `
-        <div class="alert ${estatusText} d-flex align-items-center alertaGlobal" role="alert" id="alertaGlobal">
+        <div class="alert ${estatusText} d-flex align-items-center alert-dismissible fade show alertaGlobal" role="alert" id="alertaGlobal">
                 <i class='${icono} ${clasesExtras}' ></i>
                 <p class='${clasesExtras}'> ${mensaje} </p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     `;

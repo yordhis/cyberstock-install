@@ -722,10 +722,10 @@ const formulaLibreFacturaHtml = (factura) => {
         </tr>
         <tr>
             <th colspan="3" class="text__left">
-                VENDEDOR:JUAN RAMIREZ
-                / N° TELÉFONO: 0414-3534569
+                VENDEDOR: VENDEDOR 1
+                / N° TELÉFONO: 0000-000000
             </th>
-        </tr>
+         </tr>
         <tr>
             <th colspan="5" class="text__left">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
         </tr>
@@ -831,13 +831,13 @@ const formulaLibreHtml = (factura) => {
             </tr>
             <tr>
                 <th colspan="3" class="text__left">
-                    VENDEDOR:  JUAN RAMIREZ
-                    / N° TELÉFONO: 0414-3534569
+                    VENDEDOR:  VENDEDOR 1
+                    / N° TELÉFONO: 0000-0000000
                 </th>
                 <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
             </tr>
             <tr class="border">
-                <th class="text__left">CODIGO</th>
+                <th class="text__left">CÓDIGO</th>
                 <th class="text__left">DESCRIPCIÓN</th>
                 <th class="text__right">CANTIDAD</th>
                 <th class="text__right">C/U</th>

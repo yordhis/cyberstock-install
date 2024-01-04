@@ -8,6 +8,7 @@ elementoAlertas = d.querySelector('#alertas'),
 listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'), 
 elementoFactura = d.querySelector('#componenteFactura'), 
 elementoMetodoDePagoModal= d.querySelector('#elementoMetodoDePagoModal'), 
+elementoMensajeDeEspera= d.querySelector('#mensajeDeEspera'), 
 factura = {
         codigo:'',
         razon_social:'', // nombre de cliente o proveedor
@@ -520,6 +521,9 @@ const hanledLoad = async (e) => {
     /** CLIENTE */
     elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
     cargarEventosAccionesDelCliente();
+
+    /** factura en espera */
+    elementoMensajeDeEspera.textContent = JSON.parse(localStorage.getItem('facturaEnEspera')) ? "1 factura en espera" : "0 borrador";
     
     /** FILTRO PRODUCTOS */
     elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
@@ -868,6 +872,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     facturaActual = '',
     acumuladorSubtotal = 0;
   
+
+    log(e.target)
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
         accion = e.target.id;
@@ -876,9 +882,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
+    }else if(e.target.localName == 'p'){
+        accion =  e.target.parentElement.id;
     }
 
-  
+
 
     switch (accion) {
         case 'editarCantidadFactura':
@@ -969,6 +977,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 /** Eliminamos la factura y el carrito del almacen local */
                     localStorage.removeItem('carrito');
                     localStorage.removeItem('factura');
+                    localStorage.removeItem('facturaEnEspera');
+                    localStorage.removeItem('carritoEnEspera');
                     e.target.innerHTML = spinner('text-white');
                     window.location.href = `${URL_BASE_APP}/panel`;
             }
@@ -1091,6 +1101,69 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 localStorage.removeItem('carrito');
                 localStorage.removeItem('factura');
                 window.location.href = "/pos";
+            break;
+
+        case 'facturaEnEspera':
+                /** Validar */
+                if(!JSON.parse(localStorage.getItem('factura')).identificacion){
+                    return elementoAlertas.innerHTML = componenteAlerta("No se puede crear un borrador de una factura que no tenga asignado un cliente.", 404);
+                }
+
+                if( JSON.parse(localStorage.getItem('carrito')).length > 0 ){
+                    localStorage.setItem('facturaEnEspera', localStorage.getItem('factura')); 
+                    localStorage.setItem('carritoEnEspera', localStorage.getItem('carrito')); 
+                    
+                    log(localStorage.getItem('facturaEnEspera'));
+                    log(localStorage.getItem('carritoEnEspera'));
+    
+                    localStorage.removeItem('factura');
+                    localStorage.removeItem('carrito');
+    
+                    elementoAlertas.innerHTML = componenteAlerta("Se creó un borrador de la factura correctamente.", 200);
+                    window.location.href="/pos";
+                }else{
+                    return elementoAlertas.innerHTML = componenteAlerta("No se puede crear un borrador de una factura que no tenga productos.", 404);
+                }
+            break;
+        
+        case 'limpiarBorrador':
+            if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
+                localStorage.removeItem('facturaEnEspera');
+                localStorage.removeItem('carritoEnEspera');
+                elementoAlertas.innerHTML = componenteAlerta("Se eliminó el borrador del la factura guardada.", 200);
+                window.location.href="/pos";
+            }else{
+                return elementoAlertas.innerHTML = componenteAlerta("No hay borrador.", 401);
+            }
+          
+            break;
+
+        case 'cargarFactura':
+            log(localStorage.getItem('carritoEnEspera'))
+            log(typeof(localStorage.getItem('carritoEnEspera')))
+
+
+            if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
+                let codigoFacturaNuevo = await getCodigoFactura(`${URL_BASE}/getCodigoFactura/facturas`),
+                listaProducto = [];
+
+                JSON.parse(localStorage.getItem('carritoEnEspera')).forEach(producto =>{
+                    producto.codigo = codigoFacturaNuevo.data;
+                    listaProducto.push(producto);
+                });
+                localStorage.setItem('carritoEnEspera',JSON.stringify(listaProducto))
+                
+                /** cargar los datos del borrador */
+                localStorage.setItem('factura', localStorage.getItem('facturaEnEspera')); 
+                localStorage.setItem('carrito', localStorage.getItem('carritoEnEspera')); 
+                /** borrar los datos del borrador */
+                localStorage.removeItem('facturaEnEspera');
+                localStorage.removeItem('carritoEnEspera');
+                elementoAlertas.innerHTML = componenteAlerta("Se cargó la factura del borrador correctamente.", 200);
+                window.location.href="/pos";
+            }else{
+                elementoAlertas.innerHTML = componenteAlerta("No hay borrador.", 401);
+            }
             break;
         default:
             break;

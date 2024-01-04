@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  {{-- @include('partials.header') --}}
+
   @include('partials.headerpos')
   
   <main id="mainPos" class="mainPos ">
