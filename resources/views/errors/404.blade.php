@@ -7,10 +7,10 @@
         <div class="card-body">
             <h1>Información del error:</h1>
             <p class="fs-5 text-danger">
-                {{$errorInfo ?? 'Error 404'}}
+                {{$errorInfo ?? 'Error 404 (No se hallo el elemento) click en el botón volver para regresar al sistema.'}}
             </p>
 
-            <a href="/panel" target="_self" class="btn btn-danger">VOLVER</a>
+            <a href="/panel"  class="btn btn-danger">VOLVER</a>
         </div>
     </div>
     

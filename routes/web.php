@@ -105,11 +105,13 @@ Route::middleware(['auth'])->group(function () {
         });
 
         /** POS VENTA */
-        // Route::prefix('pos')->group(function (){
-            Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
-            Route::resource('facturas', FacturaController::class)->names('admin.facturas');
-            Route::resource('clientes', ClienteController::class)->names('admin.clientes');
-        // });
+        Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+        Route::resource('facturas', FacturaController::class)->names('admin.facturas');
+        
+        /** CLIENTES */
+        Route::resource('clientes', ClienteController::class)->names('admin.clientes');
+  
+        /** POS CONFIGURACIÓN */
         Route::resource('pos', PoController::class)->names('admin.pos');
       
 });

@@ -33,15 +33,15 @@
                                 </span>
     
                                 <input type="text" name="nombre" class="form-control" id="yourUsername"
-                                    placeholder="Ingrese Nombres y apellidos" value="{{ $request->nombre ?? '' }}" required>
-                                <div class="invalid-feedback">Por favor,  Ingrese Nombres y Apellidos </div>
+                                    placeholder="Ingrese Nombres y apellidos" value="{{ $request->nombre ??  old('nombre')  }}" required>
 
-                                @error('nombre')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
                             </div>
+                            @error('nombre')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                         {{-- inputs Tipo  --}}
@@ -57,16 +57,21 @@
                                     <option value="">Seleccione tipo de contribuyente</option>
                                     <option value="V">V</option>
                                     <option value="J">J</option>
+                                    @isset($request)
+                                        <option value="{{$request->tipo}}" selected>{{$request->tipo}}</option>
+                                    @endisset
+                                    <option value="{{ old('tipo') }}" {{ old('tipo')  ? "selected" : ""}} class="{{ old('tipo')  ? "" : "d-none"}}">{{ old('tipo') }}</option>
                                 </select>
     
                                
 
-                                @error('tipo')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
                             </div>
+                            @error('tipo')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                        
@@ -80,16 +85,15 @@
                                 </span>
     
                                 <input type="text" name="identificacion" class="form-control" id="identificacion"
-                                    placeholder="Ingrese identificación" value="{{ $request->identificacion ?? '' }}" required>
-                                <div class="invalid-feedback">Por favor,  Ingrese identificacion </div>
-
-                                @error('identificacion')
-                                    <br>
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
+                                    placeholder="Ingrese identificación" value="{{ old('identificacion') ?? '' }}" required>
+                        
                             </div>
+                            @error('identificacion')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                         {{-- inputs correo  --}}
@@ -102,15 +106,16 @@
                                 </span>
     
                                 <input type="text" name="correo" class="form-control" id="correo"
-                                    placeholder="Ingrese correo" value="{{ $request->correo ?? '' }}" >
+                                    placeholder="Ingrese correo" value="{{ $request->correo ?? old('correo') }}" >
                                 <div class="invalid-feedback">Por favor,  Ingrese correo </div>
 
-                                @error('correo')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
                             </div>
+                            @error('correo')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                         {{-- inputs telefono  --}}
@@ -123,15 +128,16 @@
                                 </span>
     
                                 <input type="text" name="telefono" class="form-control" id="telefono"
-                                    placeholder="Ingrese telefono" value="{{ $request->telefono ?? '' }}">
+                                    placeholder="Ingrese telefono" value="{{ $request->telefono ?? old('telefono') }}">
                                 <div class="invalid-feedback">Por favor,  Ingrese telefono </div>
 
-                                @error('telefono')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
                             </div>
+                            @error('telefono')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                         {{-- inputs direccion  --}}
@@ -144,15 +150,16 @@
                                 </span>
     
                                 <input type="text" name="direccion" class="form-control" id="direccion"
-                                    placeholder="Ingrese direccion" value="{{ $request->direccion ?? '' }}" >
+                                    placeholder="Ingrese direccion" value="{{ $request->direccion ?? old('direccion') }}" >
                                 <div class="invalid-feedback">Por favor,  Ingrese direccion </div>
 
-                                @error('direccion')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
                             </div>
+                            @error('direccion')
+                                <br>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
 
                     </div>

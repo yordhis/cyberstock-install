@@ -24,7 +24,12 @@ class UpdateClienteRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'identificacion' => 'numeric|required|max:100000000',
+            "nombre" => "required", 
+            "tipo"  => "required", 
+            "telefono" => "max:25", 
+            "direccion" => "max:255", 
+            "correo" => "max:255", 
         ];
     }
 }

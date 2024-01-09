@@ -29,7 +29,7 @@ class ClienteController extends Controller
     public function index()
     {
         try {
-            $clientes = Cliente::paginate(10);
+            $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
             $pathname = Request::path();
       
             $menuSuperior = $this->data->menuSuperior;
@@ -173,29 +173,27 @@ class ClienteController extends Controller
     {
         try {
             $pathname = Request::path();
-
+            $menuSuperior = $this->data->menuSuperior;
+            $estatusCrear = 0;
+            $respuesta = null;
+            $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
             $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
             if(count($clienteExiste)){
-                $mensaje = "El cliente no se registro, porque el número de cédula ya existe.";
-                $estatus = 401;
+                $mensaje = $this->data->respuesta['mensaje'] = "El cliente no se registro, porque el número de cédula ya existe.";
+                $estatus  = $this->data->respuesta['estatus'] = Response::HTTP_UNAUTHORIZED;
+                
+                $respuesta = $this->data->respuesta;
             }else{
                 $estatusCrear = Cliente::create($request->all());
-                $mensaje = $estatusCrear ? "El cliente se creo correctamente." : "El cliente no se creo";
-                $estatus = $estatusCrear ? 201 : 404;
+                $this->data->respuesta['mensaje'] = $mensaje = $estatusCrear ? "El cliente se creo correctamente." : "El cliente no se creo";
+                $this->data->respuesta['estatus'] = $estatus = $estatusCrear ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
+                $respuesta = $this->data->respuesta;
             }
             
-            if($request->formulario == "modalCrearCliente"){
-                return $estatusCrear ? redirect()->route( 'admin.pos.index', compact('mensaje', 'estatus') )
-                : view('admin.pos.index', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $request));
-            }
-            
-            if($request->formulario == "modalCrearClienteSalida"){
-                $identificacion = $estatusCrear->identificacion;
-                return redirect()->route( 'admin.inventarios.crearSalida', compact('mensaje', 'estatus', 'identificacion') );
-            }
-            
-            
-            return redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus'));
+            return view('admin.clientes.lista', compact('respuesta', 'menuSuperior', 'pathname', 'request', 'clientes'));
+            // return $estatus == Response::HTTP_CREATED ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )
+            //     : view('admin.clientes.lista', compact('respuesta', 'menuSuperior', 'pathname', 'request', 'clientes'));
+            // return redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus'));
         } catch (\Throwable $th) {
             $mensaje = "Error al intentar registrar al cliente";
             $estatus = 404;
@@ -227,16 +225,7 @@ class ClienteController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Cliente  $cliente
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Cliente $cliente)
-    {
-        //
-    }
+   
 
     /**
      * Update the specified resource in storage.
@@ -272,24 +261,36 @@ class ClienteController extends Controller
     public function destroy(Cliente $cliente)
     {
         try {
-            $clienteEnUso = Factura::where("identificacion", $cliente->identificacion)->get();
-            if(count($clienteEnUso)){
-                $mensaje = "El cliente tiene facturas registradas y no puede ser eliminado.";
-                $estatus = 401;
-                return redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') );
-            }
-
-            $estatusEliminar = $cliente->delete();
-    
-            $mensaje = $estatusEliminar ? "El cliente se eliminó correctamente." : "No se pudo eliminar el cliente";
-            $estatus = $estatusEliminar ? 201 : 404;
+            
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
-            return $estatusEliminar ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )
-            : view('admin.clientes.lista', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $cliente));
+            $clientes  = [];
+            $clienteEnUso = Factura::where("identificacion", $cliente->identificacion)->get();
+            if(count($clienteEnUso)){
+                $this->data->respuesta['mensaje'] = $mensaje = "El cliente tiene facturas registradas y no puede ser eliminado.";
+                $this->data->respuesta['estatus'] = $estatus = Response::HTTP_UNAUTHORIZED;
+                $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
+                
+            }else{
+                $estatusEliminar = $cliente->delete();
+                $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
+                $this->data->respuesta['mensaje'] = $mensaje = $estatusEliminar ? "El cliente se eliminó correctamente." : "No se pudo eliminar el cliente";
+                $this->data->respuesta['estatus'] = $estatus = $estatusEliminar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+            }
+            
+            $respuesta = $this->data->respuesta;
+            return view('admin.clientes.lista', compact('menuSuperior', 'pathname', 'clientes', 'respuesta'));
+            // return $estatusEliminar ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )
+            // : view('admin.clientes.lista', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', $cliente));
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al Eliminar la cliente, ");
-            return view('errors.404', compact('mensajeError'));
+            // $this->data->respuesta['mensaje'] = $mensaje = "El cliente tiene facturas registradas y no puede ser eliminado.";
+            // $this->data->respuesta['estatus'] = $estatus = Response::HTTP_UNAUTHORIZED;
+            // $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
+            // $respuesta = $this->data->respuesta;
+            // $menuSuperior = $this->data->menuSuperior;
+            // return view('admin.clientes.lista', compact('menuSuperior', 'clientes', 'respuesta'));
+            // $mensajeError = Helpers::getMensajeError($th, "Error Al Eliminar la cliente, ");
+            // return view('errors.404', compact('mensajeError'));
         }
     }
 }

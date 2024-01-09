@@ -17,7 +17,7 @@
      
             <div class="modal-body">
                 <form action=" {{ route('admin.clientes.update', $cliente->id) }}" method="post" enctype="multipart/form-data"
-                class=" g-3 needs-validation">
+                class=" g-3 needs-validation" novalidate>
                 @csrf
                 @method('put')
 
