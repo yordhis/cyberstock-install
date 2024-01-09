@@ -813,7 +813,6 @@ const formulaLibreFacturaHtml = (factura) => {
         <tr>
             <th colspan="3" class="text__left">
                 VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
-                / N° TELÉFONO: 0000-000000
             </th>
          </tr>
         <tr>
@@ -920,8 +919,8 @@ const formulaLibreHtml = (factura) => {
             </tr>
             <tr>
                 <th colspan="3" class="text__left">
-                    VENDEDOR:  VENDEDOR 1
-                    / N° TELÉFONO: 0000-0000000
+                    VENDEDOR:  ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
+                    
                 </th>
                 <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
             </tr>
