@@ -178,14 +178,14 @@ class FacturaController extends Controller
      */
     public function getFactura($codigoFactura){
         try {
-           
             $factura = Factura::where('codigo', $codigoFactura)->get();
             if(count($factura)){
+                $totalArticulos=0;
                 $factura = $factura[0];
-                
                 $carritos = Carrito::where('codigo', $factura->codigo)->get();
                 foreach ($carritos as $key => $producto) {
                     $producto['stock'] = Inventario::select('cantidad')->where('codigo',$producto->codigo_producto)->get()[0]->cantidad;
+                    $totalArticulos = $totalArticulos  + $producto->cantidad;
                 }
 
                 // $carritos = Carrito::where('codigo', $factura->codigo)->get();
@@ -196,7 +196,7 @@ class FacturaController extends Controller
                 $factura['pos'] = Po::all()[0];
                 $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');               
                 $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');   
-             
+                $factura['totalArticulo']  = $totalArticulos;
             
         
                 return response()->json([
