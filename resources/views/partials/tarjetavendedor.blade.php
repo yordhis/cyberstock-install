@@ -10,10 +10,13 @@
 
         <p class="card-text mt-0" style="">
             <b>Usuario:</b> 
-            <span id="nombreUsuario">
+            <span>
                 {{ Auth::user()->nombre }}
             </span>
             <br>
         </p>
+
+        <input type="hidden" name="usuario" id="usuario" value="{{ Auth::user()->email }}">
+        <input type="hidden" name="usuario" id="nombreUsuario" value="{{ Auth::user()->nombre }}">
     </div>
 </div>

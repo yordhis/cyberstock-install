@@ -12,11 +12,37 @@ const getCodigoFactura = async (url) => {
     .then(data => data)
 };
 
+/** OBTIENE EL CARRITO DE COMPRA DE LAS FACTURAS */
+const getCarrito = async (codigoFactura) => {
+    return await fetch(`${URL_BASE}/getCarrito/${codigoFactura}`, {
+        method: "GET", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then( (res) => res.json() )
+    .catch( (error) => error )
+    .then( (response) => response ) 
+};
+
 /** FACTURA LOS CARRITOS DEL SALIDA - ENTRADA */
 const facturarCarrito = async (url, carrito) => {
     return await fetch(`${url}`, {
         method: "POST", // or 'PUT'
         body: JSON.stringify(carrito), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then( (res) => res.json() )
+    .catch( (error) => error )
+    .then( (response) => response ) 
+};
+
+/** REALIZAR DEVOLUCION */
+const realizarDevolucion = async (codigoFactura) => {
+    return await fetch(`${URL_BASE}/realizarDevolucion/${codigoFactura}`, {
+        method: "GET", // or 'PUT'
         headers: {
             "Content-Type": "application/json",
         },
@@ -310,9 +336,9 @@ const htmlTicket = (factura) => {
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
-                <td class="producto">${producto.cantidad} X ${producto.descripcion}</td>
-
-                <td class="precio">Bs ${ darFormatoDeNumero(quitarFormato(producto.subtotal) * factura.tasa) }</td>
+                <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
+                <td class="text__right">Bs ${darFormatoDeNumero(producto.costo * factura.tasa) }</td>
+                <td class="text__right">Bs ${ darFormatoDeNumero(producto.subtotal * factura.tasa) }</td>
             </tr>
         `;
     });
@@ -321,9 +347,8 @@ const htmlTicket = (factura) => {
     if( factura.iva > 0 ){
         ivaHtml = `
             <tr>
-                <td class="producto">IVA 16%</td>
-
-                <td class="precio">Bs ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  }</td>
+                <td class="text__left border">IVA 16%</td>
+                <td colspan="2" class="text__right border">Bs  ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  }</td>
             </tr>
         `;
     }
@@ -332,8 +357,8 @@ const htmlTicket = (factura) => {
     if(factura.descuento > 0){
         descuentoHtml = ` 
             <tr>
-                <td class="producto">Descuento ${factura.descuento}%</td>
-                <td class="precio">Bs ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) }</td>
+                <td class="text__left border">Descuento ${factura.descuento}%</td>
+                <td colspan="2" class="text__right border">Bs  ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) }</td>
             </tr>
         `;
     }
@@ -344,18 +369,16 @@ const htmlTicket = (factura) => {
         if(pago.tipoDePago == "DIVISAS"){
             metodosPagosHtml += `
                 <tr>
-                    <td class="producto">EFECTIVO 2</td>
-
-                    <td class="precio">Bs ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }</td>
+                    <td class="text__left border">EFECTIVO 2</td>
+                    <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }</td>
                 </tr>
             `;
             cambio += parseFloat(pago.montoDelPago * factura.tasa); 
         }else{
             metodosPagosHtml += `
                 <tr>
-                    <td class="producto">${pago.tipoDePago}</td>
-    
-                    <td class="precio">Bs ${ darFormatoDeNumero(pago.montoDelPago) }</td>
+                    <td class="text__left border">${pago.tipoDePago}</td>
+                    <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago) }</td>
                 </tr>
             `;
             cambio += parseFloat(pago.montoDelPago); 
@@ -365,98 +388,104 @@ const htmlTicket = (factura) => {
     if(cambio > factura.total){
         cambioHtml = `
             <tr>
-                <td class="producto">CAMBIO</td>
-
-                <td class="precio">Bs ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) }</td>
+                <td class="text__left border">CAMBIO</td>
+                <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) }</td>
             </tr>
         `;
     }
 
     // VERIFIVCAMOS SI SE DESEA IMPRIMIR CON EL LOGO
     if (factura.pos.estatusImagen) {
-        logo = `<img src="${factura.pos.imagen}" class="img" alt="Logotipo">`;
+        logo = `<img src="${factura.pos.imagen}" class="img" alt="Logotipo"> <br>`;
     } else {
         logo= '';
     }
 
     return `
-        <div class="ticket" id="ticket">
-        
-        ${logo}
-        
-        <p class="centrado empresa">
-            <br>${factura.pos.empresa}
-            <br>${factura.pos.rif}
-            <br>${factura.pos.direccion}
-            <br>ZONA POSTAL ${factura.pos.postal}
-        </p>
-        <table>
-            <thead>
-               
-                <tr>
-                    <th colspan="2" class="cantidad">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
-                </tr>
-                <tr>
-                    <th colspan="2" class="cantidad">RIF: ${factura.cliente.tipo}-${factura.cliente.identificacion}</th>
-                </tr>
-                <tr>
-                    <th class="producto"> N° ${factura.iva == 0 ? 'NOTA' : 'FACTURA'} </th>
-        
-                    <th class="precio"> ${factura.codigo} </th>
-                </tr>
-                <tr>
-                    <th class="producto"> FECHA </th>
-        
-                    <th class="precio"> ${factura.fecha} </th>
-                </tr>
-                <tr>
-                    <th class="producto">HORA</th>
-        
-                    <th class="precio"> ${factura.hora} </th>
-                </tr>
-                
-            </thead>
-            <tbody>
-                
+        <div class="ticket" id="ticket">    
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="3">
+                            ${logo}
+                            ${factura.pos.empresa}
+                            <br>${factura.pos.rif}
+                            <br>${factura.pos.direccion}
+                            <br>ZONA POSTAL ${factura.pos.postal}
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th colspan="3" class="text__left border">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="text__left">RIF: ${factura.cliente.tipo}-${darFormatoDeNumero(factura.cliente.identificacion)}</th>
+                    </tr>
+                    <tr>
+                        <th class="text__left border"> N° ${factura.iva  > 0 ? 'FACTURA' : 'NOTA' } </th>
+            
+                        <th colspan="2" class="text__right border"> ${factura.codigo} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left"> FECHA </th>
+            
+                        <th colspan="2" class="text__right"> ${factura.fecha} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left">HORA</th>
+            
+                        <th colspan="2" class="text__right"> ${factura.hora} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left border-mix">CANT X PRODUCTO</th>
+                        
+                        <th class="text__right border-mix"> C/U </th>
+                        <th class="text__right border-mix"> SUBTOTAL </th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+             
                     ${carritoHtml}
-                
-        
-        
-                <tr>
-                    <td class="producto">
-                        |Total de Articulos: ${factura.totalArticulo } | <br>
-                        SUB-TOTAL <br>
-                    </td>
-        
-                    <td class="precio"><br> Bs  ${ darFormatoDeNumero(factura.subtotal * factura.tasa) }</td>
-                </tr>
-              
-                ${descuentoHtml}
+                    
+                    
+            
+            
+                    <tr>
+                        <td class="text__left border">
+                            |Total de Articulos: ${factura.totalArticulo} | <br>
+                            SUB-TOTAL <br>
+                        </td>
+            
+                        <td colspan="2" class="text__right border"><br> Bs  ${ darFormatoDeNumero(factura.subtotal * factura.tasa) }</td>
+                    </tr>
 
-                ${ivaHtml}
+                    ${descuentoHtml}
+                    ${ivaHtml}
 
-                <tr>
-                    <td class="producto">TOTAL</td>
-        
-                    <td class="precio">Bs ${ darFormatoDeNumero(factura.total * factura.tasa)  }</td>
-                </tr>
+                    <tr>
+                        <td class="text__left border">TOTAL</td>
+                        <td colspan="2" class="text__right border" >Bs ${ darFormatoDeNumero(factura.total * factura.tasa) }</td>
+                    </tr>
 
-                <!-- Oculto para la roca -->
-                <tr>
-                    <td class="producto">TOTAL REF</td>
-        
-                    <td class="precio"> ${ darFormatoDeNumero(factura.total) }</td>
-                </tr>
-              
-                ${metodosPagosHtml}
-                ${cambioHtml}
-            </tbody>
-        </table>
-        
-        
-        <p class="centrado">
-            ¡GRACIAS POR SU COMPRA!
-        </p>
+                    <!-- Oculto para la roca -->
+                    <tr>
+                        <td class="text__left border">TOTAL REF</td>
+                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
+                    </tr>
+
+                    ${metodosPagosHtml}
+                    ${cambioHtml}
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="centrado border">
+                            ¡GRACIAS POR SU COMPRA!
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
       `;
 };
@@ -553,6 +582,68 @@ const imprimirElemento = (elemento) => {
             padding-left: 20%;
             width: 195px;
             max-width: 355px;
+        }
+    </style>`);
+    ventana.document.write('</head><body >');
+    ventana.document.write(elemento);
+    ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+    return true;
+};
+
+/** TOMA EL ELEMENTO HTML PARA IMPRIMIR UN PDF O TIKCKET */
+const imprimirElementoPos = (elemento) => {
+    var ventana = window.open('', 'PRINT', 'height=400,width=600');
+    ventana.document.write('<html><head><title>Factura</title>');
+    ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
+    ventana.document.write(`<style>
+        * {
+        margin-top: 0%;
+        font-size: 12px;
+        font-family: 'Times New Roman';
+        }
+
+        td,
+        th,
+        tr,
+        table {
+            border-collapse: collapse;
+        }
+
+        .text__left{
+            text-align: left;
+        }
+        .text__right{
+            text-align: right;
+        }
+        .border{
+            border-top: 1px solid rgb(0, 0, 0);
+        }
+        .border-mix{
+            border-top: 1px solid rgb(0, 0, 0);
+            border-bottom: 1px solid rgb(0, 0, 0);
+            
+        }
+
+        .centrado {
+            text-align: center;
+            align-content: center;
+        }
+
+        .ticket {
+            width: 325px;
+            max-width: 355px;
+        }
+
+        .img {
+            margin: 0%;
+            padding-left: 0%;
+            width: auto;
+            height: 100px;
+            max-width: 205px;
         }
     </style>`);
     ventana.document.write('</head><body >');

@@ -123,11 +123,33 @@
                     </div>
     
                     {{--  Boton de DEVOLUCIÓN --}}
-                    <div class="col-sm-12  acciones-factura">
-                        <button class="btn btn-primary w-100 my-2" id="realizarDevolucion">
+                    <div class="col-sm-12">
+                        <button class="btn btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#disablebackdrop">
                             <i class='bx bx-transfer-alt fs-3'></i>
                             <p> Devolución </p>
                         </button>
+
+                        <div class="modal fade" id="disablebackdrop" tabindex="-1" data-bs-backdrop="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Realizar devolución o reembolso</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" id="inputCodigoDeLaFactura" placeholder="Ingrese código de la factura">
+                                        <span class="text-danger"></span>
+                                        <label for="floatingInput">Código de factura</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                  <button type="button" class="btn btn-primary acciones-factura" id="cargarFacturaDevolucion">Cargar Factura</button>
+                                </div>
+                              </div>
+                            </div>
+                        </div><!-- End Disabled Backdrop Modal-->
                     </div>
         
                     {{--  Boton de COLOCAR EN ESPERA LA FACTURA --}}

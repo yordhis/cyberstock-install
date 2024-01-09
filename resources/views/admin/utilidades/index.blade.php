@@ -31,7 +31,7 @@
                                     @php
                                         $utilidades = $utilidades[0];
                                     @endphp
-                                    <form action="/utilidades/{{ $utilidades->id }}" method="post" target="_self"
+                                    <form action="{{ route('admin.utilidades.update', $utilidades->id) }}" method="post" 
                                         enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
                                         @csrf
                                         @method('put')
@@ -45,12 +45,13 @@
                                                     placeholder="Ingrese tasa BCV"
                                                     value="{{ number_format($utilidades->tasa, 2) ?? $request->tasa }}" required>
                                                 <div class="invalid-feedback">Por favor, ingrese tasa del BCV! </div>
-                                                @error('tasa')
-                                                    <span class="text-danger">
-                                                        {{ $message }}
-                                                    </span>
-                                                @enderror
                                             </div>
+                                            @error('tasa')
+                                                <br>
+                                                <span class="text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                            @enderror
 
                                         </div>
 
@@ -64,16 +65,17 @@
                                                     placeholder="Ingrese porcentaje de iva global"
                                                     value="{{ number_format($utilidades->iva, 2) ?? $request->iva }}" required>
                                                 <div class="invalid-feedback">Por favor, ingrese porcentaje de IVA! </div>
-                                                @error('iva')
-                                                    <span class="text-danger">
-                                                        {{ $message }}
-                                                    </span>
-                                                @enderror
                                             </div>
+                                            @error('iva')
+                                                <br>
+                                                <span class="text-danger">
+                                                    {{ $message }}
+                                                </span>
+                                            @enderror
                                         </div>
 
 
-                                        <div class="col-sm-4 col-xs-12">
+                                        {{-- <div class="col-sm-4 col-xs-12">
                                             <label for="yourUsername" class="form-label">% Utilidad PVP 1</label>
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
@@ -110,6 +112,7 @@
                                             @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-sm-4 col-xs-12">
                                             <label for="yourUsername" class="form-label">% Utilidad PVP 3</label>
                                             <div class="input-group has-validation">
@@ -127,7 +130,7 @@
                                                 </span>
                                             @enderror
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-12">
                                             <button class="btn btn-primary w-100" type="submit">Guardar Datos</button>
@@ -135,7 +138,7 @@
 
                                     </form>
                                 @else
-                                <form action="/utilidades" method="post" target="_self"
+                                <form action="{{ route('admin.utilidades.store')}}" method="post"
                                     enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
                                     @csrf
                                     @method('POST')
@@ -150,12 +153,13 @@
                                                 value="{{ $request->tasa ?? '' }}"
                                                 required>
                                             <div class="invalid-feedback">Por favor, ingrese tasa! </div>
-                                            @error('tasa')
-                                                <span class="text-danger">
-                                                    {{ $message }}
-                                                </span>
-                                            @enderror
                                         </div>
+                                        @error('tasa')
+                                            <br>
+                                            <span class="text-danger">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
 
                                     </div>
 
@@ -170,16 +174,17 @@
                                                 value="{{ $request->iva ?? '' }}"
                                                 required>
                                             <div class="invalid-feedback">Por favor, ingrese porcentaje de IVA! </div>
-                                            @error('iva')
-                                                <span class="text-danger">
-                                                    {{ $message }}
-                                                </span>
-                                            @enderror
                                         </div>
+                                        @error('iva')
+                                            <br>
+                                            <span class="text-danger">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
                                     </div>
 
 
-                                    <div class="col-sm-4 col-xs-12">
+                                    {{-- <div class="col-sm-4 col-xs-12">
                                         <label for="yourUsername" class="form-label">% Utilidad PVP 1</label>
                                         <div class="input-group has-validation">
                                             <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
@@ -233,7 +238,7 @@
                                             </span>
                                         @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100" type="submit">Guardar Datos</button>

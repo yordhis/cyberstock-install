@@ -45,11 +45,11 @@ const hanledImprimirFactura = async (e) => {
     if(e.target.localName == 'i') codigoFactura = e.target.parentElement.id;
     if(e.target.localName == 'bottom') codigoFactura = e.target.id;
 
-    elementoCargando.innerHTML = spinner;
+    elementoCargando.innerHTML = spinner();
     resultado = await getFactura(e.target.id);
     // log(resultado);
     if (resultado.estatus == 200) {
-        imprimirElemento(htmlTicket(resultado.data));
+        imprimirElementoPos(htmlTicket(resultado.data));
         elementoCargando.innerHTML = '';
     } else {
         alert(resultado.mensaje)

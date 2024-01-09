@@ -27,9 +27,9 @@
                                     <p class="text-center text-danger small">Rellene todos los campos</p>
                                 </div>
 
-                                <form action="/usuarios/{{ $usuarioEdit->id }}" method="post" target="_self" 
+                                <form action="{{ route('admin.users.update', $usuarioEdit->id) }}" method="post"  
                                     enctype="multipart/form-data"
-                                    class="row g-3 needs-validation" novalidate>
+                                    class="row g-3 needs-validation shadow-lg" novalidate>
                                     @csrf
                                     @method('put')  
                                     <div class="col-12">

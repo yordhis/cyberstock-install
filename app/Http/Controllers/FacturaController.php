@@ -17,6 +17,7 @@ use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
 class FacturaController extends Controller
@@ -37,7 +38,7 @@ class FacturaController extends Controller
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
-            $utilidades = $this->data->utilidades;
+            $pathname = Request::path();
             $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->paginate(10);
            
             if(count($facturas)){
@@ -47,11 +48,9 @@ class FacturaController extends Controller
                 }
             }
            
-            $pos = count(Po::all()) ? Po::all()[0]: [];
-           
-            $pathname = Request::path();
-            
-            return view('admin.facturas.lista', compact( 'facturas','menuSuperior', 'pathname', 'pos', 'utilidades'));
+            // $pos = count(Po::all()) ? Po::all()[0]: [];
+     
+            return view('admin.facturas.index', compact( 'facturas','menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
@@ -183,15 +182,20 @@ class FacturaController extends Controller
             $factura = Factura::where('codigo', $codigoFactura)->get();
             if(count($factura)){
                 $factura = $factura[0];
-
+                
                 $carritos = Carrito::where('codigo', $factura->codigo)->get();
+                foreach ($carritos as $key => $producto) {
+                    $producto['stock'] = Inventario::select('cantidad')->where('codigo',$producto->codigo_producto)->get()[0]->cantidad;
+                }
+
+                // $carritos = Carrito::where('codigo', $factura->codigo)->get();
                 $cliente = Cliente::where('identificacion', $factura->identificacion)->get();
                 if(count($cliente)) $factura['cliente'] = $cliente[0];
                 else $factura['cliente'] = ["nombre" => "El Cliente fue eliminado"];
                 $factura['carrito'] = $carritos; 
                 $factura['pos'] = Po::all()[0];
-                $factura['hora']  =  date_format(date_create(explode(' ', $factura->created_at)[1]), 'h:i:s');               
-                $factura['fecha']  =  date_format(date_create(explode(' ', $factura->created_at)[0]), 'd-m-Y');   
+                $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');               
+                $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');   
              
             
         
@@ -202,8 +206,8 @@ class FacturaController extends Controller
                 ],  Response::HTTP_OK ); 
             }else{
                 return response()->json([
-                    "mensaje" =>  "No se hallo un registro de la factura",
-                    "data" =>  $codigoFactura, 
+                    "mensaje" =>  "No se encontró factura con el código solicitado.",
+                    "data" => null, 
                     "estatus" => Response::HTTP_OK  
                 ], Response::HTTP_OK ); 
             }
@@ -230,12 +234,16 @@ class FacturaController extends Controller
         try {
             /** validamos que el codigo no se repita */
             $codigoExiste = Factura::where('codigo', $request->codigo)->get();
-            if( count($codigoExiste) ){
+            if( count($codigoExiste) && $request->estatusDeDevolucion == false ){
                 return response()->json([
                     "mensaje" => "El codigo de la factura ya EXISTE!",
                     "data" => $codigoExiste[0],
                     "estatus" => Response::HTTP_UNAUTHORIZED
                ], Response::HTTP_UNAUTHORIZED);
+            }
+
+            if($request->estatusDeDevolucion){
+                Factura::where('codigo', $request->codigo)->delete();
             }
 
             $resultado = Factura::create($request->all());
@@ -255,8 +263,8 @@ class FacturaController extends Controller
                 $resultado['carrito'] = $carritos;
                 $resultado['cliente'] = Cliente::where('identificacion', $request->identificacion)->get()[0];
                 $resultado['pos'] = Po::all()[0];
-                $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
-                $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
+                $resultado['hora']  =  date_format(date_create(explode('T', $resultado->fecha)[1]), 'h:i:sa');               
+                $resultado['fecha']  =  date_format(date_create(explode('T', $resultado->fecha)[0]), 'd-m-Y');               
                 $resultado['totalArticulo']  = $totalArticulos;
 
 

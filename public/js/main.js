@@ -59,6 +59,51 @@ const darFormatoDeNumero = (numero) => {
     }).format(numero)
 };
 
+/** REGISTRA LOS MOVIMIENTOS DE LOS USUARIO Y SUS VENTAS
+ * @param data  : usuairo, nombre, transaccion, observacion, codigo, ubicacion, dispositivo, fecha.
+ * @return number (200 o 401)
+ */
+const registrarAccionDelUsuario = async (data) =>{
+    return await fetch(`${URL_BASE}/registrarAccionDelUsuario`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(data), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then( (res) => res.json() )
+    .catch( (error) => error )
+    .then( (response) => response ) 
+};
+
+/** EJECUTA LA ACCIÓN */
+const ejecutarRegistroDeAccionDelUsuario = async (observacion, estatus) =>  {
+    let monitorDeMovimiento = {
+        usuario: d.querySelector("#usuario").value,
+        nombre: d.querySelector("#nombreUsuario").value, 
+        transaccion: URL_PATHNAME, 
+        observacion: observacion,
+        codigo: estatus,
+        ubicacion: window.location.href, 
+        dispositivo: await getIpClient() == undefined ? "127.0.0.1" : await getIpClient(), 
+        fecha: Date()
+    }, 
+    resultadoM = "";
+
+    return resultadoM = await registrarAccionDelUsuario(monitorDeMovimiento);
+
+};
+
+const  getIpClient = async () => {
+    try {
+      return await fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(ip => ip.ip)
+    } catch (error) {
+      console.error(error);
+    }
+}
+
 const formatoUSD = (numero) => {
     return  new Intl.NumberFormat("en-US", {
       maximumFractionDigits: 2,

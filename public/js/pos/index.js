@@ -4,6 +4,7 @@ elementoBuscarProducto = d.querySelector('#buscarProducto'),
 elementoTablaBuscarProducto = d.querySelector('#tablaBuscarProducto'),
 elementoTotalProductos = d.querySelector('#totalProductosFiltrados'),
 codigoFactura = d.querySelector('#codigoFactura'),
+inputCodigoDeLaFactura = d.querySelector('#inputCodigoDeLaFactura'),
 elementoAlertas = d.querySelector('#alertas'), 
 listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'), 
 elementoFactura = d.querySelector('#componenteFactura'), 
@@ -21,7 +22,8 @@ factura = {
         concepto:'', // venta, compra ...
         descuento: 0, // descuento
         fecha:'', // fecha venta, compra ...
-        metodos:''
+        metodos:'',
+        estatusDeDevolucion: false
 },
 metodosPagos = [{
     id: 1,
@@ -537,16 +539,22 @@ const hanledLoad = async (e) => {
     facturaStorage = JSON.parse(localStorage.getItem('factura'))
 
     if(facturaStorage){
-
+        log('entro aqui 1')
         factura = facturaStorage;
-         /** ALMACENAMOS LA FACTURA */
-         factura.codigo = resultado.data;
-         factura.concepto = VENTA.name;
-         factura.tipo = 'SALIDA';
-         factura.iva = 0.16;
-         let fecha = new Date();
-         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
-         localStorage.setItem('factura', JSON.stringify(factura));
+        if(factura.estatusDeDevolucion){
+            log('entro aqui devolucion')
+            factura.fecha = `${factura.fecha.split('-').reverse().join('-')}T${factura.hora.slice(0,8)}`;
+            codigoFactura.innerHTML = componenteNumeroDeFactura({data: factura.codigo});
+        }else{
+            /** ALMACENAMOS LA FACTURA */
+            factura.codigo = resultado.data;
+            factura.concepto = VENTA.name;
+            factura.tipo = 'SALIDA';
+            factura.iva = 0.16;
+            let fecha = new Date();
+            factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
+            localStorage.setItem('factura', JSON.stringify(factura));
+        }
 
         /** CLIENTE */
         elementoTarjetaCliente.innerHTML = spinner();
@@ -555,13 +563,13 @@ const hanledLoad = async (e) => {
             resultadoCliente = await getCliente(factura.identificacion);
         }
         
-            /** Validamos que existe el cliente */
-            if(resultadoCliente == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
-            else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data, "");
-            cargarEventosAccionesDelCliente();
+        /** Validamos que existe el cliente */
+        if(resultadoCliente == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
+        else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data, "");
+        cargarEventosAccionesDelCliente();
         
     }else{
-        
+        log('entro aqui 2')
         /** ALMACENAMOS LA FACTURA */
         factura.codigo = resultado.data;
         factura.concepto = VENTA.name;
@@ -575,10 +583,8 @@ const hanledLoad = async (e) => {
 
     /** Cargamos el componente factura */
     elementoFactura.innerHTML = spinner();
-    // elementoFactura.innerHTML = await componenteFactura(factura);
 
     /** Validamos si el carrito tiene productos para cargarlos a la factura */
- 
     carritoStorage =  localStorage.getItem('carrito')  ? JSON.parse(localStorage.getItem('carrito')) : [];
    
     if( carritoStorage.length ){
@@ -592,7 +598,6 @@ const hanledLoad = async (e) => {
         localStorage.setItem('carrito', JSON.stringify(carritoStorage));
 
         /** Cargamos los datos de la factura */
-
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
 
@@ -960,12 +965,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 setTimeout(()=>{
                     elementoAlertas.innerHTML=spinner();
                     window.location.href = `${URL_BASE_APP}/pos`;
-                }, 2500);
+                }, 500);
             }else{
                 elementoAlertas.innerHTML = componenteAlerta('No hay factura creada para eliminar', 404);
                 setTimeout(()=>{
                     elementoAlertas.innerHTML="";
-                }, 2500);
+                }, 500);
             }
 
             break;
@@ -1030,12 +1035,49 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     let facturaVender = JSON.parse(localStorage.getItem('factura')),
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
-                    /** FACTURAR EL CARRITO */
-                    /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    carritoVender.forEach(producto => {
-                        producto.identificacion = facturaVender.identificacion;
-                        facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
-                    });
+                    /** REALIZAR LA DEVOLUCION EN CASO DE SER UNA DEVOLUCION */
+                    if(facturaVender.estatusDeDevolucion){
+                        let resultadoDeRealizarDevolucion = await realizarDevolucion(facturaVender.codigo);
+                        log(resultadoDeRealizarDevolucion.mensaje);
+                        log(resultadoDeRealizarDevolucion.estatus);
+
+                        if(resultadoDeRealizarDevolucion.estatus == 200){
+                            /** FACTURAR EL CARRITO */
+                            carritoVender.forEach(async (producto) => {
+                                producto.identificacion = facturaVender.identificacion;
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                            });
+                        }else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucion.mensaje, resultadoDeRealizarDevolucion.estatus)
+                    } else{
+
+                        /** En casos de fallas electricas
+                         * Validamos que el carrito de la factura no se halla facturado
+                         * y si, si se facturo deve realizarse una devolucion y facturar denuevo
+                         */
+                        /** validar si el carrito se facturo */
+                        let carritoFacturado = await getCarrito(facturaVender.codigo),
+                        resultadoDeRealizarDevolucionLuz="";
+                        log(carritoFacturado)
+                        if(carritoFacturado.data.length){
+                            resultadoDeRealizarDevolucionLuz = await realizarDevolucion(facturaVender.codigo);
+                            if(resultadoDeRealizarDevolucionLuz.estatus == 200){
+                                /** FACTURAR EL CARRITO */
+                                carritoVender.forEach(async (producto) => {
+                                    producto.identificacion = facturaVender.identificacion;
+                                    facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                                });
+                            }else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucionLuz.mensaje, resultadoDeRealizarDevolucionLuz.estatus)
+                        
+                        }else{
+                            /** FACTURAR EL CARRITO */
+                            carritoVender.forEach(async (producto) => {
+                                producto.identificacion = facturaVender.identificacion;
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                            });
+                        }
+
+                    }
+
                     
                     /** MOSTRAR QUE ESTA CARGANDO  */
                     e.target.parentElement.parentElement.children[1].innerHTML = spinner();
@@ -1049,6 +1091,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         
                         /** Mostramos el dialogo de facturar */
                          if (resultadoDeFacturar.estatus == 201) {
+                                /** Registramos el movimiento del usuario */
+                                log(ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus));
                                 /** Eliminamos la factura del Storagr */
                                 localStorage.removeItem('carrito');
                                 localStorage.removeItem('factura');
@@ -1060,7 +1104,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         } else {
                             alert(resultadoDeFacturar.mensaje)
                         }
-                    },2500)
+                    },1000)
 
                 }else{
                     e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
@@ -1093,7 +1137,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
               break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
-                imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
             break;
         case 'finalizarFacturacion':
                 log('finalizando facturacion')
@@ -1102,7 +1146,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 localStorage.removeItem('factura');
                 window.location.href = "/pos";
             break;
-
         case 'facturaEnEspera':
                 /** Validar */
                 if(!JSON.parse(localStorage.getItem('factura')).identificacion){
@@ -1125,7 +1168,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     return elementoAlertas.innerHTML = componenteAlerta("No se puede crear un borrador de una factura que no tenga productos.", 404);
                 }
             break;
-        
         case 'limpiarBorrador':
             if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
                 localStorage.removeItem('facturaEnEspera');
@@ -1137,18 +1179,14 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             }
           
             break;
-
         case 'cargarFactura':
-            log(localStorage.getItem('carritoEnEspera'))
-            log(typeof(localStorage.getItem('carritoEnEspera')))
-
-
             if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
                 let codigoFacturaNuevo = await getCodigoFactura(`${URL_BASE}/getCodigoFactura/facturas`),
-                listaProducto = [];
+                listaProducto = [],
+                facturaGuardada = JSON.parse(localStorage.getItem('facturaEnEspera'));
 
                 JSON.parse(localStorage.getItem('carritoEnEspera')).forEach(producto =>{
-                    producto.codigo = codigoFacturaNuevo.data;
+                    producto.codigo = facturaGuardada.estatusDeDevolucion ? facturaGuardada.codigo : codigoFacturaNuevo.data;
                     listaProducto.push(producto);
                 });
                 localStorage.setItem('carritoEnEspera',JSON.stringify(listaProducto))
@@ -1164,6 +1202,25 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             }else{
                 elementoAlertas.innerHTML = componenteAlerta("No hay borrador.", 401);
             }
+            break;
+        case 'cargarFacturaDevolucion':
+            if(inputCodigoDeLaFactura.value == "") return inputCodigoDeLaFactura.nextElementSibling.textContent = "El campo Código es obligatorio";
+            if(inputCodigoDeLaFactura.value.length > 8) return inputCodigoDeLaFactura.nextElementSibling.textContent = "El máximo de caracteres es de 8.";
+            inputCodigoDeLaFactura.nextElementSibling.innerHTML = spinner();
+            
+            let datosDeLaFactura = await getFactura(inputCodigoDeLaFactura.value),
+            carritoNormalizado = [];
+            if(!datosDeLaFactura.data) return inputCodigoDeLaFactura.nextElementSibling.textContent = datosDeLaFactura.mensaje;
+            datosDeLaFactura.data.estatusDeDevolucion = true;
+
+            carritoNormalizado = adaptadorDeProductoACarritoDeDevolucion(datosDeLaFactura.data.carrito, datosDeLaFactura.data)
+            localStorage.setItem('factura', JSON.stringify(datosDeLaFactura.data));
+            localStorage.setItem('carrito', JSON.stringify(carritoNormalizado));
+            inputCodigoDeLaFactura.nextElementSibling.innerHTML = componenteAlerta("Se cargó la factura correctamente.", 200);
+            
+            
+            // return log(datosDeLaFactura);
+            window.location.href="/pos";
             break;
         default:
             break;
@@ -1354,6 +1411,29 @@ function adaptadorDeProductoACarrito(producto, cantidad, factura){
         subtotal: parseFloat(producto.pvp * cantidad), // subtotal en dolares
         subtotalBs: parseFloat(producto.pvp * cantidad * factura.tasa), // subtotal en bolivares
     };
+};
+
+function adaptadorDeProductoACarritoDeDevolucion(productos, factura){
+    let productosNormalizados = [];
+    productos.forEach(producto => {
+        productosNormalizados.push(
+            {
+                codigo: factura.codigo, // Codigo de la factura
+                codigo_producto: producto.codigo_producto,
+                identificacion: factura.identificacion,
+                descripcion: producto.descripcion,
+                /** Datos numéricos */
+                cantidad: producto.cantidad,
+                stock: parseFloat(producto.stock),
+                costo: parseFloat(producto.costo), // costo/pvp en dolares 
+                costoBs: parseFloat(producto.costo * factura.tasa), // costo/pvp en bolivares
+                subtotal: parseFloat(producto.costo * producto.cantidad), // subtotal en dolares
+                subtotalBs: parseFloat(producto.costo * producto.cantidad * factura.tasa), // subtotal en bolivares
+            }
+        )
+    });
+    
+    return productosNormalizados;
 };
 
 async function cargarEventosDeAgregarProductoAFactura(){

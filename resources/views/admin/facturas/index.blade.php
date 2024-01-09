@@ -13,12 +13,11 @@
            
 
             <div class="col-lg-12 mt-4 ">
-
+                
                 <div class="card">
                     <div class="card-body table-responsive">
                     
                         <!-- Table with stripped rows -->
-                        
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -48,10 +47,9 @@
                                                     <a href="{{ route('admin.facturas.show', $factura->id) }}" >
                                                         <i class="bi bi-eye btn btn-success"></i>
                                                     </a>
-                                                    {{-- @include('admin.facturas.partials.modalEditar') --}}
-                                                    {{-- @include('admin.facturas.partials.modaldialog') --}}
+                                    
                                                    
-                                                        @include('admin.facturas.partials.modal')
+                                                    @include('admin.facturas.partials.modal')
                                                   
 
                                                 </td>
@@ -85,8 +83,9 @@
         </div>
     </section>
 
-    <script src="{{ asset('/js/main.js') }}" defer></script>
-    <script src="{{ asset('/js/utilidad/autorizacion.js')}}" defer><script>
+    <script src="{{ asset('js/main.js') }}" defer></script>
+    <script src="{{ asset('js/utilidad/autorizacion.js') }}" defer><script>
+    
  
 
 @endsection

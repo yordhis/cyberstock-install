@@ -24,7 +24,8 @@ class StoreUtilidadeRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'iva' => "required|numeric|max:100|min:1",
+            'tasa' => "required|numeric|max:100|min:1"
         ];
     }
 }

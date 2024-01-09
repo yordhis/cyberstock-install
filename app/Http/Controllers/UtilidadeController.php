@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUtilidadeRequest;
 use App\Http\Requests\UpdateUtilidadeRequest;
 use App\Models\DataDev;
 use App\Models\Helpers;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
 class UtilidadeController extends Controller
@@ -28,22 +29,11 @@ class UtilidadeController extends Controller
         try {
             $utilidades = Utilidade::all();
             $menuSuperior = $this->data->menuSuperior;
-            $pathname = Request::path();
-            return view('admin.utilidades.index', compact('menuSuperior', 'pathname', 'utilidades'));
+            return view('admin.utilidades.index', compact('menuSuperior', 'utilidades'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al consultar las utilidades del sistema, ");
             return view('errors.404', compact('mensajeError'));
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -67,8 +57,9 @@ class UtilidadeController extends Controller
             return $estatusCrear ? redirect()->route( 'admin.utilidades.index', compact('mensaje', 'estatus') )
             : view('admin.utilidades.index', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', 'request'));
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al Guardar la utilidades, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = Helpers::getMensajeError($th, "Error Al Actualizar las utilidades, ");
+            $estatus = Response::HTTP_NOT_FOUND;
+            return redirect()->route( 'admin.utilidades.index', compact('mensaje', 'estatus') );
         }
     }
 
@@ -128,15 +119,16 @@ class UtilidadeController extends Controller
             $estatusActualizar = $utilidade->update($request->all());
 
             $mensaje = $estatusActualizar ? "Las utilidades se actualizaron correctamente." : "Los cambios no se guardaron!";
-            $estatus = $estatusActualizar ? 201 : 404;
+            $estatus = $estatusActualizar ? 200 : 404;
             
             $pathname = Request::path();
             $menuSuperior = $this->data->menuSuperior;
             return $estatusActualizar ? redirect()->route( 'admin.utilidades.index', compact('mensaje', 'estatus') )
             : view('admin.utilidades.index', compact('mensaje', 'estatus', 'menuSuperior', 'pathname', 'request', 'utilidades'));
         } catch (\Throwable $th) {
-            $mensajeError = Helpers::getMensajeError($th, "Error Al Actualizar la utilidades, ");
-            return view('errors.404', compact('mensajeError'));
+            $mensaje = Helpers::getMensajeError($th, "Error Al Actualizar las utilidades, ");
+            $estatus = Response::HTTP_NOT_FOUND;
+            return redirect()->route( 'admin.utilidades.index', compact('mensaje', 'estatus') );
         }
     }
 
