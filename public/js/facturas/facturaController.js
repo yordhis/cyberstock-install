@@ -468,11 +468,11 @@ const htmlTicket = (factura) => {
                         <td colspan="2" class="text__right border" >Bs ${ darFormatoDeNumero(factura.total * factura.tasa) }</td>
                     </tr>
 
-                    <!-- Oculto para la roca -->
+                    <!-- Oculto para la roca
                     <tr>
                         <td class="text__left border">TOTAL REF</td>
                         <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
-                    </tr>
+                    </tr> -->
 
                     ${metodosPagosHtml}
                     ${cambioHtml}
