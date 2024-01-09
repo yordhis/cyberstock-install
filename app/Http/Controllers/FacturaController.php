@@ -77,6 +77,8 @@ class FacturaController extends Controller
                         $contador += $producto->cantidad;
                     }
                     $factura->totalArticulos = $contador;
+                    $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');               
+                    $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');   
             }else{
                 $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
                 $estatus = 404;

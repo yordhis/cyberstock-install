@@ -1054,7 +1054,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
               break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
-                imprimirElemento(htmlTicket(resultadoDeFacturar.data));
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
             break;
         case 'finalizarFacturacion':
                 log('finalizando facturacion')

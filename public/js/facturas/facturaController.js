@@ -750,11 +750,8 @@ const formulaLibreFacturaHtml = (factura) => {
     let metodosDePagoHtml = ``,
     carritoHtml="",
     ivaHtml="",
-    descuentoHtml="",
-    [dia,mes,anio] = factura.fecha.split('-');
-
-    let fecha = new Date(anio,mes-1,dia).toLocaleString('ves', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-    hora = new Date(anio,mes-1,dia).toLocaleTimeString('ves');
+    iva= factura.iva > 0 ? factura.iva : 0.16,
+    descuentoHtml="";
 
     
     /** RECORREMOS EL CARRITO DE COMPRA */
@@ -772,10 +769,12 @@ const formulaLibreFacturaHtml = (factura) => {
     });
     
     // Verificacamos si se aplico el impuesto
+
         ivaHtml = `
+            
             <td class="text__right">
-                IVA 16%: 
-                ${ darFormatoDeNumero( factura.subtotal  * 0.16 * factura.tasa )  } 
+                IVA ${factura.iva > 0 ? factura.iva*100 : "16"}%: 
+                ${ darFormatoDeNumero( factura.subtotal  * iva * factura.tasa )  } 
             </td>
         `;
     
@@ -813,12 +812,12 @@ const formulaLibreFacturaHtml = (factura) => {
         </tr>
         <tr>
             <th colspan="3" class="text__left">
-                VENDEDOR: VENDEDOR 1
+                VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
                 / N° TELÉFONO: 0000-000000
             </th>
          </tr>
         <tr>
-            <th colspan="5" class="text__left">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
+            <th colspan="5" class="text__left">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
         </tr>
         <tr class="border">
             <th class="text__left numero">CODIGO</th>
@@ -868,9 +867,8 @@ const formulaLibreHtml = (factura) => {
     let metodosDePagoHtml = ``,
     carritoHtml="",
     ivaHtml="",
-    descuentoHtml="",
-    fecha = factura.fecha.split('T')[0],
-    hora = factura.fecha.split('T')[1];
+    descuentoHtml="";
+   
 
     /** RECORREMOS EL CARRITO DE COMPRA */
     // Recorremos el carrito
@@ -925,7 +923,7 @@ const formulaLibreHtml = (factura) => {
                     VENDEDOR:  VENDEDOR 1
                     / N° TELÉFONO: 0000-0000000
                 </th>
-                <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${fecha} - ${hora}</span></th>
+                <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
             </tr>
             <tr class="border">
                 <th class="text__left">CÓDIGO</th>
