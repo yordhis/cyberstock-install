@@ -176,7 +176,7 @@ class ClienteController extends Controller
             $menuSuperior = $this->data->menuSuperior;
             $estatusCrear = 0;
             $respuesta = null;
-            $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
+            
             $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
             if(count($clienteExiste)){
                 $mensaje = $this->data->respuesta['mensaje'] = "El cliente no se registro, porque el número de cédula ya existe.";
@@ -190,6 +190,7 @@ class ClienteController extends Controller
                 $respuesta = $this->data->respuesta;
             }
             
+            $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
             return view('admin.clientes.lista', compact('respuesta', 'menuSuperior', 'pathname', 'request', 'clientes'));
             // return $estatus == Response::HTTP_CREATED ? redirect()->route( 'admin.clientes.index', compact('mensaje', 'estatus') )
             //     : view('admin.clientes.lista', compact('respuesta', 'menuSuperior', 'pathname', 'request', 'clientes'));
