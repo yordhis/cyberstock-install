@@ -3,9 +3,10 @@
 @section('title', 'Lista de Clientes')
 
 @section('content')
-     @isset($respuesta)
+    @isset($respuesta)
         @include('partials.alert')
     @endisset
+    
     <div id="alert"></div>
     <section class="section">
         <div class="row">

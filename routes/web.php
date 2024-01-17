@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    ActivoInmobiliarioController,
     ApiController,
     CarritoController,
     CarritoInventarioController,
@@ -50,6 +51,9 @@ Route::get('/preload', [ApiController::class, 'preload'])->name('api.preload');
 Route::middleware(['auth'])->group(function () {
     /** RUTAS DE PANEL */
         Route::get('/panel', [DashboardController::class, 'index'])->name('admin.panel.index');
+
+    /** RUTAS DE PANEL */
+        Route::resource('/activos', ActivoInmobiliarioController::class)->names('admin.activos');
    
     /** RUTAS DE PANEL */
         Route::delete('/eliminarTodoNotificaciones', [NotificacioneController::class, 'destroyAll'])->name('admin.notificaciones.destroyAll');

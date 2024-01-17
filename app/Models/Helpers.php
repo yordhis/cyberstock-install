@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use App\Models\{
     User,
     RolPermiso,
@@ -119,12 +118,7 @@ class Helpers extends Model
 
     public static function getMensajeError($e, $mensaje)
     {
-        $errorInfo = $mensaje . " ("
-            . $e->getMessage() . ")."
-            . "Código de error: " . $e->getCode()
-            . "Linea de error: " . $e->getLine()
-            . "El archivo: " . $e->getFile()
-            ?? 'No hay mensaje de error';
+        $errorInfo = $mensaje . config("const.ERR_CLIENT.{$e->getCode()}") ?? 'No hay mensaje de error';
         return $errorInfo;
     }
 
