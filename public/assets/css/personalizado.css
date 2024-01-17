@@ -68,7 +68,7 @@
     margin: auto;
     width: 90%;
     max-width: 600px;
-    max-height: 90%;
+    max-height: auto;
     background-color: #fff;
     border-radius: 6px;
     padding: 3em 2.5em;
@@ -95,8 +95,8 @@
 
 .modal__close{
     text-decoration: none;
-    color: #ffc107;
-    background-color: #198754;
+    color: #000000;
+    background-color: #db0c0cdc;
     padding: 1em 3em;
     border: 1px solid ;
     border-radius: 6px;

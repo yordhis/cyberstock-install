@@ -27,9 +27,9 @@
                                     <p class="text-center text-danger small">Rellene todos los campos</p>
                                 </div>
 
-                                <form action="/usuarios" method="post" target="_self" 
+                                <form action="{{ route('admin.users.store') }}" method="post" 
                                 enctype="multipart/form-data"
-                                    class="row g-3 needs-validation" novalidate>
+                                    class="row g-3 needs-validation shadow-lg" novalidate>
                                     @csrf
                                     @method('post')
                                     <div class="col-12">
@@ -57,7 +57,7 @@
 
                                     <div class="col-12">
                                         <label for="yourPassword" class="form-label">Contrseña</label>
-                                        <input type="password" name="clave" class="form-control" id="yourPassword"
+                                        <input type="password" name="password" class="form-control" id="yourPassword"
                                             placeholder="Ingrese su contraseña" value="{{ $request->clave ?? '' }}"
                                             required>
                                         <div class="invalid-feedback">Por favor ingrese su contraseña!</div>

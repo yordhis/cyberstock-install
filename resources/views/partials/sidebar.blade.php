@@ -82,10 +82,16 @@ $subcategoria = 'LISTA';
                 <i class="bx bx-store"></i><span>POS</span></i>
             </a>
         </li><!-- End Components Nav | POS venta-->
+        <!-- Start Components Nav | POS venta -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.inventarios.crearSalida') }}">
+                <i class="bx bx-store"></i><span>POS MAYOREO</span></i>
+            </a>
+        </li><!-- End Components Nav | POS venta-->
 
         <!-- Start Components Nav | PROVEEDORES -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.proveedores.index') }}">
+            <a class="nav-link {{ $categoria == "PROVEEDORES" ? "bg-white text-black": '' }}" href="{{ route('admin.proveedores.index') }}">
                 <i class="bi bi-person-vcard-fill"></i><span>PROVEEDORES</span>
             </a>
         </li><!-- End Components Nav | PROVEEDORES -->

@@ -4,10 +4,12 @@ elementoBuscarProducto = d.querySelector('#buscarProducto'),
 elementoTablaBuscarProducto = d.querySelector('#tablaBuscarProducto'),
 elementoTotalProductos = d.querySelector('#totalProductosFiltrados'),
 codigoFactura = d.querySelector('#codigoFactura'),
+inputCodigoDeLaFactura = d.querySelector('#inputCodigoDeLaFactura'),
 elementoAlertas = d.querySelector('#alertas'), 
 listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'), 
 elementoFactura = d.querySelector('#componenteFactura'), 
 elementoMetodoDePagoModal= d.querySelector('#elementoMetodoDePagoModal'), 
+elementoMensajeDeEspera= d.querySelector('#mensajeDeEspera'), 
 factura = {
         codigo:'',
         razon_social:'', // nombre de cliente o proveedor
@@ -20,7 +22,8 @@ factura = {
         concepto:'', // venta, compra ...
         descuento: 0, // descuento
         fecha:'', // fecha venta, compra ...
-        metodos:''
+        metodos:'',
+        estatusDeDevolucion: false
 },
 metodosPagos = [{
     id: 1,
@@ -32,9 +35,6 @@ metodosPagos = [{
 /** COMPONENTES */
 /** CLIENTE */
 const componenteTarjetaCliente = (cliente, mensaje) => {
-
-
-
     if(cliente.length){
         cliente = cliente[0];
         if(!cliente.telefono){
@@ -47,15 +47,17 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <h5 class="card-title text-danger">Cliente N°: ${cliente.id}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Datos del cliente</h6>
             <p class="card-text">
-                <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
-                <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
-                <b>Teléfono:</b> ${cliente.telefono} <br><br>
+                <b>Nombre y Apellido:</b> ${cliente.nombre} <br>
+                <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br>
+                <b>Teléfono:</b> ${cliente.telefono ? cliente.telefono : "No asignado"} <br>
+                <b>Dirección:</b> ${cliente.direccion ? cliente.direccion : "No asignada"} <br>
+                <b>Correo:</b> ${cliente.correo ? cliente.correo : "No asignado"} <br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
                 <i class="bi bi-search fs-4"></i>
             </a>
-            <a href="${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
+            <a href="${URL_BASE_APP}/${cliente.identificacion}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
                 <i class="bi bi-pencil-fill fs-4"></i>
             </a>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
@@ -101,9 +103,10 @@ const componenteFormularioAgregarCliente = () => {
         <form action="#" method="post" id="formCrearCliente">
             <div class="form-floating m-2">
                 <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="Ingrese nombre y apellido">
+                <span class="text-danger"></span>
                 <label for="floatingInput">Nombre y apelldio</label>
-                <div class="text-danger validate"></div>
-            </div>
+                </div>
+                
             <div class="form-floating m-2">
                 <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
                 <option selected>Tipo de documento</option>
@@ -111,34 +114,34 @@ const componenteFormularioAgregarCliente = () => {
                 <option value="E">E</option>
                 <option value="J">J</option>
                 </select>
+                <span class="text-danger"></span>
                 <label for="floatingSelect">Seleccione tipo de documento</label>
-                <div class="text-danger validate"></div>
             </div>
             <div class="form-floating m-2">
                 <input type="number" class="form-control" name="identificacion" id="floatingInput" placeholder="Ingrese número de identificación.">
+                <span class="text-danger"></span>
                 <label for="floatingInput">RIF O ID</label>
-                <div class="text-danger validate"></div>
-            </div>
-            <div class="form-floating m-2">
-                <div id="respuesta-de-validacion"></div>                
             </div>
 
             <div class="form-floating m-2">
                 <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <span class="text-danger"></span>
                 <label for="floatingInput">TELÉFONO</label>
-                <div class="text-danger validate"></div>
             </div>
             <div class="form-floating m-2">
-                <div id="respuesta-de-validacion"></div>                
+                <input type="text" class="form-control" name="direccion" id="floatingInput" placeholder="Ingrese dirección.">
+                <span class="text-danger"></span>
+                <label for="floatingInput">DIRECCIÓN</label>
+            </div>
+            <div class="form-floating m-2">
+                <input type="text" class="form-control" name="correo" id="floatingInput" placeholder="Ingrese correo electrónico.">
+                <span class="text-danger"></span>
+                <label for="floatingInput">E-MAIL</label>
             </div>
             <div class="form-floating m-2">
                 <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
-                
             </div>
-
-          
-
-            </form>
+        </form>
             <a href="#" class="card-link ms-3 acciones-cliente" id="activarInputBuscarCliente">
                 <i class="bi bi-search fs-4"></i>
             </a>
@@ -163,8 +166,8 @@ const componenteFormularioEditarCliente = (cliente) => {
             
                 <div class="form-floating m-2">
                     <input type="text" class="form-control" name="nombre" value="${cliente.nombre}" id="floatingInput" placeholder="Ingrese nombre y apellido">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">Nombre y apelldio</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
                     <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
@@ -173,22 +176,31 @@ const componenteFormularioEditarCliente = (cliente) => {
                     <option value="E">E</option>
                     <option value="J">J</option>
                     </select>
+                    <span class="text-danger"></span>
                     <label for="floatingSelect">Seleccione tipo de documento</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
                     <input type="number" class="form-control" name="identificacion" value="${cliente.identificacion}" id="floatingInput" placeholder="Ingrese número de identificación.">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">RIF O ID</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
-                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono ? cliente.telefono : ""}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">TELÉFONO</label>
-                    <div class="text-danger validate"></div>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="direccion" value="${cliente.direccion ? cliente.direccion : ""}" id="floatingInput" placeholder="Ingrese dirección.">
+                    <span class="text-danger"></span>
+                    <label for="floatingInput">DIRECCIÓN</label>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="correo" value="${cliente.correo ? cliente.correo : ""}" id="floatingInput" placeholder="Ingrese correo electrónico.">
+                    <span class="text-danger"></span>
+                    <label for="floatingInput">E-MAIL</label>
                 </div>
                 <div class="form-floating m-2">
                     <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
-                    
                 </div>
     
     
@@ -345,6 +357,16 @@ const componenteFactura = async (factura) => {
         </div>
     `;
 };
+
+const componenteBotonesDeImpresion = () =>{
+    return `
+        <div class="d-grid gap-2">
+            <!--<button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibre">IMPRIMIR FORMATO FORMULA LIBRE</button>-->
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirTicket">IMPRIMIR TICKET</button>
+            <button class="btn btn-danger acciones-factura" type="button" id="finalizarFacturacion">FINALIZAR</button>
+        </div>
+    `;
+}
 /** CIERRE FACTURA */
 
 
@@ -501,6 +523,9 @@ const hanledLoad = async (e) => {
     /** CLIENTE */
     elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
     cargarEventosAccionesDelCliente();
+
+    /** factura en espera */
+    elementoMensajeDeEspera.textContent = JSON.parse(localStorage.getItem('facturaEnEspera')) ? "1 factura en espera" : "0 borrador";
     
     /** FILTRO PRODUCTOS */
     elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
@@ -514,31 +539,37 @@ const hanledLoad = async (e) => {
     facturaStorage = JSON.parse(localStorage.getItem('factura'))
 
     if(facturaStorage){
-
+        log('entro aqui 1')
         factura = facturaStorage;
-         /** ALMACENAMOS LA FACTURA */
-         factura.codigo = resultado.data;
-         factura.concepto = VENTA.name;
-         factura.tipo = 'SALIDA';
-         factura.iva = 0.16;
-         let fecha = new Date();
-         factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
-         localStorage.setItem('factura', JSON.stringify(factura));
+        if(factura.estatusDeDevolucion){
+            log('entro aqui devolucion')
+            factura.fecha = `${factura.fecha.split('-').reverse().join('-')}T${factura.hora.slice(0,8)}`;
+            codigoFactura.innerHTML = componenteNumeroDeFactura({data: factura.codigo});
+        }else{
+            /** ALMACENAMOS LA FACTURA */
+            factura.codigo = resultado.data;
+            factura.concepto = VENTA.name;
+            factura.tipo = 'SALIDA';
+            factura.iva = 0.16;
+            let fecha = new Date();
+            factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
+            localStorage.setItem('factura', JSON.stringify(factura));
+        }
 
         /** CLIENTE */
-        elementoTarjetaCliente.innerHTML = spinner;
-        listaDeProductosEnFactura.innerHTML = spinner;
+        elementoTarjetaCliente.innerHTML = spinner();
+        listaDeProductosEnFactura.innerHTML = spinner();
         if(factura.identificacion.length != 0){
             resultadoCliente = await getCliente(factura.identificacion);
         }
         
-            /** Validamos que existe el cliente */
-            if(resultadoCliente == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
-            else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data, "");
-            cargarEventosAccionesDelCliente();
+        /** Validamos que existe el cliente */
+        if(resultadoCliente == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
+        else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data, "");
+        cargarEventosAccionesDelCliente();
         
     }else{
-        
+        log('entro aqui 2')
         /** ALMACENAMOS LA FACTURA */
         factura.codigo = resultado.data;
         factura.concepto = VENTA.name;
@@ -551,11 +582,9 @@ const hanledLoad = async (e) => {
     }
 
     /** Cargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
-    // elementoFactura.innerHTML = await componenteFactura(factura);
+    elementoFactura.innerHTML = spinner();
 
     /** Validamos si el carrito tiene productos para cargarlos a la factura */
- 
     carritoStorage =  localStorage.getItem('carrito')  ? JSON.parse(localStorage.getItem('carrito')) : [];
    
     if( carritoStorage.length ){
@@ -569,7 +598,6 @@ const hanledLoad = async (e) => {
         localStorage.setItem('carrito', JSON.stringify(carritoStorage));
 
         /** Cargamos los datos de la factura */
-
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
 
@@ -597,7 +625,7 @@ const hanledAccionesCliente = async (e) => {
             cargarEventosDeFormularios();
             break;
         case 'activarFormEditarCliente':
-            elementoTarjetaCliente.innerHTML = spinner;
+            elementoTarjetaCliente.innerHTML = spinner();
     
             let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
@@ -621,8 +649,8 @@ const hanledBuscarCliente = async (e) => {
   
         
       
-        /** Se cargar el spinner para mostrar que esta procesando */
-        elementoTarjetaCliente.innerHTML = spinner;
+        /** Se cargar el spinner() para mostrar que esta procesando */
+        elementoTarjetaCliente.innerHTML = spinner();
         let cliente = await getCliente( parseInt(e.target.value) );
 
         /** Validamos si no hay data del cliente */
@@ -654,7 +682,7 @@ const hanledFormulario = async (e) => {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
                     if(!resultado) return;
-                    e.target.innerHTML = spinner;
+                    e.target.innerHTML = spinner();
                     
                     cliente = await storeCliente(resultado);
 
@@ -683,7 +711,7 @@ const hanledFormulario = async (e) => {
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
-            e.target.innerHTML = spinner;
+            e.target.innerHTML = spinner();
 
             cliente = await updateCliente(e.target.action, resultado);
                /** Seteamos el cliente en la factura de local storage */
@@ -816,7 +844,7 @@ const hanledBuscarProducto = async (e) => {
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         
-        elementoTotalProductos.innerHTML = spinner;
+        elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
     
         let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
@@ -849,6 +877,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     facturaActual = '',
     acumuladorSubtotal = 0;
   
+
+    log(e.target)
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
         accion = e.target.id;
@@ -857,9 +887,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
+    }else if(e.target.localName == 'p'){
+        accion =  e.target.parentElement.id;
     }
 
-  
+
 
     switch (accion) {
         case 'editarCantidadFactura':
@@ -931,14 +963,14 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     
                 elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
                 setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
+                    elementoAlertas.innerHTML=spinner();
                     window.location.href = `${URL_BASE_APP}/pos`;
-                }, 2500);
+                }, 500);
             }else{
                 elementoAlertas.innerHTML = componenteAlerta('No hay factura creada para eliminar', 404);
                 setTimeout(()=>{
                     elementoAlertas.innerHTML="";
-                }, 2500);
+                }, 500);
             }
 
             break;
@@ -950,26 +982,25 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 /** Eliminamos la factura y el carrito del almacen local */
                     localStorage.removeItem('carrito');
                     localStorage.removeItem('factura');
-    
-                elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
-                setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
+                    localStorage.removeItem('facturaEnEspera');
+                    localStorage.removeItem('carritoEnEspera');
+                    e.target.innerHTML = spinner('text-white');
                     window.location.href = `${URL_BASE_APP}/panel`;
-                }, 1500);
             }
 
             break;
         case 'cargarModalMetodoPago':
-                if(factura.identificacion == ""){
-                    return alert("Debes Ingresar un cliente para poder vender");
-                }
-               await cargarEventosAccionesDeFactura()
+                if(factura.identificacion == "") return alert("Debes Ingresar un cliente para poder vender");
+                await cargarEventosAccionesDeFactura();
             break;
         case 'vender':
             /** declaracion de variables */
             let abonado = 0,
             resultadoDefacturarCarrito = '';
 
+            /** validamos que halla productos en la factura */
+            if(JSON.parse(localStorage.getItem('carrito')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
+            
             /** validamos si el cliente esta gregado a la factura  */
             if(factura.identificacion == "") {
                 e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
@@ -1004,16 +1035,54 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     let facturaVender = JSON.parse(localStorage.getItem('factura')),
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
-                    /** FACTURAR EL CARRITO */
-                    /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    carritoVender.forEach(producto => {
-                        producto.identificacion = facturaVender.identificacion;
-                        producto.subtotal = producto.subtotal;
-                        facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
-                    });
+                    /** REALIZAR LA DEVOLUCION EN CASO DE SER UNA DEVOLUCION */
+                    if(facturaVender.estatusDeDevolucion){
+                        let resultadoDeRealizarDevolucion = await realizarDevolucion(facturaVender.codigo);
+                        log(resultadoDeRealizarDevolucion.mensaje);
+                        log(resultadoDeRealizarDevolucion.estatus);
+
+                        if(resultadoDeRealizarDevolucion.estatus == 200){
+                            /** FACTURAR EL CARRITO */
+                            carritoVender.forEach(async (producto) => {
+                                producto.identificacion = facturaVender.identificacion;
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                            });
+                        }else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucion.mensaje, resultadoDeRealizarDevolucion.estatus)
+                    } else{
+
+                        /** En casos de fallas electricas
+                         * Validamos que el carrito de la factura no se halla facturado
+                         * y si, si se facturo deve realizarse una devolucion y facturar denuevo
+                         */
+                        /** validar si el carrito se facturo */
+                        let carritoFacturado = await getCarrito(facturaVender.codigo),
+                        resultadoDeRealizarDevolucionLuz="";
+                        log(carritoFacturado)
+                        if(carritoFacturado.data.length){
+                            resultadoDeRealizarDevolucionLuz = await realizarDevolucion(facturaVender.codigo);
+                            if(resultadoDeRealizarDevolucionLuz.estatus == 200){
+                                /** FACTURAR EL CARRITO */
+                                carritoVender.forEach(async (producto) => {
+                                    producto.identificacion = facturaVender.identificacion;
+                                    facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                                });
+                            }else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucionLuz.mensaje, resultadoDeRealizarDevolucionLuz.estatus)
+                        
+                        }else{
+                            /** FACTURAR EL CARRITO */
+                            carritoVender.forEach(async (producto) => {
+                                producto.identificacion = facturaVender.identificacion;
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                            });
+                        }
+
+                    }
+
                     
                     /** MOSTRAR QUE ESTA CARGANDO  */
-                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+                    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+                    e.target.parentElement.children[0].classList.add('d-none');
+                    e.target.parentElement.children[1].classList.add('d-none');
 
                     /** FACTURAR */
                     setTimeout( async ()=>{
@@ -1022,29 +1091,20 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         
                         /** Mostramos el dialogo de facturar */
                          if (resultadoDeFacturar.estatus == 201) {
-                            resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                            if (resultado) {
-                                imprimirElemento(htmlTicket(resultadoDeFacturar.data));
-                                
-                                resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                                if (resultadoOtraCapia) {
-                                    imprimirElemento(htmlTicket(resultadoDeFacturar.data));
-                                }
+                                /** Registramos el movimiento del usuario */
+                                log(ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus));
                                 /** Eliminamos la factura del Storagr */
                                 localStorage.removeItem('carrito');
                                 localStorage.removeItem('factura');
-                                window.location.href = "/pos";
-    
-                            } else {
-                                 /** Eliminamos la factura del Storagr */
-                                 localStorage.removeItem('carrito');
-                                 localStorage.removeItem('factura');
-                                window.location.href = "/pos";
-                            }
+                                /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
+                                e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
+                                e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
+                                await cargarEventosAccionesDeFactura();
                         } else {
                             alert(resultadoDeFacturar.mensaje)
                         }
-                    },2500)
+                    },1000)
 
                 }else{
                     e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
@@ -1070,6 +1130,97 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         case 'editarDescuento':
            
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
+            break;
+        case 'imprimirFormulaLibre':
+                log('imprimiendo formula libre')
+                imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
+              break;
+        case 'imprimirTicket':
+                log('imprimiendo ticket')
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
+            break;
+        case 'finalizarFacturacion':
+                log('finalizando facturacion')
+                /** Eliminamos la factura del Storagr */
+                localStorage.removeItem('carrito');
+                localStorage.removeItem('factura');
+                window.location.href = "/pos";
+            break;
+        case 'facturaEnEspera':
+                /** Validar */
+                if(!JSON.parse(localStorage.getItem('factura')).identificacion){
+                    return elementoAlertas.innerHTML = componenteAlerta("No se puede crear un borrador de una factura que no tenga asignado un cliente.", 404);
+                }
+
+                if( JSON.parse(localStorage.getItem('carrito')).length > 0 ){
+                    localStorage.setItem('facturaEnEspera', localStorage.getItem('factura')); 
+                    localStorage.setItem('carritoEnEspera', localStorage.getItem('carrito')); 
+                    
+                    log(localStorage.getItem('facturaEnEspera'));
+                    log(localStorage.getItem('carritoEnEspera'));
+    
+                    localStorage.removeItem('factura');
+                    localStorage.removeItem('carrito');
+    
+                    elementoAlertas.innerHTML = componenteAlerta("Se creó un borrador de la factura correctamente.", 200);
+                    window.location.href="/pos";
+                }else{
+                    return elementoAlertas.innerHTML = componenteAlerta("No se puede crear un borrador de una factura que no tenga productos.", 404);
+                }
+            break;
+        case 'limpiarBorrador':
+            if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
+                localStorage.removeItem('facturaEnEspera');
+                localStorage.removeItem('carritoEnEspera');
+                elementoAlertas.innerHTML = componenteAlerta("Se eliminó el borrador del la factura guardada.", 200);
+                window.location.href="/pos";
+            }else{
+                return elementoAlertas.innerHTML = componenteAlerta("No hay borrador.", 401);
+            }
+          
+            break;
+        case 'cargarFactura':
+            if( JSON.parse(localStorage.getItem('carritoEnEspera')) ){
+                let codigoFacturaNuevo = await getCodigoFactura(`${URL_BASE}/getCodigoFactura/facturas`),
+                listaProducto = [],
+                facturaGuardada = JSON.parse(localStorage.getItem('facturaEnEspera'));
+
+                JSON.parse(localStorage.getItem('carritoEnEspera')).forEach(producto =>{
+                    producto.codigo = facturaGuardada.estatusDeDevolucion ? facturaGuardada.codigo : codigoFacturaNuevo.data;
+                    listaProducto.push(producto);
+                });
+                localStorage.setItem('carritoEnEspera',JSON.stringify(listaProducto))
+                
+                /** cargar los datos del borrador */
+                localStorage.setItem('factura', localStorage.getItem('facturaEnEspera')); 
+                localStorage.setItem('carrito', localStorage.getItem('carritoEnEspera')); 
+                /** borrar los datos del borrador */
+                localStorage.removeItem('facturaEnEspera');
+                localStorage.removeItem('carritoEnEspera');
+                elementoAlertas.innerHTML = componenteAlerta("Se cargó la factura del borrador correctamente.", 200);
+                window.location.href="/pos";
+            }else{
+                elementoAlertas.innerHTML = componenteAlerta("No hay borrador.", 401);
+            }
+            break;
+        case 'cargarFacturaDevolucion':
+            if(inputCodigoDeLaFactura.value == "") return inputCodigoDeLaFactura.nextElementSibling.textContent = "El campo Código es obligatorio";
+            if(inputCodigoDeLaFactura.value.length > 8) return inputCodigoDeLaFactura.nextElementSibling.textContent = "El máximo de caracteres es de 8.";
+            inputCodigoDeLaFactura.nextElementSibling.innerHTML = spinner();
+            
+            let datosDeLaFactura = await getFactura(inputCodigoDeLaFactura.value),
+            carritoNormalizado = [];
+            if(!datosDeLaFactura.data) return inputCodigoDeLaFactura.nextElementSibling.textContent = datosDeLaFactura.mensaje;
+            datosDeLaFactura.data.estatusDeDevolucion = true;
+
+            carritoNormalizado = adaptadorDeProductoACarritoDeDevolucion(datosDeLaFactura.data.carrito, datosDeLaFactura.data)
+            localStorage.setItem('factura', JSON.stringify(datosDeLaFactura.data));
+            localStorage.setItem('carrito', JSON.stringify(carritoNormalizado));
+            inputCodigoDeLaFactura.nextElementSibling.innerHTML = componenteAlerta("Se cargó la factura correctamente.", 200);
+            
+            
+            // return log(datosDeLaFactura);
+            window.location.href="/pos";
             break;
         default:
             break;
@@ -1207,17 +1358,18 @@ async function cargarEventosDeFormularios(){
 /** Validar formulario de cliente y retornar data */
 async function validarDataDeFormularioCliente(formulario){
     let esquema = {},
-    banderaDeALertar = 0;
+    banderaDeAlertar = 0;
     for (const iterator of formulario) {
         if(iterator.localName == "input" || iterator.localName == "select"){
-            if(!iterator.value.length) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
-            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent=`${iterator.name}`, iterator.classList.add(['border-success']);
-            if(iterator.value == "Tipo de documento") iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
+            if(iterator.name == "correo") {esquema[iterator.name] = iterator.value; continue;}
+            if(!iterator.value.length) iterator.classList.add(['border-danger']), banderaDeAlertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
+            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent=``, iterator.classList.add(['border-success']);
+            if(iterator.value == "Tipo de documento") iterator.classList.add(['border-danger']), banderaDeAlertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
             // Asignamos el valor al esquema
             esquema[iterator.name] = iterator.value;
         }
     }
-    if(banderaDeALertar) return false;
+    if(banderaDeAlertar) return false;
     else return esquema;
 }
 
@@ -1259,6 +1411,29 @@ function adaptadorDeProductoACarrito(producto, cantidad, factura){
         subtotal: parseFloat(producto.pvp * cantidad), // subtotal en dolares
         subtotalBs: parseFloat(producto.pvp * cantidad * factura.tasa), // subtotal en bolivares
     };
+};
+
+function adaptadorDeProductoACarritoDeDevolucion(productos, factura){
+    let productosNormalizados = [];
+    productos.forEach(producto => {
+        productosNormalizados.push(
+            {
+                codigo: factura.codigo, // Codigo de la factura
+                codigo_producto: producto.codigo_producto,
+                identificacion: factura.identificacion,
+                descripcion: producto.descripcion,
+                /** Datos numéricos */
+                cantidad: producto.cantidad,
+                stock: parseFloat(producto.stock),
+                costo: parseFloat(producto.costo), // costo/pvp en dolares 
+                costoBs: parseFloat(producto.costo * factura.tasa), // costo/pvp en bolivares
+                subtotal: parseFloat(producto.costo * producto.cantidad), // subtotal en dolares
+                subtotalBs: parseFloat(producto.costo * producto.cantidad * factura.tasa), // subtotal en bolivares
+            }
+        )
+    });
+    
+    return productosNormalizados;
 };
 
 async function cargarEventosDeAgregarProductoAFactura(){
@@ -1324,7 +1499,7 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     localStorage.setItem('factura', JSON.stringify(factura));
 
     /** Recargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
+    elementoFactura.innerHTML = spinner();
     elementoFactura.innerHTML = await componenteFactura(factura);
 
        /** Cargamos el modal de metodos de pago */

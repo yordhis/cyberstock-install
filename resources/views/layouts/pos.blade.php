@@ -6,10 +6,10 @@
 </head>
 
 <body>
-  {{-- @include('partials.header') --}}
+
   @include('partials.headerpos')
   
-  <main id="mainPos" class="mainPos">
+  <main id="mainPos" class="mainPos ">
 
       @yield('content')
    

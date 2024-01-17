@@ -37,7 +37,7 @@ class CarritoController extends Controller
                 } else {
                     return response()->json([
                         "mensaje" => "No hay carrito facturado con el codigo de factura ingresado",
-                        "data" => $carrito,
+                        "data" => [],
                         "estatus" => Response::HTTP_OK
                     ], Response::HTTP_OK);
                 }
@@ -60,6 +60,7 @@ class CarritoController extends Controller
                 // $productoEnInventario = Inventario::where('codigo', $request->codigo_producto)->get();
                 // if (count($productoEnInventario)) {
                 //     if ($request->cantidad > $productoEnInventario[0]->cantidad) {
+                //         Carrito::where('codigo', $request->codigo)->delete();
                 //         return response()->json([
                 //             "mensaje" => "La Existencia es insuficiente para facturar el producto {$request->descripcion} | Disponibles: {$request->cantidad} .",
                 //             "data" => $productoEnInventario,
@@ -149,6 +150,46 @@ class CarritoController extends Controller
 
             } catch (\Throwable $th) {
                 $mensajeError = Helpers::getMensajeError($th, "Error Al Eliminar todos los productos de la factura, ");
+                return response()->json([
+                    "mensaje" =>  $mensajeError,
+                    "data" => [],
+                    "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR,
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+
+        /** REALIZAR DEVOLUCION DE PRODUCTOS */
+        public function realizarDevolucion($codigoFactura){
+            try {
+                /** DEVOLVER TODOS LOS PRODUCTOS DE CARRITO AL INVENTARIO */
+                $carritos = Carrito::where('codigo', $codigoFactura)->get();
+                    foreach ($carritos as $key => $producto) {
+                        $cantidadActualProducto = Inventario::where("codigo", $producto->codigo_producto)->get()[0]->cantidad;
+                        Inventario::where("codigo", $producto->codigo_producto)->update([
+                            "cantidad" =>  $cantidadActualProducto + $producto->cantidad
+                        ]);
+                    } 
+                
+                /** ELIMINAMOS EL CARRITO */
+                $estatusEliminar = Carrito::where('codigo', $codigoFactura)->delete();
+
+                if($estatusEliminar){
+                    $mensaje = $estatusEliminar ? "La devolución del carrito de compra se realizó correctamente." : "No se pudo realizar la devolución.";
+                    $estatus = $estatusEliminar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+                } else {
+                    $mensaje = "La factura no poseé carrito de compra.";
+                    $estatus = Response::HTTP_NOT_FOUND;
+                }
+
+                return response()->json([
+                    "mensaje" => $mensaje,
+                    "data" => $estatusEliminar,
+                    "estatus" => $estatus,
+                ], $estatus);
+
+            } catch (\Throwable $th) {
+                $mensajeError = Helpers::getMensajeError($th, "Error Al Realizar la devolución, probablemente el producto que intentan devolver fue eliminado del inventario, ");
                 return response()->json([
                     "mensaje" =>  $mensajeError,
                     "data" => [],

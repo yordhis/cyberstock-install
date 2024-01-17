@@ -8,12 +8,15 @@
 <body>
   @include('partials.header')
   @include('partials.sidebar')
-  
-  <main id="main" class="main">
 
+  
+  
+  <main id="main" class="main ">
     @include('partials.pagetitle')
 
-    <div class="container">
+    @include('partials.preload')
+
+    <div class="container preloadFalse d-none">
       @yield('content')
     </div>
   </main><!-- End #main -->

@@ -38,11 +38,14 @@ use App\Http\Controllers\{
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
 
+    /** CARRITO */
+    Route::get('/realizarDevolucion/{codigoFactura}', [CarritoController::class, 'realizarDevolucion'])->name('api.realizarDevolucion');
+   
     /** NOTIFICACIONES */
     Route::get('/getNotificaciones', [NotificacioneController::class, 'getNotificaciones'])->name('api.notificaciones');
     
     /** MONITORES (MOVIMIENTOS DE USUARIOS) */
-    Route::get('/setMovimiento', [MonitoreController::class, 'setMovimiento'])->name('api.monitores.setMovimiento');
+    Route::post('/registrarAccionDelUsuario', [MonitoreController::class, 'store'])->name('api.monitores.store');
 
     /** AUTORIZACION */
     Route::post('verificarClave', [LoginController::class, 'verificarClave'])->name('api.verificarClave');

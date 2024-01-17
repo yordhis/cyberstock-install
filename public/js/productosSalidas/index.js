@@ -44,9 +44,11 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
             <h5 class="card-title text-danger">Cliente N°: ${cliente.id}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Datos del cliente</h6>
             <p class="card-text">
-                <b>Nombre y Apellido:</b> ${cliente.nombre} <br><br>
-                <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br><br>
-                <b>Teléfono:</b> ${cliente.telefono} <br><br>
+                <b>Nombre y Apellido:</b> ${cliente.nombre} <br>
+                <b>Rif o ID:</b> ${cliente.tipo}-${cliente.identificacion} <br>
+                <b>Teléfono:</b> ${cliente.telefono ? cliente.telefono : "No asignado"} <br>
+                <b>Dirección:</b> ${cliente.direccion ? cliente.direccion : "No asignada"} <br>
+                <b>Correo:</b> ${cliente.correo ? cliente.correo : "No asignado"} <br>
                 
             </p>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
@@ -98,9 +100,10 @@ const componenteFormularioAgregarCliente = () => {
         <form action="#" method="post" id="formCrearCliente">
             <div class="form-floating m-2">
                 <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="Ingrese nombre y apellido">
+                <span class="text-danger"></span>
                 <label for="floatingInput">Nombre y apelldio</label>
-                <div class="text-danger validate"></div>
-            </div>
+                </div>
+                
             <div class="form-floating m-2">
                 <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
                 <option selected>Tipo de documento</option>
@@ -108,34 +111,34 @@ const componenteFormularioAgregarCliente = () => {
                 <option value="E">E</option>
                 <option value="J">J</option>
                 </select>
+                <span class="text-danger"></span>
                 <label for="floatingSelect">Seleccione tipo de documento</label>
-                <div class="text-danger validate"></div>
             </div>
             <div class="form-floating m-2">
                 <input type="number" class="form-control" name="identificacion" id="floatingInput" placeholder="Ingrese número de identificación.">
+                <span class="text-danger"></span>
                 <label for="floatingInput">RIF O ID</label>
-                <div class="text-danger validate"></div>
-            </div>
-            <div class="form-floating m-2">
-                <div id="respuesta-de-validacion"></div>                
             </div>
 
             <div class="form-floating m-2">
                 <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <span class="text-danger"></span>
                 <label for="floatingInput">TELÉFONO</label>
-                <div class="text-danger validate"></div>
             </div>
             <div class="form-floating m-2">
-                <div id="respuesta-de-validacion"></div>                
+                <input type="text" class="form-control" name="direccion" id="floatingInput" placeholder="Ingrese dirección.">
+                <span class="text-danger"></span>
+                <label for="floatingInput">DIRECCIÓN</label>
+            </div>
+            <div class="form-floating m-2">
+                <input type="text" class="form-control" name="correo" id="floatingInput" placeholder="Ingrese correo electrónico.">
+                <span class="text-danger"></span>
+                <label for="floatingInput">E-MAIL</label>
             </div>
             <div class="form-floating m-2">
                 <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
-                
             </div>
-
-          
-
-            </form>
+        </form>
             <a href="#" class="card-link ms-3 acciones-cliente" id="activarInputBuscarCliente">
                 <i class="bi bi-search fs-4"></i>
             </a>
@@ -160,8 +163,8 @@ const componenteFormularioEditarCliente = (cliente) => {
             
                 <div class="form-floating m-2">
                     <input type="text" class="form-control" name="nombre" value="${cliente.nombre}" id="floatingInput" placeholder="Ingrese nombre y apellido">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">Nombre y apelldio</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
                     <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
@@ -170,22 +173,31 @@ const componenteFormularioEditarCliente = (cliente) => {
                     <option value="E">E</option>
                     <option value="J">J</option>
                     </select>
+                    <span class="text-danger"></span>
                     <label for="floatingSelect">Seleccione tipo de documento</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
                     <input type="number" class="form-control" name="identificacion" value="${cliente.identificacion}" id="floatingInput" placeholder="Ingrese número de identificación.">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">RIF O ID</label>
-                    <div class="text-danger validate"></div>
                 </div>
                 <div class="form-floating m-2">
-                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <input type="text" class="form-control" name="telefono" value="${cliente.telefono ? cliente.telefono : ""}" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                    <span class="text-danger"></span>
                     <label for="floatingInput">TELÉFONO</label>
-                    <div class="text-danger validate"></div>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="direccion" value="${cliente.direccion ? cliente.direccion : ""}" id="floatingInput" placeholder="Ingrese dirección.">
+                    <span class="text-danger"></span>
+                    <label for="floatingInput">DIRECCIÓN</label>
+                </div>
+                <div class="form-floating m-2">
+                    <input type="text" class="form-control" name="correo" value="${cliente.correo ? cliente.correo : ""}" id="floatingInput" placeholder="Ingrese correo electrónico.">
+                    <span class="text-danger"></span>
+                    <label for="floatingInput">E-MAIL</label>
                 </div>
                 <div class="form-floating m-2">
                     <button type="submit" class="btn btn-success w-100 ">Guardar datos</button>
-                    
                 </div>
     
     
@@ -276,11 +288,8 @@ const componenteAgregarCantidadDeProductoModal = (producto) =>{
 
                 <div class="form-floating mb-3">
                     <input type="submit" class="btn btn-primary agregar-producto" id="agregarProductoAlCarrito" name="${producto.codigo}" value="Agregar a factura" />
-                    <p class="btn btn-danger m-1 cerrar__ModalCustom" id="cerrarModalCustom"> SALIR </p>
+                    <p class="btn btn-danger m-1 cerrar__ModalCustom" id="cerrarModalCustom"> Cerrar </p>
                 </div>
-
-
-               
             </div>
         </section>
     `;
@@ -484,7 +493,7 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
 };
 
 
-const componenteMetodoDePago  = async (factura) => {
+const componenteMetodoDePagoModal  = async (factura) => {
     return `
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -518,6 +527,16 @@ const componenteMetodoDePago  = async (factura) => {
     `;
 };
 
+const componenteBotonesDeImpresion = () =>{
+    return `
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibreFactura">IMPRIMIR FORMATO FORMULA LIBRE FACTURA</button>
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirFormulaLibre">IMPRIMIR FORMATO FORMULA LIBRE NOTA</button>
+            <button class="btn btn-primary acciones-factura" type="button" id="imprimirTicket">IMPRIMIR TICKET</button>
+            <button class="btn btn-danger acciones-factura" type="button" id="finalizarFacturacion">FINALIZAR</button>
+        </div>
+    `;
+}
 
 /** MANEJADORES DE EVENTOS */
 const hanledLoad = async (e) => {
@@ -546,8 +565,8 @@ const hanledLoad = async (e) => {
         factura = facturaStorage;
 
         /** CLIENTE */
-        elementoTarjetaCliente.innerHTML = spinner;
-        listaDeProductosEnFactura.innerHTML = spinner;
+        elementoTarjetaCliente.innerHTML = spinner();
+        listaDeProductosEnFactura.innerHTML = spinner();
         if(factura.identificacion.length != 0){
             resultadoCliente = await getCliente(factura.identificacion);
         }
@@ -571,7 +590,7 @@ const hanledLoad = async (e) => {
     }
 
     /** Cargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
+    elementoFactura.innerHTML = spinner();
 
     /** Validamos si el carrito tiene productos para cargarlos a la factura */
     carritoStorage =  localStorage.getItem('carritoSalida')  ? JSON.parse(localStorage.getItem('carritoSalida')) : [];
@@ -615,7 +634,7 @@ const hanledAccionesCliente = async (e) => {
             cargarEventosDeFormularios();
             break;
         case 'activarFormEditarCliente':
-            elementoTarjetaCliente.innerHTML = spinner;
+            elementoTarjetaCliente.innerHTML = spinner();
           
             let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
             elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
@@ -638,8 +657,8 @@ const hanledBuscarCliente = async (e) => {
         else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
   
         
-        /** Se cargar el spinner para mostrar que esta procesando */
-        elementoTarjetaCliente.innerHTML = spinner;
+        /** Se cargar el spinner() para mostrar que esta procesando */
+        elementoTarjetaCliente.innerHTML = spinner();
         let cliente = await getCliente( parseInt(e.target.value) );
 
         /** Validamos si no hay data del cliente */
@@ -670,7 +689,7 @@ const hanledFormulario = async (e) => {
         case 'formCrearCliente':
                     resultado = await validarDataDeFormularioCliente(e.target)
                     if(!resultado) return;
-                    e.target.innerHTML = spinner;
+                    e.target.innerHTML = spinner();
                     
                     cliente = await storeCliente(resultado);
 
@@ -699,7 +718,7 @@ const hanledFormulario = async (e) => {
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
             if(!resultado) return;
-            e.target.innerHTML = spinner;
+            e.target.innerHTML = spinner();
 
             cliente = await updateCliente(e.target.action, resultado);
                /** Seteamos el cliente en la factura de local storage */
@@ -862,7 +881,7 @@ const hanledBuscarProducto = async (e) => {
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         
-        elementoTotalProductos.innerHTML = spinner;
+        elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
     
         let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
@@ -888,15 +907,13 @@ const hanledBuscarProducto = async (e) => {
 const hanledAccionesDeCarritoFactura = async (e) => {
     e.preventDefault();
     /** Declaracion de variables */
+    log(e.target)
     let cantidad = 0,
     carritoActual = JSON.parse(localStorage.getItem('carritoSalida')),
     accion='',
     banderaDeError = 0,
     facturaActual = '',
     acumuladorSubtotal = 0;
-
-    log(e.target.localName)
-    log(e.target.parentElement.id)
   
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
@@ -909,7 +926,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
     }
-log(accion)
+
     switch (accion) {
         case 'editarCantidadFactura':
                 cantidad = prompt('Ingrese nueva cantidad:');
@@ -980,8 +997,8 @@ log(accion)
     
                 elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
                 setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
                     window.location.href = `${URL_BASE_APP}/inventarios/crearSalida`;
+                    elementoAlertas.innerHTML=spinner();
                 }, 2500);
             }else{
                 elementoAlertas.innerHTML = componenteAlerta('No hay factura creada para eliminar', 404);
@@ -997,122 +1014,21 @@ log(accion)
        
             if(facturaActual){
                 /** Eliminamos la factura y el carrito del almacen local */
-                    localStorage.removeItem('carritoSalida');
-                    localStorage.removeItem('facturaSalida');
-    
-                elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
-                setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner;
-                    window.location.href = `${URL_BASE_APP}/inventarios`;
-                }, 1500);
+                localStorage.removeItem('carritoSalida');
+                localStorage.removeItem('facturaSalida');
+                e.target.innerHTML = spinner('text-white');
+                window.location.href = `${URL_BASE_APP}/inventarios`;
+            }else{
+                window.location.href = `${URL_BASE_APP}/inventarios`;
             }
 
             break;
         case 'cargarModalMetodoPago':
-                if(factura.identificacion == ""){
-                    
-                  
-                    return alert("Debes Ingresar un cliente para poder vender");
-                }
-               
-               await cargarEventosAccionesDeFactura()
-
+            await cargarEventosAccionesDeFactura()
             break;
         case 'vender':
-            /** declaracion de variables */
-            let abonado = 0,
-            resultadoDefacturarCarrito = '';
-
-            /** validamos si el cliente esta gregado a la factura  */
-            if(factura.identificacion == "") {
-                e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
-                let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                return setTimeout( () => {
-                    elementoAlertaVender.forEach(element => {
-                        element.classList.add('d-none')
-                    });
-                    cargarEventosAccionesDeFactura();
-                }, 2500);
-            } 
-         
-            /** Sumamos todos los metodos de pago */
-            metodosPagos.forEach(elementoAbono => {
-                if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
-                else abonado += elementoAbono.montoDelPago / factura.tasa;
-            });
-
-    
-
-                /** Validamos si el monto es mayor o igual al total a pagar */
-             
-                if( (Math.round(abonado*100)/100) >= (Math.round(factura.total * 100)/100) ){
-                    
-                    /** Agregamos los metodos en formato JSON a la factura */
-                    factura.metodos = JSON.stringify(metodosPagos);
-                  
-                    /** Guardamos los cambios en localStorage */
-                    localStorage.setItem('facturaSalida', JSON.stringify(factura));
-    
-                    /** Obtenemos el carrito y la factura actualizados */
-                    let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
-                    carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
-                 
-                    /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-                    carritoVender.forEach(async producto => {
-                        producto.identificacion = facturaVender.identificacion;
-                        producto.subtotal = producto.subtotal;
-                        await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
-                    });
-
-                    /** MOSTRAR QUE ESTA CARGANDO  */
-                    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
-
-                    /** FACTURAR */
-                    setTimeout( async ()=>{
-                        
-                            /** Procesamos la factura y generamos el ticket */
-                            resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
-        
-                            /** Mostramos el dialogo de facturar */
-                            if (resultadoDeFacturar.estatus == 201) {
-                                resultado = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
-                                if (resultado) {
-        
-                                    imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
-                                    
-                                    resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                                    if (resultadoOtraCapia) {
-                                        imprimirElemento(htmlTicketSalidaV1(resultadoDeFacturar.data));
-                                    }
-                                    /** Eliminamos la factura del Storagr */
-                                    localStorage.removeItem('carritoSalida');
-                                    localStorage.removeItem('facturaSalida');
-                                    window.location.href = "/inventarios/crearSalida";
-        
-                                } else {
-                                    /** Eliminamos la factura del Storagr */
-                                    localStorage.removeItem('carritoSalida');
-                                    localStorage.removeItem('facturaSalida');
-                                    window.location.href = "/inventarios/crearSalida";
-                                }
-                            } else {
-                                alert(resultadoDeFacturar.mensaje)
-                            }
-        
-                        }, 2500);
-                        
-                    }else{
-                        
-                        e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
-                        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                        return setTimeout( () => {
-                            elementoAlertaVender.forEach(element => {
-                                element.classList.add('d-none')
-                            });
-                            cargarEventosAccionesDeFactura();
-                        }, 2500);
-                    }
-
+            
+            await procesarFactura(e);
 
             break;
         case 'desactivarFacturaFiscal':
@@ -1127,6 +1043,25 @@ log(accion)
         case 'concepto_salida':
                 factura.concepto = e.target.value;
                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
+            break;
+        case 'imprimirFormulaLibre':
+                log('imprimiendo formula libre NOTA')
+                imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
+              break;
+        case 'imprimirFormulaLibreFactura':
+                log('imprimiendo formula libre FACTURA')
+                imprimirElementoFormulaLibre(formulaLibreFacturaHtml(resultadoDeFacturar.data));
+              break;
+        case 'imprimirTicket':
+                log('imprimiendo ticket')
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
+            break;
+        case 'finalizarFacturacion':
+                log('finalizando facturacion')
+                /** Eliminamos la factura del Storagr */
+                localStorage.removeItem('carritoSalida');
+                localStorage.removeItem('facturaSalida');
+                window.location.href = "/inventarios/crearSalida";
             break;
         default:
             break;
@@ -1265,6 +1200,97 @@ elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);
 
 /** ULTILIDADES */
 
+const procesarFactura = async (e) => {
+    /** declaracion de variables */
+    let abonado = 0,
+    resultadoDefacturarCarrito = '';
+
+    /** validamos que halla productos en la factura */
+    if(JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
+    
+     /** validamos si el cliente esta gregado a la factura  */
+    if(factura.identificacion == "") {
+        e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
+        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
+        return setTimeout( () => {
+            elementoAlertaVender.forEach(element => {
+                element.classList.add('d-none')
+            });
+            cargarEventosAccionesDeFactura();
+        }, 2500);
+    } 
+ 
+    /** Sumamos todos los metodos de pago */
+    metodosPagos.forEach(elementoAbono => {
+        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
+        else abonado += elementoAbono.montoDelPago / factura.tasa;
+    });
+
+    /** Validamos si el monto es mayor o igual al total a pagar */
+        if( (Math.round(abonado*100)/100) >= (Math.round(factura.total * 100)/100) ){
+            
+            /** Agregamos los metodos en formato JSON a la factura */
+            factura.metodos = JSON.stringify(metodosPagos);
+          
+            /** Guardamos los cambios en localStorage */
+            localStorage.setItem('facturaSalida', JSON.stringify(factura));
+
+            /** Obtenemos el carrito y la factura actualizados */
+            let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
+            carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
+         
+            /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
+            carritoVender.forEach(async producto => {
+                producto.identificacion = facturaVender.identificacion;
+                await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
+            });
+
+            /** MOSTRAR QUE ESTA CARGANDO  */
+            e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+            e.target.parentElement.children[0].classList.add('d-none');
+            e.target.parentElement.children[1].classList.add('d-none');
+            /** FACTURAR */
+                setTimeout( async ()=>{
+
+                    /** Procesamos la factura y generamos el ticket */
+                    resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
+                    
+                    /** Mostramos el dialogo de facturar */
+                        if (resultadoDeFacturar.estatus == 201) {
+                            /** Eliminamos la factura del Storagr */
+                            localStorage.removeItem('carritoSalida');
+                            localStorage.removeItem('facturaSalida');
+                            /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                            e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
+                            e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
+                            e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
+                            await cargarEventosAccionesDeFactura();
+        
+                        } else {
+                            /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
+                              /** Eliminamos la factura del Storagr */
+                              localStorage.removeItem('carritoSalida');
+                              localStorage.removeItem('facturaSalida');
+                              e.target.parentElement.children[1].classList.add('d-none');
+                              e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("NO SE PROCESO LA FACTUA (ERROR)", 404, 'fs-1 m-2');
+                              setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
+                        }
+
+                }, 1500);
+                    
+                }else{
+                
+                e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
+                let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
+                return setTimeout( () => {
+                    elementoAlertaVender.forEach(element => {
+                        element.classList.add('d-none')
+                    });
+                    cargarEventosAccionesDeFactura();
+                }, 2500);
+            }
+}
+
 function cargarEventosAccionesDelCliente(){
     let accionesDelCliente = d.querySelectorAll('.acciones-cliente');
     accionesDelCliente.forEach(accionesCliente => {
@@ -1286,8 +1312,9 @@ async function validarDataDeFormularioCliente(formulario){
     banderaDeAlertar = 0;
     for (const iterator of formulario) {
         if(iterator.localName == "input" || iterator.localName == "select"){
+            if(iterator.name == "correo") {esquema[iterator.name] = iterator.value; continue;}
             if(!iterator.value.length) iterator.classList.add(['border-danger']), banderaDeAlertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
-            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent=`${iterator.name}`, iterator.classList.add(['border-success']);
+            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent=``, iterator.classList.add(['border-success']);
             if(iterator.value == "Tipo de documento") iterator.classList.add(['border-danger']), banderaDeAlertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
             // Asignamos el valor al esquema
             esquema[iterator.name] = iterator.value;
@@ -1405,11 +1432,11 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 
     /** Recargamos el componente factura */
-    elementoFactura.innerHTML = spinner;
+    elementoFactura.innerHTML = spinner();
     elementoFactura.innerHTML = await componenteFactura(factura);
 
        /** Cargamos el modal de metodos de pago */
-       elementoMetodoDePagoModal.innerHTML = await componenteMetodoDePago(factura);
+       elementoMetodoDePagoModal.innerHTML = await componenteMetodoDePagoModal(factura);
 
        /** Obtenemos el elemento del componente M-pagos */
        let elementoMetodoDePago = d.querySelector('#elementoMetodoDePago');

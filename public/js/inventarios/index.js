@@ -278,8 +278,8 @@ const hanledBotonEliminar = async (e) => {
     e.preventDefault();
     // log(e.target.parentElement.parentElement.parentElement.isConnected);
  
-    // Asignamos el spinner
-    e.target.parentElement.parentElement.children[1].innerHTML = spinner;
+    // Asignamos el spinner()
+    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
 
     // Ocultamos el boton eliminar al hacer la solicitud de eliminar
     e.target.parentElement.children[1].classList.add('d-none');
@@ -302,7 +302,7 @@ const hanledPaginacion = async (e) => {
     if(e.target.href){
         if(e.target.href.includes('getInventariosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
-            elementoTablaCuerpo.innerHTML = spinner;
+            elementoTablaCuerpo.innerHTML = spinner();
 
             let inventarios = await getInventariosFiltro(`${e.target.href}`,  config);
         
@@ -352,7 +352,7 @@ const hanledFormulario = async (e) => {
             
             
         
-                e.target.innerHTML = spinner;
+                e.target.innerHTML = spinner();
             
                 let resultado = await editarProductoDelInventario(e.target.action, esquema);
                 
@@ -381,7 +381,7 @@ const hanledFormulario = async (e) => {
 
                 let inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  config);
                 log(inventarios);
-                elementoTablaCuerpo.innerHTML = spinner;
+                elementoTablaCuerpo.innerHTML = spinner();
 
                 /** Si no hay datos entregamos un estatus 0 */
                 if(!inventarios.data.data.length) return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
@@ -459,7 +459,7 @@ function adaptadorDeProducto(data){
 };
 
 async function getLista(url = `${URL_BASE}/getInventarios`){
-    elementoTablaCuerpo.innerHTML = spinner;
+    elementoTablaCuerpo.innerHTML = spinner();
     let inventarios = await getInventarios(url);
 
     if(typeof(inventarios.data.data) == 'undefined'){

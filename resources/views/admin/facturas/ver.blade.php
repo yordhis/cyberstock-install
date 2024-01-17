@@ -39,9 +39,17 @@
                             <div class="p-2 bd-highlight" id="codigoFactura">{{ $factura->codigo }}</div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            <div class="p-2 bd-highlight">Fecha: {{ date_format(date_create( explode( " ",$factura->created_at)[0] ), "d-m-Y")  }}</div>
-                            <div class="p-2 bd-highlight">Hora: {{ date_format(date_create( explode( " ",$factura->created_at)[1] ), "h:i:s") }}</div>
+                            <div class="p-2 bd-highlight">Fecha: {{ $factura->fecha }}</div>
+                            <div class="p-2 bd-highlight">Hora: {{ $factura->hora }}</div>
                             
+                          </div>
+
+                          
+                          <div class="bg-black m-1 w-100" style="height: 2px;"></div>
+
+                          <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
+                            <div class="p-2 bd-highlight" > CANT. X PRODUCTO </div>
+                            <div class="p-2 bd-highlight" >C/U | SUBTOTAL</div>
                           </div>
     
                           <div class="bg-black m-1 w-100" style="height: 2px;"></div>
@@ -50,7 +58,10 @@
                           @foreach ($factura->carrito as $producto)
                             <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                               <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
-                              <div class="p-2 bd-highlight" >Bs {{ floatVal($producto->subtotal) *  $factura->tasa }}</div>
+                              <div class="p-2 bd-highlight" >
+                                Bs {{ floatVal($producto->costo) *  $factura->tasa }} |
+                                Bs {{ floatVal($producto->subtotal) *  $factura->tasa }}
+                              </div>
                             </div>
                             
                           @endforeach
@@ -77,12 +88,12 @@
                               Descuento: {{ $factura->descuento }}%
                              
                             </div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->descuento *  $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">Bs {{ number_format(($factura->descuento/100) * $factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            <div class="p-2 bd-highlight">IVA:</div>
+                            <div class="p-2 bd-highlight">IVA: {{ $factura->iva * 100 }}%</div>
                           
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal * $factura->tasa * $factura->iva, 2, ',', '.') }}</div>
                           </div>
                           
     

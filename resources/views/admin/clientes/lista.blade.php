@@ -3,6 +3,10 @@
 @section('title', 'Lista de Clientes')
 
 @section('content')
+    @isset($respuesta)
+        @include('partials.alert')
+    @endisset
+    
     <div id="alert"></div>
     <section class="section">
         <div class="row">
@@ -11,6 +15,10 @@
                 <h2>Lista de Clientes</h2>
             </div>
             <div class="col-sm-4 text-end">
+                @if($errors->any())
+                    <div class="text-danger">El cliente no se registro intente de nuevo, click en el botón.</div>
+                @endif
+               
                 @include('admin.clientes.partials.modalCrear')
             </div>
 

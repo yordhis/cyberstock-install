@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateClienteRequest extends FormRequest
+class UpdateActivoInmobiliarioRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +24,13 @@ class UpdateClienteRequest extends FormRequest
     public function rules()
     {
         return [
-            'identificacion' => 'numeric|required|max:100000000',
-            "nombre" => "required", 
-            "tipo"  => "required", 
-            "telefono" => "max:25", 
-            "direccion" => "max:255", 
-            "correo" => "max:255", 
+            'codigo' => 'required|max:55', 
+            'descripcion' => 'required|max:255', 
+            'ubicacion' => 'required|max:255',
+            'fecha_compra' => 'required|max:155',
+            'cantidad'=> 'numeric|required|min:1|max:255',
+            'costo' => 'numeric|required|min:1|max:255',
+            'estatus' => ''
         ];
     }
 }

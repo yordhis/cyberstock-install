@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    ActivoInmobiliarioController,
+    ApiController,
     CarritoController,
     CarritoInventarioController,
     CategoriaController,
@@ -41,6 +43,7 @@ Route::get('/', function () {
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout');
+Route::get('/preload', [ApiController::class, 'preload'])->name('api.preload');
 /** CIERRE LOGIN */
 
 
@@ -48,6 +51,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout')
 Route::middleware(['auth'])->group(function () {
     /** RUTAS DE PANEL */
         Route::get('/panel', [DashboardController::class, 'index'])->name('admin.panel.index');
+
+    /** RUTAS DE PANEL */
+        Route::resource('/activos', ActivoInmobiliarioController::class)->names('admin.activos');
    
     /** RUTAS DE PANEL */
         Route::delete('/eliminarTodoNotificaciones', [NotificacioneController::class, 'destroyAll'])->name('admin.notificaciones.destroyAll');
@@ -105,11 +111,13 @@ Route::middleware(['auth'])->group(function () {
         });
 
         /** POS VENTA */
-        // Route::prefix('pos')->group(function (){
-            Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
-            Route::resource('facturas', FacturaController::class)->names('admin.facturas');
-            Route::resource('clientes', ClienteController::class)->names('admin.clientes');
-        // });
+        Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
+        Route::resource('facturas', FacturaController::class)->names('admin.facturas');
+        
+        /** CLIENTES */
+        Route::resource('clientes', ClienteController::class)->names('admin.clientes');
+  
+        /** POS CONFIGURACIÓN */
         Route::resource('pos', PoController::class)->names('admin.pos');
       
 });

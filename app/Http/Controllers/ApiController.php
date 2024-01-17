@@ -13,6 +13,10 @@ use App\Models\{
 class ApiController extends Controller
 {
 
+    public function preload(){
+        return view('preload');
+    }
+
     public function getProveedor($idProveedor)
     {
         try {

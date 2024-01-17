@@ -1,4 +1,4 @@
-let formularios = d.forms;
+
 
 class Autorizacion {
     _password = ""
@@ -23,7 +23,7 @@ class Autorizacion {
 }
 
 /** MANAJADORES DE EVENTOS */
-const hanledFormulario = async (e) => {
+const hanledFormularioDeAutorizacion = async (e) => {
     if(e.target.id != "cerrarSesion"){
         e.preventDefault();
 
@@ -31,10 +31,10 @@ const hanledFormulario = async (e) => {
         resultado="";
 
         /** Seteamos la clave en el objeto */
-        autorizacion.setClave(await validarDataDeFormulario(e.target));
+        autorizacion.setClave(await validarDataDeFormularioAutorizacion(e.target));
 
         /** mostrar carga */
-        e.target.children[4].innerHTML = spinner;
+        e.target.children[4].innerHTML = spinner();
 
         /** Validar que la clave concida con la de algun aministrador */
         resultado = await autorizacion.verificarClave()
@@ -52,13 +52,14 @@ const hanledFormulario = async (e) => {
 };
 
 // /** LOS EVENTOS */
-for (const iterator of formularios) {
-    iterator.addEventListener('submit', hanledFormulario);
+let formulariosAuth = document.forms;
+for (const iterator of formulariosAuth) {
+    iterator.addEventListener('submit', hanledFormularioDeAutorizacion);
 }
 
 
 /** Validar formulario de cliente y retornar data */
-async function validarDataDeFormulario(formulario){
+async function validarDataDeFormularioAutorizacion(formulario){
     let esquema = {},
     banderaDeALertar = 0;
     for (const iterator of formulario) {

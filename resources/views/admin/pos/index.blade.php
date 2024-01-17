@@ -7,50 +7,19 @@
 
 
    
-    <div class="container-fluid ">
+    <div class="container-fluid">
        
         <div class="row position-relative">
-            {{-- Botenes cliente - factura --}}
-            <div class="col-12">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-1">
-                    <a href="{{ route('admin.facturas.index') }}" class="btn btn-primary m-2">
-                        <i class="bi bi-paypal"></i>
-                        Facturas
-                    </a>
-                    
-                    <a href="{{ route('admin.clientes.index') }}" class="btn btn-primary m-2">
-                        <i  class="bi bi-person"></i>
-                        Clientes
-                    </a>
-                </div>
-            </div>
             
-            {{-- Cliente --}}
             <div class="col-sm-2 col-xs-12">
 
-                {{--  Boton de salir --}}
-                <div class="card"  style=" height: 4.5rem; width: 100%;">
-                    <button class="btn btn-danger fs-3 h-100 acciones-factura" id="salirDelPos">
-                        <i class='bx bx-reply-all'></i> 
-                        Salir
-                    </button>
-                </div>
-
                 {{-- Tarjeta del cliente --}}
-                <div class="card" style="height: 25.5rem; width: 100%;" id="tarjetaCliente">       
-                </div>
+                <div class="card" style="height: auto; width: 100%;" id="tarjetaCliente"></div>
+                {{-- CIERRE Tarjeta del cliente --}}
 
                 {{-- Tarjeta del vendedor --}}
-                <div class="card" style="height: 11rem; width: 100%;">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">Vendedor ID: {{ Auth::user()->id }}</h5>
-                
-                        <p class="card-text" style="">
-                            <b>Usuario:</b> {{ Auth::user()->nombre }} <br>
-                            <b>Fecha y Hora:</b> {{ date('d/m/Y - h:m:sa') }}
-                        </p>
-                    </div>
-                </div>
+                @include('partials.tarjetavendedor')
+                {{-- CIERRE Tarjeta del vendedor --}}
                 
 
             </div> {{-- Cierre cliente --}}
@@ -97,8 +66,8 @@
             </div> {{-- CIERRE Filtro de productos --}}
 
             {{-- Factura --}}
-            <div class="col-sm-6 col-xs-12">
-                <div class="card" style=" height: 45rem; width: 100%;">
+            <div class="col-sm-5 col-xs-12">
+                <div class="card" style=" height: auto; width: 100%;">
                     {{-- alertas o mensaje de respuestas --}}
                     <div class="position-relative">
                         <div class="position-absolute top-0 end-0" id="alertas">
@@ -116,7 +85,7 @@
 
                         </div>
                     </div>
-                    <div class="card-body table-responsive" style="height: 25rem; overflow: auto;">
+                    <div class="card-body" style="height: 25rem; overflow: auto;">
                        <table class="table ">
                             <thead>
                                 <tr>
@@ -142,11 +111,78 @@
                
             </div> {{-- CIERRE Factura --}}
 
-            {{-- Metodos de pago --}}
-            <div class="col-sm-8" id="elementoMetodoDePagoModal">
-               
-  
+            {{-- MAs botones --}}
+            <div class="col-sm-1 col-xs-12 card">
+                <div class="row">
+                    {{--  Boton de salir --}}
+                    <div class="col-sm-12 acciones-factura">
+                        <button class="btn btn-danger w-100 my-2" id="salirDelPos">
+                            <i class='bx bx-reply-all fs-3'></i> 
+                            <p> Salir</p>
+                        </button>
+                    </div>
+    
+                    {{--  Boton de DEVOLUCIÓN --}}
+                    <div class="col-sm-12">
+                        <button class="btn btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#disablebackdrop">
+                            <i class='bx bx-transfer-alt fs-3'></i>
+                            <p> Devolución </p>
+                        </button>
+
+                        <div class="modal fade" id="disablebackdrop" tabindex="-1" data-bs-backdrop="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Realizar devolución o reembolso</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" id="inputCodigoDeLaFactura" placeholder="Ingrese código de la factura">
+                                        <span class="text-danger"></span>
+                                        <label for="floatingInput">Código de factura</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                  <button type="button" class="btn btn-primary acciones-factura" id="cargarFacturaDevolucion">Cargar Factura</button>
+                                </div>
+                              </div>
+                            </div>
+                        </div><!-- End Disabled Backdrop Modal-->
+                    </div>
+        
+                    {{--  Boton de COLOCAR EN ESPERA LA FACTURA --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-primary  w-100 my-2" 
+                            id="facturaEnEspera" >
+                            <i class='bx bxs-hourglass-top fs-3'></i> 
+                            <p> Guardar </p> 
+                        </button>
+                    </div>
+                    {{--  Boton de CARGAR FACTURA EN ESPERA PARA FACTURAR --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-info  w-100 my-2" 
+                            id="cargarFactura" >
+                            <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
+                            <p id="mensajeDeEspera"> En espera </p> 
+                        </button>
+                    </div>
+
+                    {{--  Boton de ELIMINAR FACTURA DE ESPERA --}}
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-warning  w-100 my-2" 
+                            id="limpiarBorrador" >
+                            <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
+                            <p> Limpiar </p> 
+                        </button>
+                    </div>
+                </div>
             </div>
+
+
+            {{-- Metodos de pago --}}
+            <div class="col-sm-8" id="elementoMetodoDePagoModal"></div>
         </div>
     </div>
     

@@ -8,6 +8,8 @@ const hanledReporte = async (e) => {
         tipo: "",
         rango: {}
     },
+    dataReporte = "",
+    empresa = "",
     url = `${URL_BASE}/storeReportes`,
     fechaPersonalizada;
     log(e.target);
@@ -21,9 +23,9 @@ const hanledReporte = async (e) => {
                     inicio: `${fechaPersonalizada.getFullYear()}-${fechaPersonalizada.getMonth()+1}-${fechaPersonalizada.getDate()}T${fechaPersonalizada.getHours()}:${fechaPersonalizada.getMinutes()}:${fechaPersonalizada.getSeconds()}`
                 };
 
-                /** ocultamos el boton y cargamos el spinner */
+                /** ocultamos el boton y cargamos el spinner() */
                 e.target.style = "display:none;";
-                e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner;
+                e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner();
 
                 /** Obtenemos la data del reporte segun el rango */
                 dataReporte = await storeReportes(url, config);
@@ -58,9 +60,9 @@ const hanledReporte = async (e) => {
                     inicio: `${fechaPersonalizada.getFullYear()}-${fechaPersonalizada.getMonth()+1}-${fechaPersonalizada.getDate()}T${fechaPersonalizada.getHours()}:${fechaPersonalizada.getMinutes()}:${fechaPersonalizada.getSeconds()}`
                 };
 
-                /** ocultamos el boton y cargamos el spinner */
+                /** ocultamos el boton y cargamos el spinner() */
                 e.target.style = "display:none;";
-                e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner;
+                e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner();
 
                 /** Obtenemos la data del reporte segun el rango */
                 dataReporte = await storeReportes(url, config);
@@ -96,6 +98,8 @@ const hanledReporte = async (e) => {
             if(config.rango.tipoDeReporte == "DETALLADO") config.tipo = 'storeReportesDetallado';
             else config.tipo = e.target.id;
             
+            log(config)
+            
             /** Detenemos la ejecución por falta de rango de fecha */
             if(config.rango == false) return;
 
@@ -109,9 +113,9 @@ const hanledReporte = async (e) => {
             empresa = await getEmpresa();
             log(dataReporte);
 
-            /** ocultamos el boton y cargamos el spinner */
+            /** ocultamos el boton y cargamos el spinner() */
             e.target.style = "display:none;";
-            e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner;
+            e.target.parentElement.children[ e.target.parentElement.children.length - 1].innerHTML= spinner();
 
               /** validamos si hay datos */
               if(empresa.estatus == 401){
@@ -121,6 +125,9 @@ const hanledReporte = async (e) => {
                       e.target.style = "display:greed;";
                   }, 5000);
               }
+
+              log(dataReporte)
+
               if(dataReporte.data.length){
                 if(config.rango.tipoDeReporte == "DETALLADO") imprimirElemento(reportePorRangoDetalladolHtml(dataReporte.data, empresa.data, config));
                 else imprimirElemento(reportePorRangoGeneralHtml(dataReporte.data, empresa.data, config));;
