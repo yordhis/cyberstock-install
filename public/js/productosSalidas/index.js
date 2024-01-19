@@ -907,14 +907,13 @@ const hanledBuscarProducto = async (e) => {
 const hanledAccionesDeCarritoFactura = async (e) => {
     e.preventDefault();
     /** Declaracion de variables */
-    log(e.target)
     let cantidad = 0,
     carritoActual = JSON.parse(localStorage.getItem('carritoSalida')),
     accion='',
     banderaDeError = 0,
     facturaActual = '',
     acumuladorSubtotal = 0;
-  
+   
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
         accion = e.target.id;
@@ -925,7 +924,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.parentElement.id;
     }else if(e.target.localName == 'input'){
         accion = e.target.id;
+    }else if(e.target.localName == 'select'){
+        accion = e.target.id;
     }
+
 
     switch (accion) {
         case 'editarCantidadFactura':
@@ -1335,14 +1337,14 @@ function adaptadorDeProducto(data){
         codigo: data.codigo,
         descripcion: data.descripcion,
         cantidad: data.cantidad,
-        costo: darFormatoDeNumero(parseFloat( data.costo )),
-        costoBs: darFormatoDeNumero(parseFloat( data.costo * data.tasa )),
-        pvpBs: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp) )),
-        pvp:  darFormatoDeNumero(parseFloat(data.pvp)),
-        pvpBs_2: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp_2) )),
-        pvp_2:  darFormatoDeNumero(parseFloat(data.pvp_2)),
-        pvpBs_3: darFormatoDeNumero(parseFloat( (data.tasa * data.pvp_3) )),
-        pvp_3:  darFormatoDeNumero(parseFloat(data.pvp_3)),
+        costo: parseFloat( data.costo ),
+        costoBs: parseFloat( data.costo * data.tasa ),
+        pvpBs: parseFloat( (data.tasa * data.pvp) ),
+        pvp:  parseFloat(data.pvp),
+        pvpBs_2: parseFloat( (data.tasa * data.pvp_2) ),
+        pvp_2:  parseFloat(data.pvp_2),
+        pvpBs_3: parseFloat( (data.tasa * data.pvp_3) ),
+        pvp_3:  parseFloat(data.pvp_3),
         marca: data.id_marca.nombre,
         imagen: data.imagen,
         fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),

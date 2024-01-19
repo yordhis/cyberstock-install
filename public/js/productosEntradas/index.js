@@ -880,6 +880,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.id;
     }else if(e.target.localName == 'option'){
         accion = e.target.parentElement.id;
+    }else if(e.target.localName == 'select'){
+        accion = e.target.id;
     }
 
     switch (accion) {
@@ -1061,7 +1063,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                             resultadoConfirm = confirm("Compra procesada correctamente, ¿Deseas imprimir el comprobante?");
                             if (resultadoConfirm) {
                                 let facturaDeCompra = htmlTicketEntrada(resultadoDeFacturar.data)
-                                setTimeout(()=>imprimirElemento(facturaDeCompra),1000);
+                                setTimeout(()=>imprimirElementoPos(facturaDeCompra),1000);
                                
                                 /** Eliminamos la factura del Storagr */
                                 setTimeout(()=>{
@@ -1100,6 +1102,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'concepto_entrada':
             factura.concepto = e.target.value;
+            log(e.target.value)
+            log(factura)
             localStorage.setItem('facturaInventario', JSON.stringify(factura));
         break;
         default:

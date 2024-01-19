@@ -199,7 +199,7 @@ const htmlTicketSalidaV1 = (factura) => {
 };
 
 /** TICKET DE ENTRADA */
-const htmlTicketEntrada = (factura) => {
+const htmlTicketEntradaExample = (factura) => {
     log(factura)
     // Declaracion de variables
     let carritoHtml = '', 
@@ -321,6 +321,174 @@ const htmlTicketEntrada = (factura) => {
       `;
 };
 
+/** TICKET DE POS - COMPRA */
+const htmlTicketEntrada = (factura) => {
+    // Declaracion de variables
+    let carritoHtml = '', 
+    descuentoHtml = '',
+    metodosPagosHtml = '',
+    logo = '',
+    metodosPagos = JSON.parse(factura.metodos),
+    ivaHtml = '',
+    cambioHtml = '';
+
+    // Recorremos el carrito
+    factura.carrito.forEach(producto => {
+        carritoHtml+=`
+            <tr>
+                <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
+                <td class="text__right">| ${darFormatoDeNumero(producto.costo * factura.tasa) } Bs |</td>
+                <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs</td>
+            </tr>
+        `;
+    });
+
+    // Verificacamos si se aplico el impuesto
+    if( factura.iva > 0 ){
+        ivaHtml = `
+            <tr>
+                <td class="text__left border">IVA 16%:</td>
+                <td colspan="2" class="text__right border">   ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  } Bs</td>
+            </tr>
+        `;
+    }
+
+    // Verificamos si se aplico un descuento
+    if(factura.descuento > 0){
+        descuentoHtml = ` 
+            <tr>
+                <td class="text__left border">Descuento ${factura.descuento}%:</td>
+                <td colspan="2" class="text__right border">  ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) } Bs</td>
+            </tr>
+        `;
+    }
+
+    // recorremos los metodos de pagos
+    // let cambio = 0;
+    // metodosPagos.forEach((pago)=>{
+    //     if(pago.tipoDePago == "DIVISAS"){
+    //         metodosPagosHtml += `
+    //             <tr>
+    //                 <td class="text__left border">EFECTIVO 2:</td>
+    //                 <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }Bs</td>
+    //             </tr>
+    //         `;
+    //         cambio += parseFloat(pago.montoDelPago * factura.tasa); 
+    //     }else{
+    //         metodosPagosHtml += `
+    //             <tr>
+    //                 <td class="text__left border">${pago.tipoDePago}:</td>
+    //                 <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago) }Bs</td>
+    //             </tr>
+    //         `;
+    //         cambio += parseFloat(pago.montoDelPago); 
+    //     }
+    // });
+
+    // if(cambio > factura.total){
+    //     cambioHtml = `
+    //         <tr>
+    //             <td class="text__left border">CAMBIO:</td>
+    //             <td colspan="2" class="text__right border"> ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) } Bs</td>
+    //         </tr>
+    //     `;
+    // }
+
+    // VERIFIVCAMOS SI SE DESEA IMPRIMIR CON EL LOGO
+    // if (factura.pos.estatusImagen) {
+    //     logo = `<img src="${factura.pos.imagen}" class="img" alt="Logotipo"> <br>`;
+    // } else {
+    //     logo= '';
+    // }
+
+    return `
+        <div class="ticket" id="ticket">    
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text__left border"> N# MOVIMIENTO: </th>
+            
+                        <th colspan="2" class="text__right border"> ${factura.codigo} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left border">CONCEPTO: </th>
+            
+                        <th colspan="2" class="text__right border"> ${factura.concepto} </th>
+                    </tr>
+
+                    <tr>
+                        <th colspan="3" class="text__left border">PROVEEDOR: ${factura.pos.empresa.toUpperCase()}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="text__left">RIF: ${factura.pos.tipo_documento}-${factura.pos.codigo}</th>
+                    </tr>
+                    <tr>
+                        <th class="text__left border"> N# ${factura.iva  > 0 ? 'FACTURA' : 'NOTA' }: </th>
+            
+                        <th colspan="2" class="text__right border"> ${factura.codigo_factura} </th>
+                    </tr>
+                    
+                    
+                    <tr>
+                        <th class="text__left"> FECHA: </th>
+            
+                        <th colspan="2" class="text__right"> ${factura.fecha} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left">HORA:</th>
+            
+                        <th colspan="2" class="text__right"> ${factura.hora} </th>
+                    </tr>
+                    <tr>
+                        <th class="text__left border-mix"> CANT X PRODUCTO </th>
+                        
+                        <th class="text__right border-mix"> |  C/U  | </th>
+                        <th class="text__right border-mix"> SUBTOTAL </th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+             
+                    ${carritoHtml}
+                    
+                    
+            
+            
+                    <tr>
+                        <td class="text__left border">
+                            |Total de Articulos: ${factura.totalArticulo} | <br>
+                            SUB-TOTAL: <br>
+                        </td>
+            
+                        <td colspan="2" class="text__right border"><br>   ${ darFormatoDeNumero(factura.subtotal * factura.tasa) } Bs</td>
+                    </tr>
+
+                    ${descuentoHtml}
+                    ${ivaHtml}
+
+                    <tr>
+                        <td class="text__left border">TOTAL:</td>
+                        <td colspan="2" class="text__right border" > ${ darFormatoDeNumero(factura.total * factura.tasa) } Bs</td>
+                    </tr>
+
+                    
+                    <tr>
+                        <td class="text__left border">TOTAL REF:</td>
+                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
+                    </tr> 
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="centrado border">
+                            ----- FACTURA DE COMPRA ----- 
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+      `;
+};
 /** TICKET DE POS - VENTA */
 const htmlTicket = (factura) => {
     // Declaracion de variables
