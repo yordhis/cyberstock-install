@@ -481,7 +481,7 @@ const htmlTicket = (factura) => {
                 <tfoot>
                     <tr>
                         <td colspan="3" class="centrado border">
-                            ¡GRACIAS POR SU COMPRA!
+                            ¡    GRACIAS POR SU COMPRA    ! 
                         </td>
                     </tr>
                 </tfoot>
