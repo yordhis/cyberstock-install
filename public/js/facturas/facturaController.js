@@ -598,11 +598,11 @@ const imprimirElemento = (elemento) => {
 const imprimirElementoPos = (elemento) => {
     var ventana = window.open('', 'PRINT', 'height=400,width=600');
     ventana.document.write('<html><head><title>Factura</title>');
-    ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
+    // ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
     ventana.document.write(`<style>
         * {
-        margin-top: 0%;
-        font-size: 12px;
+        margin: 0%;
+        font-size: 10px;
         font-family: 'Times New Roman';
         }
 
