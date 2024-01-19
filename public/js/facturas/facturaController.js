@@ -347,8 +347,8 @@ const htmlTicket = (factura) => {
     if( factura.iva > 0 ){
         ivaHtml = `
             <tr>
-                <td class="text__left border">IVA 16%</td>
-                <td colspan="2" class="text__right border">Bs  ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  }</td>
+                <td class="text__left border">IVA 16%:</td>
+                <td colspan="2" class="text__right border"> Bs  ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  }</td>
             </tr>
         `;
     }
@@ -357,7 +357,7 @@ const htmlTicket = (factura) => {
     if(factura.descuento > 0){
         descuentoHtml = ` 
             <tr>
-                <td class="text__left border">Descuento ${factura.descuento}%</td>
+                <td class="text__left border">Descuento ${factura.descuento}%:</td>
                 <td colspan="2" class="text__right border">Bs  ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) }</td>
             </tr>
         `;
@@ -369,7 +369,7 @@ const htmlTicket = (factura) => {
         if(pago.tipoDePago == "DIVISAS"){
             metodosPagosHtml += `
                 <tr>
-                    <td class="text__left border">EFECTIVO 2</td>
+                    <td class="text__left border">EFECTIVO 2:</td>
                     <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }</td>
                 </tr>
             `;
@@ -377,7 +377,7 @@ const htmlTicket = (factura) => {
         }else{
             metodosPagosHtml += `
                 <tr>
-                    <td class="text__left border">${pago.tipoDePago}</td>
+                    <td class="text__left border">${pago.tipoDePago}:</td>
                     <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago) }</td>
                 </tr>
             `;
@@ -388,7 +388,7 @@ const htmlTicket = (factura) => {
     if(cambio > factura.total){
         cambioHtml = `
             <tr>
-                <td class="text__left border">CAMBIO</td>
+                <td class="text__left border">CAMBIO:</td>
                 <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) }</td>
             </tr>
         `;
@@ -422,24 +422,24 @@ const htmlTicket = (factura) => {
                         <th colspan="3" class="text__left">RIF: ${factura.cliente.tipo}-${darFormatoDeNumero(factura.cliente.identificacion)}</th>
                     </tr>
                     <tr>
-                        <th class="text__left border"> N° ${factura.iva  > 0 ? 'FACTURA' : 'NOTA' } </th>
+                        <th class="text__left border"> N# ${factura.iva  > 0 ? 'FACTURA' : 'NOTA' }: </th>
             
                         <th colspan="2" class="text__right border"> ${factura.codigo} </th>
                     </tr>
                     <tr>
-                        <th class="text__left"> FECHA </th>
+                        <th class="text__left"> FECHA: </th>
             
                         <th colspan="2" class="text__right"> ${factura.fecha} </th>
                     </tr>
                     <tr>
-                        <th class="text__left">HORA</th>
+                        <th class="text__left">HORA:</th>
             
                         <th colspan="2" class="text__right"> ${factura.hora} </th>
                     </tr>
                     <tr>
                         <th class="text__left border-mix"> CANT X PRODUCTO </th>
                         
-                        <th class="text__right border-mix"> | C/U | </th>
+                        <th class="text__right border-mix"> |  C/U  | </th>
                         <th class="text__right border-mix"> SUBTOTAL </th>
                     </tr>
                     
@@ -454,7 +454,7 @@ const htmlTicket = (factura) => {
                     <tr>
                         <td class="text__left border">
                             |Total de Articulos: ${factura.totalArticulo} | <br>
-                            SUB-TOTAL <br>
+                            SUB-TOTAL: <br>
                         </td>
             
                         <td colspan="2" class="text__right border"><br> Bs  ${ darFormatoDeNumero(factura.subtotal * factura.tasa) }</td>
@@ -464,13 +464,13 @@ const htmlTicket = (factura) => {
                     ${ivaHtml}
 
                     <tr>
-                        <td class="text__left border">TOTAL</td>
+                        <td class="text__left border">TOTAL:</td>
                         <td colspan="2" class="text__right border" >Bs ${ darFormatoDeNumero(factura.total * factura.tasa) }</td>
                     </tr>
 
                     <!-- Oculto para la roca
                     <tr>
-                        <td class="text__left border">TOTAL REF</td>
+                        <td class="text__left border">TOTAL REF:</td>
                         <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
                     </tr> -->
 
