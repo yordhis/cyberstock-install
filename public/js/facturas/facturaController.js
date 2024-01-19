@@ -337,8 +337,8 @@ const htmlTicket = (factura) => {
         carritoHtml+=`
             <tr>
                 <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
-                <td class="text__right">Bs ${darFormatoDeNumero(producto.costo * factura.tasa) }</td>
-                <td class="text__right">Bs ${ darFormatoDeNumero(producto.subtotal * factura.tasa) }</td>
+                <td class="text__right">${darFormatoDeNumero(producto.costo * factura.tasa) } Bs</td>
+                <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs</td>
             </tr>
         `;
     });
@@ -348,7 +348,7 @@ const htmlTicket = (factura) => {
         ivaHtml = `
             <tr>
                 <td class="text__left border">IVA 16%:</td>
-                <td colspan="2" class="text__right border"> Bs  ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  }</td>
+                <td colspan="2" class="text__right border">   ${ darFormatoDeNumero( factura.subtotal * factura.tasa * factura.iva )  } Bs</td>
             </tr>
         `;
     }
@@ -358,7 +358,7 @@ const htmlTicket = (factura) => {
         descuentoHtml = ` 
             <tr>
                 <td class="text__left border">Descuento ${factura.descuento}%:</td>
-                <td colspan="2" class="text__right border">Bs  ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) }</td>
+                <td colspan="2" class="text__right border">  ${ darFormatoDeNumero( (factura.subtotal * ( factura.descuento/100 )) * factura.tasa ) } Bs</td>
             </tr>
         `;
     }
@@ -370,7 +370,7 @@ const htmlTicket = (factura) => {
             metodosPagosHtml += `
                 <tr>
                     <td class="text__left border">EFECTIVO 2:</td>
-                    <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }</td>
+                    <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }Bs</td>
                 </tr>
             `;
             cambio += parseFloat(pago.montoDelPago * factura.tasa); 
@@ -378,7 +378,7 @@ const htmlTicket = (factura) => {
             metodosPagosHtml += `
                 <tr>
                     <td class="text__left border">${pago.tipoDePago}:</td>
-                    <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero(pago.montoDelPago) }</td>
+                    <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago) }Bs</td>
                 </tr>
             `;
             cambio += parseFloat(pago.montoDelPago); 
@@ -389,7 +389,7 @@ const htmlTicket = (factura) => {
         cambioHtml = `
             <tr>
                 <td class="text__left border">CAMBIO:</td>
-                <td colspan="2" class="text__right border">Bs ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) }</td>
+                <td colspan="2" class="text__right border"> ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) } Bs</td>
             </tr>
         `;
     }
@@ -457,7 +457,7 @@ const htmlTicket = (factura) => {
                             SUB-TOTAL: <br>
                         </td>
             
-                        <td colspan="2" class="text__right border"><br> Bs  ${ darFormatoDeNumero(factura.subtotal * factura.tasa) }</td>
+                        <td colspan="2" class="text__right border"><br>   ${ darFormatoDeNumero(factura.subtotal * factura.tasa) } Bs</td>
                     </tr>
 
                     ${descuentoHtml}
@@ -465,7 +465,7 @@ const htmlTicket = (factura) => {
 
                     <tr>
                         <td class="text__left border">TOTAL:</td>
-                        <td colspan="2" class="text__right border" >Bs ${ darFormatoDeNumero(factura.total * factura.tasa) }</td>
+                        <td colspan="2" class="text__right border" > ${ darFormatoDeNumero(factura.total * factura.tasa) } Bs</td>
                     </tr>
 
                     <!-- Oculto para la roca
