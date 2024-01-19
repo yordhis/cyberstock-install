@@ -437,9 +437,9 @@ const htmlTicket = (factura) => {
                         <th colspan="2" class="text__right"> ${factura.hora} </th>
                     </tr>
                     <tr>
-                        <th class="text__left border-mix">CANT X PRODUCTO</th>
+                        <th class="text__left border-mix"> CANT X PRODUCTO </th>
                         
-                        <th class="text__right border-mix"> C/U </th>
+                        <th class="text__right border-mix"> | C/U | </th>
                         <th class="text__right border-mix"> SUBTOTAL </th>
                     </tr>
                     
