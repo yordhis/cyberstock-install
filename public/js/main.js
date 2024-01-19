@@ -54,9 +54,13 @@ const componenteAlerta = (mensaje, estatus, clasesExtras = "") => {
 };
 
 const darFormatoDeNumero = (numero) => {
-    return  new Intl.NumberFormat("de-DE", {
-      maximumFractionDigits: 2,
+    return  new Intl.NumberFormat("ves", {
+      maximumFractionDigits: 3,
+      minimumFractionDigits: 2
     }).format(numero)
+    // return  new Intl.NumberFormat("de-DE", {
+    //   maximumFractionDigits: 2,
+    // }).format(numero)
 };
 
 /** REGISTRA LOS MOVIMIENTOS DE LOS USUARIO Y SUS VENTAS

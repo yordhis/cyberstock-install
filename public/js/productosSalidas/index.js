@@ -1046,15 +1046,19 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             break;
         case 'imprimirFormulaLibre':
                 log('imprimiendo formula libre NOTA')
-                imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
+                let formulaLN = formulaLibreHtml(resultadoDeFacturar.data);
+                setTimeout(()=>imprimirElementoFormulaLibre(formulaLN),1000);
+                
               break;
         case 'imprimirFormulaLibreFactura':
                 log('imprimiendo formula libre FACTURA')
-                imprimirElementoFormulaLibre(formulaLibreFacturaHtml(resultadoDeFacturar.data));
+                let formulaLF = formulaLibreFacturaHtml(resultadoDeFacturar.data);
+                setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
               break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
-                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
+                let hTicket = htmlTicket(resultadoDeFacturar.data);
+                setTimeout(()=>imprimirElementoPos(hTicket), 1000);
             break;
         case 'finalizarFacturacion':
                 log('finalizando facturacion')

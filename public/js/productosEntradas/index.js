@@ -1058,19 +1058,17 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
                         /** Mostramos el dialogo de facturar */
                          if ( resultadoDeFacturar.estatus == 201 ) {
-                            resultadoConfirm = confirm("Factura procesada correctamente, ¿Deseas imprimir el comprobante?");
+                            resultadoConfirm = confirm("Compra procesada correctamente, ¿Deseas imprimir el comprobante?");
                             if (resultadoConfirm) {
-                                
-                                imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
+                                let facturaDeCompra = htmlTicketEntrada(resultadoDeFacturar.data)
+                                setTimeout(()=>imprimirElemento(facturaDeCompra),1000);
                                
-                                // resultadoOtraCapia = confirm("¿Deseas imprimir otra copia del comprobante?");
-                                // if (resultadoOtraCapia) {
-                                //     imprimirElemento(htmlTicketEntrada(resultadoDeFacturar.data));
-                                // }
                                 /** Eliminamos la factura del Storagr */
-                                localStorage.removeItem('carritoInventario');
-                                localStorage.removeItem('facturaInventario');
-                                window.location.href = "/inventarios/crearEntrada";
+                                setTimeout(()=>{
+                                    localStorage.removeItem('carritoInventario');
+                                    localStorage.removeItem('facturaInventario');
+                                    window.location.href = "/inventarios/crearEntrada";
+                                },2500);
     
                             } else {
                                  /** Eliminamos la factura del Storagr */

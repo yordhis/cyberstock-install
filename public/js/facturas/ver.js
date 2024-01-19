@@ -49,7 +49,8 @@ const hanledImprimirFactura = async (e) => {
     resultado = await getFactura(e.target.id);
     // log(resultado);
     if (resultado.estatus == 200) {
-        imprimirElementoPos(htmlTicket(resultado.data));
+        let ticket = htmlTicket(resultado.data);
+        setTimeout(()=>imprimirElementoPos(ticket), 1000);
         elementoCargando.innerHTML = '';
     } else {
         alert(resultado.mensaje)

@@ -1019,8 +1019,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += elementoAbono.montoDelPago;
                 else abonado += elementoAbono.montoDelPago / factura.tasa;
             });
-
-            /** Previsualizamos el monto abonado */
          
                 /** Validamos si el monto es mayor o igual al total a pagar */
                 if( (Math.round(abonado*100)/100) >= (Math.round(factura.total * 100)/100) ){
@@ -1057,7 +1055,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         /** validar si el carrito se facturo */
                         let carritoFacturado = await getCarrito(facturaVender.codigo),
                         resultadoDeRealizarDevolucionLuz="";
-                        log(carritoFacturado)
+                    
                         if(carritoFacturado.data.length){
                             resultadoDeRealizarDevolucionLuz = await realizarDevolucion(facturaVender.codigo);
                             if(resultadoDeRealizarDevolucionLuz.estatus == 200){
@@ -1092,7 +1090,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                         /** Mostramos el dialogo de facturar */
                          if (resultadoDeFacturar.estatus == 201) {
                                 /** Registramos el movimiento del usuario */
-                                log(ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus));
+                                ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
                                 /** Eliminamos la factura del Storagr */
                                 localStorage.removeItem('carrito');
                                 localStorage.removeItem('factura');
@@ -1131,13 +1129,14 @@ const hanledAccionesDeCarritoFactura = async (e) => {
            
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
-        case 'imprimirFormulaLibre':
-                log('imprimiendo formula libre')
-                imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
-              break;
+        // case 'imprimirFormulaLibre':
+        //         log('imprimiendo formula libre')
+        //         imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
+        //       break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
-                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data));
+                let hTicket = htmlTicket(resultadoDeFacturar.data);
+                setTimeout(()=>imprimirElementoPos(hTicket), 1000);
             break;
         case 'finalizarFacturacion':
                 log('finalizando facturacion')
