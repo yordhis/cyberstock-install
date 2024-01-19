@@ -9,8 +9,8 @@
                 <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                     <div class="d-flex justify-content-center pb-1">
-                        <a href="/" target="_self">
-                            <img src="assets/img/logo_2.png" alt="logo" id="logo">
+                        <a href="{{ route('admin.panel.index') }}" target="_self">
+                            <img src="{{asset('assets/img/logo_2.png')}}" alt="logo" id="logo">
                         </a>
                     </div><!-- End Logo -->
 
@@ -23,29 +23,33 @@
                                     iniciar sesión</p>
                             </div>
 
-                            <form action="/login" method="post" novalidate 
-                            class="row g-3 needs-validation" target="_self">
+                            <form action="{{ route('login.store') }}" method="post" novalidate 
+                            class="row g-3 needs-validation" >
                                 @csrf
                                 @method('post')
                                 <div class="col-12">
                                     <label for="yourUsername" class="form-label">Nombre de Usuario</label>
                                     <div class="input-group has-validation">
                                         <span class="input-group-text bg-primary text-white" id="inputGroupPrepend">@</span>
-                                        <input type="text" name="email" class="form-control" id="yourUsername"
+                                        <input type="text" name="email" class="form-control" 
+                                            autofocus id="email"
                                             required>
                                         <div class="invalid-feedback">Por favor, ingrese su nombre de usuario!</div>
-                                        @error('email')
-                                            <span class="text-danger">
-                                                {{ $message }}
-                                            </span>
-                                        @enderror
                                     </div>
+                                    @error('email')
+                                        <br>
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
                                 </div>
 
                                 <div class="col-12">
                                     <label for="yourPassword" class="form-label">Contraseña</label>
-                                    <input type="password" name="password" class="form-control" id="yourPassword" required>
+                                    <input type="password" name="password" autocomplete="false" class="form-control" id="password" required>
+                                    <div class="invalid-feedback">Por favor, ingrese su contraseña!</div>
                                     @error('password')
+                                        <br>
                                         <span class="text-danger">
                                             {{ $message }}
                                         </span>

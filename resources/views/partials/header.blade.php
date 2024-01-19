@@ -22,8 +22,8 @@
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-        <a href="/panel" class="">
-            <img src="{{ asset('assets/img/logo_2.png') }}" height="50" width="" alt="">
+        <a href="{{ route('admin.panel.index') }}" class="">
+            <img src="{{ asset('assets/img/logo_2.png') ?? 'LOGO' }}" height="50" width="" alt="">
             {{-- <span class="d-none d-lg-block">NiceAdmin</span> --}}
         </a>
         <i class="bi bi-list toggle-sidebar-btn text-white active"></i>
@@ -114,7 +114,7 @@
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="{{ Auth::user()->foto ?? '' }}" alt="Profile" class="rounded-circle">
+                    <img src="{{ asset(Auth::user()->foto ?? '') }}" alt="Profile" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{ Auth::user()->nombre ?? '' }}</span>
                 </a><!-- End Profile Iamge Icon -->
 

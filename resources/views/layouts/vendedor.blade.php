@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  @laravelPWA
   @include('partials.headvendedor')
 </head>
 

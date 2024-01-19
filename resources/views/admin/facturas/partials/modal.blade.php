@@ -20,8 +20,12 @@
             @csrf
             @method('delete')
                
-                <label for="">Clave de administrador</label>
-                <input type="password" class="form-control my-2 autorizaciones" placeholder="Ingrese clave de autorización" name="clave" id="autorizacion">
+                <label for="clave{{$factura->id}}">Clave de administrador</label>
+                <input type="password" autocomplete="false" 
+                class="form-control my-2 autorizaciones" 
+                placeholder="Ingrese clave de autorización" 
+                name="clave" 
+                id="autorizacion{{$factura->id}}">
                 <span class="text-danger"></span><br>
                 
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>

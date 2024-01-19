@@ -83,8 +83,8 @@
         </div>
     </section>
 
-    <script src="{{ asset('js/main.js') }}" defer></script>
     <script src="{{ asset('js/utilidad/autorizacion.js') }}" defer><script>
+    <script src="{{ asset('js/main.js') }}" defer></script>
     
  
 
