@@ -54,8 +54,8 @@ const componenteAlerta = (mensaje, estatus, clasesExtras = "") => {
 };
 
 const darFormatoDeNumero = (numero) => {
-    return  new Intl.NumberFormat("ves", {
-      maximumFractionDigits: 3,
+    return  new Intl.NumberFormat("de-DE", {
+      maximumFractionDigits: 2,
       minimumFractionDigits: 2
     }).format(numero)
     // return  new Intl.NumberFormat("de-DE", {

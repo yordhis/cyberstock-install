@@ -419,7 +419,7 @@ const htmlTicket = (factura) => {
                         <th colspan="3" class="text__left border">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
                     </tr>
                     <tr>
-                        <th colspan="3" class="text__left">RIF: ${factura.cliente.tipo}-${darFormatoDeNumero(factura.cliente.identificacion)}</th>
+                        <th colspan="3" class="text__left">RIF: ${factura.cliente.tipo}-${factura.cliente.identificacion}</th>
                     </tr>
                     <tr>
                         <th class="text__left border"> N# ${factura.iva  > 0 ? 'FACTURA' : 'NOTA' }: </th>
