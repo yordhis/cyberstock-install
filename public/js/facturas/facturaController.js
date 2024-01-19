@@ -337,7 +337,7 @@ const htmlTicket = (factura) => {
         carritoHtml+=`
             <tr>
                 <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
-                <td class="text__right">${darFormatoDeNumero(producto.costo * factura.tasa) } Bs</td>
+                <td class="text__right">| ${darFormatoDeNumero(producto.costo * factura.tasa) } Bs |</td>
                 <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs</td>
             </tr>
         `;
