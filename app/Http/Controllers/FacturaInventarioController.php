@@ -69,8 +69,8 @@ class FacturaInventarioController extends Controller
 
                 $resultado['pos'] = Proveedore::where('codigo',  $request->identificacion)->get()[0];
                 $resultado['carrito'] = $carritos;
-                $resultado['hora']  =  date_format(date_create(explode(' ', $resultado->created_at)[1]), 'h:i:s');               
-                $resultado['fecha']  =  date_format(date_create(explode(' ', $resultado->created_at)[0]), 'd-m-Y');               
+                $resultado['hora']  =  date_format(date_create(explode('T', $resultado->fecha)[1]), 'h:i:sa');               
+                $resultado['fecha']  =  date_format(date_create(explode('T', $resultado->fecha)[0]), 'd-m-Y');             
                 $resultado['totalArticulo']  = $totalArticulos;
 
                
