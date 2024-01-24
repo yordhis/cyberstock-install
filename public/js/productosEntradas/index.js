@@ -549,6 +549,11 @@ const hanledLoad = async (e) => {
     if(facturaStorage){
 
         factura = facturaStorage;
+        factura.codigo = resultado.data;
+        factura.tipo = 'ENTRADA';
+        let fecha = new Date();
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
+        localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
         /** CLIENTE */
         elementoTarjetaCliente.innerHTML = spinner();
