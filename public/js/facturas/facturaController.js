@@ -504,9 +504,9 @@ const htmlTicket = (factura) => {
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
-                <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
-                <td class="text__right">${darFormatoDeNumero(producto.costo * factura.tasa) } Bs </td>
-                <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs</td>
+                <td class="text__left"> <b> ${producto.cantidad} X ${producto.descripcion} </b> </td>
+                <td class="text__right"> <b> ${darFormatoDeNumero(producto.costo * factura.tasa) } Bs </b> </td>
+                <td class="text__right"><b> ${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs </b> </td>
             </tr>
         `;
     });
