@@ -505,7 +505,7 @@ const htmlTicket = (factura) => {
         carritoHtml+=`
             <tr>
                 <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
-                <td class="text__right">| ${darFormatoDeNumero(producto.costo * factura.tasa) } Bs |</td>
+                <td class="text__right">${darFormatoDeNumero(producto.costo * factura.tasa) } Bs </td>
                 <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } Bs</td>
             </tr>
         `;
@@ -607,7 +607,7 @@ const htmlTicket = (factura) => {
                     <tr>
                         <th class="text__left border-mix"> CANT X PRODUCTO </th>
                         
-                        <th class="text__right border-mix"> |  C/U  | </th>
+                        <th class="text__right border-mix"> C/U </th>
                         <th class="text__right border-mix"> SUBTOTAL </th>
                     </tr>
                     
@@ -770,7 +770,7 @@ const imprimirElementoPos = (elemento) => {
     ventana.document.write(`<style>
         * {
         margin: 0%;
-        font-size: 10px;
+        font-size: 12px;
         font-family: 'Times New Roman';
         }
 
