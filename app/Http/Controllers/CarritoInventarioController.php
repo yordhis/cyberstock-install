@@ -59,15 +59,19 @@ class CarritoInventarioController extends Controller
                  * @param VENTA
                  * @param CREDITO
                  */
-                Carrito::create([
-                    "codigo" => $request->codigo_factura, 
-                    "codigo_producto" => $request->codigo_producto,
-                    "identificacion"  => $request->identificacion,
-                    "cantidad"  => $request->cantidad,
-                    "costo"  => $request->costo,
-                    "subtotal"  => $request->subtotal,
-                    "descripcion"  => $request->descripcion
-                ]);
+                if($request->concepto != 'CONSUMO'){
+                    Carrito::create([
+                        "codigo" => $request->codigo_factura, 
+                        "codigo_producto" => $request->codigo_producto,
+                        "identificacion"  => $request->identificacion,
+                        "cantidad"  => $request->cantidad,
+                        "costo"  => $request->costo,
+                        "subtotal"  => $request->subtotal,
+                        "descripcion"  => $request->descripcion
+                    ]);
+                }
+
+
                 $estatusCrear = CarritoInventario::create($request->all());
 
                 if($estatusCrear){

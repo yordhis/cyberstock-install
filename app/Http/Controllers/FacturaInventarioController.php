@@ -106,20 +106,22 @@ class FacturaInventarioController extends Controller
             
             // Se factura dos veces 
             $resultado = FacturaInventario::create($request->all());
-            $resultadoFacturaVenta = Factura::create([
-                "codigo" => $request->codigo_factura,
-                "razon_social" => $request->razon_social, // nombre de cliente o proveedor
-                "identificacion" => $request->identificacion, // numero de documento
-                "subtotal" => $request->subtotal, // se guarda en divisas
-                "total" => $request->total,
-                "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
-                "iva" => $request->iva, // impuesto
-                "tipo" => $request->tipo, // fiscal o no fialcal
-                "concepto" => $request->concepto, // venta, compra ...
-                "descuento" => $request->descuento, // descuento
-                "fecha" => $request->fecha, // fecha venta, compra ...
-                "metodos" => $request->metodos
-            ]);
+            if($request->concepto != 'CONSUMO'){
+                $resultadoFacturaVenta = Factura::create([
+                    "codigo" => $request->codigo_factura,
+                    "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                    "identificacion" => $request->identificacion, // numero de documento
+                    "subtotal" => $request->subtotal, // se guarda en divisas
+                    "total" => $request->total,
+                    "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                    "iva" => $request->iva, // impuesto
+                    "tipo" => $request->tipo, // fiscal o no fialcal
+                    "concepto" => $request->concepto, // venta, compra ...
+                    "descuento" => $request->descuento, // descuento
+                    "fecha" => $request->fecha, // fecha venta, compra ...
+                    "metodos" => $request->metodos
+                ]);
+            }
        
             $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";
             $estatus = $resultado ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;

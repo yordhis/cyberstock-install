@@ -321,7 +321,7 @@ class InventarioController extends Controller
         $pos = Po::all()[0];
         $salidas = FacturaInventario::where([
             "tipo" => "SALIDA"
-        ])->orderBy('codigo_factura', 'desc')->paginate(10);
+        ])->orderBy('codigo', 'desc')->paginate(10);
         
         $cliente = [];
 
