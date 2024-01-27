@@ -489,6 +489,7 @@ const htmlTicketEntrada = (factura) => {
         </div>
       `;
 };
+
 /** TICKET DE POS - VENTA */
 const htmlTicket = (factura) => {
     // Declaracion de variables

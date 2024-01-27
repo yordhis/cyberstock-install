@@ -324,7 +324,8 @@ const componenteFactura = async (factura) => {
                 <select class="form-select acciones-factura" name="concepto_entrada" id="concepto_entrada" aria-label="Tipo de entrada">
                     <option value="${factura.concepto}" selected>${factura.concepto}</option>
                     <option value="COMPRA">COMPRA</option>
-                    <option value="CREDITO">CREDITO</option>
+                    <option value="CREDITO">CREDITO</option>0
+                    <option value="DEVOLUCION">DEVOLUCIÓN</option>0
                 </select>
                 <label for="concepto_entrada">Concepto de entrada</label>
             </div>
@@ -549,6 +550,11 @@ const hanledLoad = async (e) => {
     if(facturaStorage){
 
         factura = facturaStorage;
+        factura.codigo = resultado.data;
+        factura.tipo = 'ENTRADA';
+        let fecha = new Date();
+        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
+        localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
         /** CLIENTE */
         elementoTarjetaCliente.innerHTML = spinner();
@@ -561,6 +567,8 @@ const hanledLoad = async (e) => {
             if(resultadoProveedor == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
             else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoProveedor.data, "");
             cargarEventosAccionesDelCliente();
+        
+            localStorage.setItem('facturaInventario', JSON.stringify(factura));
         
     }else{
         

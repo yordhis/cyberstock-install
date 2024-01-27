@@ -8,7 +8,7 @@
           <!-- You can delete the links only if you purchased the pro version. -->
           <!-- Licensing information: https://bootstrapmade.com/license/ -->
           <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-          Diseñado por <a class="text-warning" href="https://cyberstaffstore.com/">cyberstaffstore.com</a>
+          Diseñado por <a class="text-warning" href="https://cyberstaffstore.com/" target="_blank">cyberstaffstore.com</a>
       </div>
   </footer><!-- End Footer -->
 

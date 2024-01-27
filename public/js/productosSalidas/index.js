@@ -331,7 +331,7 @@ const componenteNumeroDeFactura = (data, nombre) =>{
 const componenteFactura = async (factura) => {
 
     let botonDeProcesarHtml = ``,
-    inputObservacion = ``;
+    inputObservacionHtml = ``;
     if(factura.concepto != 'CONSUMO'){
         botonDeProcesarHtml = `
             <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
@@ -340,7 +340,7 @@ const componenteFactura = async (factura) => {
         `;
     }else{
 
-        inputObservacion = `
+        inputObservacionHtml = `
             <div class="col-sm-12 form-floating mb-2">
                 <input type="text" class="form-control acciones-factura" id="observacion" name="observacion" >
                 <label for="floatingInput"> Ingrese observación (OPCIONAL)</label>
@@ -401,7 +401,7 @@ const componenteFactura = async (factura) => {
             
         </div>
 
-        ${inputObservacion}
+        ${inputObservacionHtml}
         <div class="col-sm-6">
            ${botonDeProcesarHtml}
         </div>
@@ -892,7 +892,7 @@ const hanledAgregarAFactura = async (e) => {
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito( JSON.parse(localStorage.getItem('carritoSalida')) );
     
                 /** Cargamos la factura y sus eventos de acciones del carrito de factura */
-                await cargarDatosDeFactura(carritoActual, factura);
+                await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
             }else{
                 alert(resultado.mensaje);
             }
@@ -945,7 +945,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     accion='',
     banderaDeError = 0,
     facturaActual = '',
-    acumuladorSubtotal = 0;
+    acumuladorSubtotal = 0,
+    inputObservacion  = "";
    
    log(e.target)
    log(e.target.localName)
@@ -990,8 +991,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = darFormatoDeNumero( quitarFormato(producto.costo) * cantidad );
-                        producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
+                        producto.subtotal = producto.costo * cantidad;
+                        producto.subtotalBs = cantidad * producto.costoBs;
                     };
                     return producto;
                 });
@@ -1004,15 +1005,15 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 }
 
                /** Guardamos en local el nuevo carrito */
-                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoB.reverse()));
+                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoB));
                 /** Cargamos la lista del carrito de compra */
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB.reverse());
+                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB);
             
 
                  /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
                 carritoActual = JSON.parse(localStorage.getItem('carritoSalida'));
 
-                await cargarDatosDeFactura(carritoActual, factura);
+                await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
 
 
             break;
@@ -1022,7 +1023,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
                 /** Actualizamos la factura */
-                await cargarDatosDeFactura(carritoActualizadoC, factura);
+                await cargarDatosDeFactura(carritoActualizadoC, factura, factura.iva, factura.descuento);
             break;
         case 'eliminarFactura':
             /** validamos si hay factura para eliminar */
@@ -1089,6 +1090,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     localStorage.setItem('facturaSalida', JSON.stringify(factura));
                     cargarDatosDeFactura(carritoActual, factura, factura.iva, 0);
                 }
+
             break;
         case 'imprimirFormulaLibre':
                 log('imprimiendo formula libre NOTA')
@@ -1272,7 +1274,10 @@ const procesarConsumo = async (e) => {
 
     /** VACIAMOS EL CODIGO DE FACTURA */
     facturaVender.codigo_factura = "";
-
+    facturaVender.observacion = d.querySelector('#observacion').value 
+                                ? d.querySelector('#observacion').value 
+                                : "Sin observación asignada.";
+    log(facturaVender)
     /** PROCESAR CARRITO */
     carritoVender.forEach(async producto => {
         producto.identificacion = facturaVender.identificacion;
@@ -1283,8 +1288,6 @@ const procesarConsumo = async (e) => {
 
     /** MOSTRAR QUE ESTA CARGANDO  */
     e.target.innerHTML = spinner();
-    // e.target.parentElement.children[0].classList.add('d-none');
-    // e.target.parentElement.children[1].classList.add('d-none');
         
     /** FACTURAR */
     setTimeout( async ()=>{
@@ -1296,13 +1299,11 @@ const procesarConsumo = async (e) => {
             /** Eliminamos la factura del Storagr */
             localStorage.removeItem('carritoSalida');
             localStorage.removeItem('facturaSalida');
-                       
-            /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
-            e.target.innerHTML = "<h4>IMPRIMIR</h4>";
-            e.target.innerHTML += componenteAlerta("La factura de consumo se proceso correctamente.", 200, 'fs-1 m-2');
-            e.target.innerHTML += componenteBotonesDeImpresion();
-            await cargarEventosAccionesDeFactura();
-            
+            confirmoLaImpresion = confirm('Se proceso correctamente la factura de consumo, presione aceptar para imprimir comprobante.');           
+            if(confirmoLaImpresion){
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data))
+            }
+            setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
         } else {
             /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
             /** Eliminamos la factura del Storagr */
