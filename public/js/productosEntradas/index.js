@@ -443,6 +443,7 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
                         <div class="col-md-6">
                             <select class="form-select acciones-pagos" id="tipoDePago" >
                                 <option selected>Método de pago</option>
+                                <option value="BIO PAGO">BIO PAGO</option>
                                 <option value="EFECTIVO">EFECTIVO</option>
                                 <option value="DIVISAS">DIVISAS</option>
                                 <option value="PAGO MOVIL">PAGO MOVIL</option>
