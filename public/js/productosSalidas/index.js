@@ -945,7 +945,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
                     }, 3500);
-                }else if(!parseInt(cantidad)){
+                }else if(!parseFloat(cantidad)){
                     elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401); 
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
@@ -960,8 +960,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = darFormatoDeNumero( quitarFormato(producto.costo) * cantidad );
-                        producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
+                        producto.subtotal = darFormatoDeNumero( producto.costo * cantidad );
+                        producto.subtotalBs = darFormatoDeNumero( producto.costoBs * cantidad );
                     };
                     return producto;
                 });
@@ -1342,7 +1342,7 @@ function adaptadorDeProducto(data){
         numero: data.id,
         codigo: data.codigo,
         descripcion: data.descripcion,
-        cantidad: data.cantidad,
+        cantidad: parseFloat(data.cantidad),
         costo: parseFloat( data.costo ),
         costoBs: parseFloat( data.costo * data.tasa ),
         pvpBs: parseFloat( (data.tasa * data.pvp) ),
