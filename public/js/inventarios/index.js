@@ -367,9 +367,6 @@ const hanledFormulario = async (e) => {
                 
                 for (const iterator of e.target) {
                     if(iterator.localName == "input" || iterator.localName == "select"){
-                        // if(iterator.value == "") iterator.classList.add(['border-danger']), banderaDeALertarConfig++; 
-                        // else iterator.classList.remove(['border-danger']), iterator.classList.add(['border-success']);
-                        
                         if(iterator.value == "CATEGORIAS" || iterator.value == "MARCAS")  config[iterator.name] = 0;
                         else  config[iterator.name] = iterator.value;
                     }

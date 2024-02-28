@@ -18,6 +18,7 @@ use App\Http\Controllers\{
     MonitoreController,
     NotificacioneController,
     PoController,
+    PorcentajeController,
     ProductoController,
     ProveedoreController,
     ReporteController
@@ -37,7 +38,9 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
-
+    /** RUTAS DE PORCENTAJES */
+    Route::put('/porcentajes', [PorcentajeController::class, 'update'])->name('admin.porcentajes.update');
+    
     /** CARRITO */
     Route::get('/realizarDevolucion/{codigoFactura}', [CarritoController::class, 'realizarDevolucion'])->name('api.realizarDevolucion');
    
