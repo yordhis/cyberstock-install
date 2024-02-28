@@ -193,10 +193,20 @@ const hanledFormulario = async (e) => {
                 
                 break;
             case 'limpiarFiltro':
+                    /** mostras una precarga */
+                    elementoTablaCuerpo.innerHTML = spinner();
+
+                    /** Resetear formulario de busqueda */
                     for (const iterator of d.forms) {
                         if(iterator.id == "formularioFiltro") iterator.reset();
                     }
-                    hanledLoad();
+
+                    /** restauramos todo las variables configuradas */
+                    inventarios = {},
+                    inventarioAdaptado= [];
+                    elementoTablaPaginacion.innerHTML="";
+                    return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
+
                 break;
             case 'setPorcentajes':
                     let resultadoSetPorcentaje = {};
