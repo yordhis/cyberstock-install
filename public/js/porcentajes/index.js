@@ -3,6 +3,7 @@ log('conectado a porcentajes')
 /** VARIABLES */
 let elementoTablaCuerpo = d.querySelector('#lista'),
 elementoAlert = d.querySelector('#alert'),
+elementoBarraDePorcentaje = d.querySelector('#barraDePorcentaje'),
 elementoInputFiltroDescripcion = d.querySelector('#filtro-descripcion'),
 elementoInputFiltroCodigo = d.querySelector('#filtro-codigo'),
 elementoInputFiltroLimpiar = d.querySelector('#filtro-limpiar'),
@@ -88,14 +89,13 @@ const hanledLoad = async (e) => {
 
 };
 
-
 const hanledPaginacion = async (e) => {
     e.preventDefault();
     if(e.target.href){
         if(e.target.href.includes('getInventariosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
             elementoTablaCuerpo.innerHTML = spinner();
-
+        
             let inventarios = await getInventariosFiltro(`${e.target.href}`,  config);
         
             if(!inventarios.data.data.length){
@@ -104,22 +104,16 @@ const hanledPaginacion = async (e) => {
                 elementoTablaCuerpo.innerHTML='';
                 await inventarios.data.data.forEach( element => {
                     element.tasa = inventarios.tasa;
-                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
+                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config.porcentaje));
                 });
         
                 elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
 
-                /** Activamos los eventos del boton eliminar */
-                await cargarEventosDelBotonEliminar();
-                await cargarEventosDelBotonEditar();
+                
             }
         }else{
             elementoTablaPaginacion.innerHTML = '';
             await getLista(e.target.href);
-            
-            /** Activamos los eventos del boton eliminar */
-            await cargarEventosDelBotonEliminar();
-            await cargarEventosDelBotonEditar();
         }
     }
 };
@@ -131,8 +125,10 @@ const hanledFormulario = async (e) => {
         switch (e.target.id) {
             case 'formularioFiltro':
                 let banderaDeALertarConfig = 0;
+                inventarioAdaptado = [];
 
                 for (const iterator of e.target) {
+                    if(iterator.localName == "button") iterator.disabled=true;
                     if(iterator.localName == "input" || iterator.localName == "select"){
                         if(iterator.value == "CATEGORIAS" || iterator.value == "MARCAS")  config[iterator.name] = 0;
                         else  config[iterator.name] = iterator.value;
@@ -140,22 +136,42 @@ const hanledFormulario = async (e) => {
                 }
 
                 console.log(config);
+                /** Configuramos el porcentaje a formato 1,x */
                 config.porcentaje = ((config.porcentaje / 100) +1);
+
                 /** Se configuran los campos */
                 config.campo = ['codigo', ' descripcion'];
 
+                /** consultamos para pagina y previsualizar */
                 inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  config);
-                log(inventarios);
+                log(inventarios)
+                /** Validamos si retorna un 404 */
+                if(inventarios.estatus == 404){
+                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
+                    return elementoAlert.innerHTML=componenteAlerta(inventarios.mensaje, inventarios.estatus);
+                }
+
+                /** consultamos todo para la actualización de precios y costos */
+                todosLosProductos = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltroAll`,  config);
+
+                /** Se adaptan todos los productos para ser configurados */
+                await todosLosProductos.data.forEach(element => {
+                    inventarioAdaptado.push(adaptadorDeProducto(element, config.porcentaje));
+                });
+
+                /** mostras una precarga */
                 elementoTablaCuerpo.innerHTML = spinner();
 
                 /** Si no hay datos entregamos un estatus 0 */
-                if(!inventarios.data.data.length) return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
+                if(!inventarios.data.data.length) {
+                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
+                    return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
+                }
 
                 setTimeout(async ()=>{
                     elementoTablaCuerpo.innerHTML = "";
                     await inventarios.data.data.forEach( element => {
                         element.tasa = inventarios.tasa;
-                        inventarioAdaptado.push(adaptadorDeProducto(element, config.porcentaje));
                         elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config.porcentaje));
                     });
           
@@ -168,6 +184,9 @@ const hanledFormulario = async (e) => {
                     elementoDePaginacion.forEach( btnPaginacion => {
                         btnPaginacion.addEventListener('click', hanledPaginacion);
                     });
+
+                    /** Activamos el boton */
+                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
                 }, 1500)
 
 
@@ -181,23 +200,39 @@ const hanledFormulario = async (e) => {
                 break;
             case 'setPorcentajes':
                     let resultadoSetPorcentaje = {};
+                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=true;
                     
                     resultadoDeConfirmacion = confirm("¿Seguro que deseas actualizar los precios y costos de los productos seleccionados?");
                     
                     if(resultadoDeConfirmacion){
-                        if(!inventarioAdaptado.length) elementoAlert.innerHTML = componenteAlerta("No hay productos seleccionados para actualizar precios y costos", 404);
+                        if(!inventarioAdaptado.length){
+                            for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
+                            elementoAlert.innerHTML = componenteAlerta("No hay productos seleccionados para actualizar precios y costos", 404);
+                        } 
                         
-                        elementoTablaCuerpo.innerHTML=spinner();
                         
-                        inventarioAdaptado.forEach(producto => {
-                            resultadoSetPorcentaje = editarProductoDelInventarioPorcentaje(`${URL_BASE}/porcentajes` , producto); 
+                        let contador = 0;
+                        
+                        inventarioAdaptado.forEach(async producto => {
+                            resultadoSetPorcentaje = await editarProductoDelInventarioPorcentaje(`${URL_BASE}/porcentajes` , producto); 
+                            
+                            contador++;
+                            
+                            elementoBarraDePorcentaje.innerHTML = barraDePorcentaje(inventarioAdaptado.length, contador);
+                            log(contador)
+                            if(contador == inventarioAdaptado.length){
+                                inventarioAdaptado = [];
+                                config.porcentaje = 0;
+                                getLista(config);
+                                elementoBarraDePorcentaje.innerHTML="";
+                                for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
+                                elementoAlert.innerHTML = componenteAlerta(resultadoSetPorcentaje.mensaje, resultadoSetPorcentaje.estatus);
+                            }
+                            
                         });
 
-                        resultadoSetPorcentaje.then(res => {
-                            config.porcentaje = 0;
-                            getLista(config);
-                            elementoAlert.innerHTML = componenteAlerta(res.mensaje, res.estatus);
-                        });
+                    }else{
+                        for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
                     }
 
                     
@@ -217,7 +252,7 @@ for (const formulario of formularios) {
     if(formulario.id != "cerrarSesion") formulario.addEventListener('submit', hanledFormulario);
 }
 
-// elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
+elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
 elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
 
 
@@ -225,6 +260,7 @@ elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
 
 
 /** FUNCIONES O UTILIDADES EXTRAS */
+
 /** Validar formulario reportes y retorna la data si pasa la validación */
 async function validarDataDeFormulario(formulario){
     let esquema = {},
@@ -277,7 +313,7 @@ function adaptadorDeProducto(data, porcentaje){
 /** Retorna la lista de inventario */
 async function getLista(config, url = `${URL_BASE}/getInventariosFiltro`){
     elementoTablaCuerpo.innerHTML = spinner();
-    let inventarios = await getInventariosFiltro(url,  config);
+    inventarios = await getInventariosFiltro(url,  config);
 
     if(typeof(inventarios.data.data) == 'undefined'){
         return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})

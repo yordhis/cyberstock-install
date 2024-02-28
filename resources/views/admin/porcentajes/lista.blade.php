@@ -119,6 +119,8 @@
             </div>
             
             <div class="col-sm-12">
+                <div id="barraDePorcentaje" class="my-2 w-100"></div>
+
                 <form action="porcentajes" id="setPorcentajes">
                     <button class="btn btn-primary w-100">
                         Guardar configuración de porcentajes

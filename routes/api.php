@@ -74,6 +74,7 @@ Route::group(['middleware' => ['cors']], function () {
     
     /** INVENTARIOS */
     Route::get('getInventarios', [InventarioController::class, 'getInventarios'])->name('api.getInventarios');
+    Route::post('getInventariosFiltroAll', [InventarioController::class, 'getInventariosFiltroAll'])->name('api.getInventariosFiltroAll');
     Route::post('getInventariosFiltro', [InventarioController::class, 'getInventariosFiltro'])->name('api.getInventariosFiltro');
     Route::delete('deleteProductoDelInventario/{id}', [InventarioController::class, 'deleteProductoDelInventario'])->name('api.deleteProductoDelInventario');
     Route::put('editarProductoDelInventario/{id}', [InventarioController::class, 'editarProductoDelInventario'])->name('api.editarProductoDelInventario');

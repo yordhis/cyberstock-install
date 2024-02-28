@@ -81,14 +81,14 @@ class PorcentajeController extends Controller
      */
     public function update(Request $request)
     {
-
+        
         $resultado = Inventario::where('id', $request->id)->update([
-            "costo" => $request->costo_despues,
-            "pvp" => $request->pvp_despues,
-            "pvp_2" => $request->pvp_2_despues,
-            "pvp_3" => $request->pvp_3_despues
+            "costo" => number_format($request->costo_despues,2),
+            "pvp" => number_format($request->pvp_despues, 2),
+            "pvp_2" => number_format($request->pvp_2_despues, 2),
+            "pvp_3" => number_format($request->pvp_3_despues, 2)
         ]);
-
+    
         if($resultado){
             return response()->json([
                 "mensaje" => "Precios y costo actualizado con exito.",

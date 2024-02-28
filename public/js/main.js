@@ -15,6 +15,16 @@ spinner = (clases = "text-primary") => `
     </div>
 `;
 
+
+const barraDePorcentaje = (total, contador) => {
+    let porcentaje = ( ( contador * 100 ) / total );
+    return `
+        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="${porcentaje}" aria-valuemin="${porcentaje}" aria-valuemax="100">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: ${porcentaje}%;">${porcentaje.toFixed(2)}%  Total a procesar: ${total} | Procesados: ${contador}</div>
+        </div>
+    `;
+}
+
 const componenteAlerta = (mensaje, estatus, clasesExtras = "") => {
     let estatusText = '',
     icono = '';

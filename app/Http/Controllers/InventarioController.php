@@ -66,6 +66,134 @@ class InventarioController extends Controller
     }
 
     /** API REST FULL */
+    public function getInventariosFiltroAll(Request $request)
+    {
+        try {
+            $tasa = Utilidade::all()[0]->tasa;
+            // filtramos por la descripcion
+            if (request('filtro')) {
+                /** Buscamos por codigo de barra */
+                foreach ($request->campo as $key => $campo) {
+                    switch ($campo) {
+                        case 'codigo':
+                            $resultados = Inventario::where("{$campo}", $request->filtro)->get();
+                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                            if (count($resultados)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CODIGO",
+                                    "data" =>  [
+                                        "data" => $resultados,
+                                        "total" => count($resultados)
+                                    ],
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+                        case 'descripcion':
+
+                            if($request->id_categoria > 0 && $request->id_marca > 0){
+                         
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->get();
+
+                
+                            }elseif ($request->id_categoria > 0){
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->get();
+
+                            }elseif ($request->id_marca > 0) {
+                                
+                                $resultados = Inventario::where([
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->get();
+
+                            }else{
+                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->get();
+                            }
+
+                            
+            
+                            $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                          
+
+                            if (count($resultados)) {
+
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => $resultados,
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }else{
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => $resultados,
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+
+                        default:
+                            return response()->json([
+                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                                "data" => [
+                                    "data" => [],
+                                    "total" => 0
+                                ],
+                                "tasa" => $tasa,
+                                "estatus" => Response::HTTP_OK
+                            ], Response::HTTP_OK);
+                            break;
+                    }
+                }
+            }else{
+                if ($request->id_categoria > 0) {
+                    $resultados = Inventario::where([
+                        "id_categoria" => $request->id_categoria,
+                    ])
+                    ->orderBy('descripcion', 'asc')->get();
+                }elseif ($request->id_marca > 0) {
+                    $resultados = Inventario::where([
+                        "id_marca" => $request->id_marca,
+                    ])
+                    ->orderBy('descripcion', 'asc')->get();
+                }else{
+                    return response()->json([
+                        "mensaje" => "El filtro no poseé parametros de busquedas",
+                        "data" => ["data" => []],
+                        "estatus" => Response::HTTP_NOT_FOUND
+                    ], Response::HTTP_NOT_FOUND);
+                }
+
+                $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+
+                return response()->json([
+                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                    "data" => $resultados,
+                    "tasa" => $tasa,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "ERROR AL FILTRAR LA BUSQUEDA DEL PRODUCTO,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => ["data" => []],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
     public function getInventariosFiltro(Request $request)
     {
         try {
