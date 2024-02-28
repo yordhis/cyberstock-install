@@ -960,8 +960,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = darFormatoDeNumero( producto.costo * producto.cantidad  );
-                        producto.subtotalBs = darFormatoDeNumero( producto.costoBs * producto.cantidad  );
+                        producto.subtotal = producto.costo * producto.cantidad;
+                        producto.subtotalBs = producto.costoBs * producto.cantidad;
                     };
                     return producto;
                 });
