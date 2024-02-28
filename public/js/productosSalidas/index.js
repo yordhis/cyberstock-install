@@ -234,8 +234,8 @@ const componenteListaDeProductoFiltrados = (producto) => {
             <td>${producto.codigo}</td>
             <td>${producto.descripcion}</td>
             <td>
-                ${producto.pvpBs} <br>
-                REF: ${producto.pvp}
+                ${darFormatoDeNumero(producto.pvpBs)} <br>
+                REF: ${darFormatoDeNumero(producto.pvp)}
             </td>
         
             <td>${producto.cantidad}</td>
