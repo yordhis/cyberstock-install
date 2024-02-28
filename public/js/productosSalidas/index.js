@@ -825,8 +825,8 @@ const hanledAgregarAFactura = async (e) => {
                             if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
                             else {
                                 producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal =  productoAdaptado.cantidad *  productoAdaptado.costo;
-                                producto.subtotalBs =  productoAdaptado.cantidad *  productoAdaptado.costoBs;
+                                producto.subtotal =  producto.cantidad *  productoAdaptado.costo;
+                                producto.subtotalBs =  producto.cantidad *  productoAdaptado.costoBs;
                             }; 
                         }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                             banderaDeProductoNuevo++;
