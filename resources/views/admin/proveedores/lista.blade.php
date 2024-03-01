@@ -25,7 +25,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -65,8 +65,8 @@
                                 </tbody>
                             </table>
                             
-                            {{ $proveedores->links() }}
-                            {{ "Total de proveedores registrados: " . $proveedores->total() }}
+                            {{-- {{ $proveedores->links() }}
+                            {{ "Total de proveedores registrados: " . $proveedores->total() }} --}}
                         <!-- End Table with stripped rows -->
 
                     </div>

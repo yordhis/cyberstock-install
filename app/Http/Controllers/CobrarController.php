@@ -35,8 +35,7 @@ class CobrarController extends Controller
             $menuSuperior = $this->data->menuSuperior;
     
             $cobrar = FacturaInventario::where([
-                "tipo" => 'SALIDA',
-                
+                "tipo" => 'SALIDA'
             ])->get();
 
             foreach ($cobrar as $key => $value) {
@@ -44,14 +43,15 @@ class CobrarController extends Controller
                 $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
                 $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
                 
+                foreach($value['carrito'] as $cantidade){
+                    $value['totalArticulos'] += $cantidade->cantidad; 
+                }
+                
                 $total_abono = 0;
                 foreach ($value['abonos'] as $key => $abono) {
                     $total_abono = $total_abono + $abono->monto;
                 }
 
-                foreach($value['carrito'] as $cantidade){
-                    $value['totalArticulos'] += $cantidade->cantidad; 
-                }
                 $value['total_abono'] = $total_abono;
             }
 
