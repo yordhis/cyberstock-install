@@ -33,7 +33,7 @@ class PagarController extends Controller
             $pagar = FacturaInventario::where([
                 "tipo" => 'ENTRADA',
                 "concepto" => 'CREDITO',
-            ])->paginate(10);
+            ])->get();
     
             foreach ($pagar as $key => $value) {
                $value['proveedor']= Proveedore::where('codigo', $value->identificacion)->get();

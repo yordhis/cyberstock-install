@@ -39,7 +39,7 @@ class FacturaController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = Request::path();
-            $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->paginate(10);
+            $facturas = Factura::orderBy('codigo', 'DESC')->get();
            
             if(count($facturas)){
                 foreach ($facturas as $key => $factura) {
@@ -63,15 +63,16 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, $moneda="$")
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
             $factura = Factura::find($id);
-          
+            if($moneda == "$") $factura->tasa = 1;
             if($factura){
                     $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
+                    $factura->cliente = Cliente::where('identificacion', $factura->identificacion)->get();
                     $contador = 0;
                     foreach ($factura->carrito as $key => $producto) {
                         $contador += $producto->cantidad;
@@ -85,12 +86,12 @@ class FacturaController extends Controller
                 return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
             }
           
-
+            
             $pos = count(Po::all()) ? Po::all()[0]: [];
             $pathname = Request::path();
             $pathname = explode('/', $pathname)[0] . '/ver';
            
-            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior' ) );
+            return view( 'admin.facturas.ver', compact( 'factura', 'moneda', 'pos', 'utilidades', 'menuSuperior' ) );
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

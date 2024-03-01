@@ -1064,6 +1064,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     setTimeout(async ()=>{
                         
                         /** Procesamos la factura y generamos el ticket */
+                        facturaVender.tipo="ENTRADA";
                         resultadoDeFacturar = await setFactura( `${URL_BASE}/setFacturaEntrada`, facturaVender );
 
                         /** Mostramos el dialogo de facturar */
@@ -1365,7 +1366,6 @@ async function cargarEventosAccionesDeFactura(){
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('facturaInventario', JSON.stringify(factura));
 };
 

@@ -1292,6 +1292,7 @@ const procesarConsumo = async (e) => {
     /** FACTURAR */
     setTimeout( async ()=>{
         /** Procesamos la factura y generamos el ticket */
+        facturaVender.tipo = "SALIDA";
         resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
                
         /** Mostramos el dialogo de facturar */
@@ -1369,6 +1370,7 @@ const procesarFactura = async (e) => {
                 setTimeout( async ()=>{
 
                     /** Procesamos la factura y generamos el ticket */
+                    facturaVender.tipo="SALIDA";
                     resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
                     
                     /** Mostramos el dialogo de facturar */
@@ -1565,6 +1567,5 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 };

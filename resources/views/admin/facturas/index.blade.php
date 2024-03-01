@@ -18,10 +18,10 @@
                     <div class="card-body table-responsive">
                     
                         <!-- Table with stripped rows -->
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
-                                        <th scope="col">#</th>
+
                                         <th scope="col">N° Factura</th>
                                         <th scope="col">Razón social</th>
                                         <th scope="col">Rif o Cédula</th>
@@ -32,11 +32,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $contador = 1; @endphp
-                                    @if (count($facturas))
+                                   
                                         @foreach ($facturas as $factura)
+                                   
                                             <tr>
-                                                <td scope="row">{{ $contador }}</td> 
+                                            
                                                 <td>{{ $factura->codigo }}</td>
                                                 <td>{{ $factura->razon_social }}</td>
                                                 <td>{{ number_format($factura->identificacion, 0, ',', '.') }}</td>
@@ -48,19 +48,16 @@
                                                         <i class="bi bi-eye btn btn-success"></i>
                                                     </a>
                                     
-                                                   
+                                                
                                                     @include('admin.facturas.partials.modal')
-                                                  
+                                                
 
                                                 </td>
                                             </tr>
-                                            @php $contador++; @endphp
+                                            
                                         @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="7" class="text-center text-danger">No hay resultados</td>
-                                        </tr>
-                                    @endif
+                                    
+                                            
                                        
                                    
                                     
@@ -69,8 +66,8 @@
                      
                         <!-- End Table with stripped rows -->
                         <!-- PAGINACION BLADE -->
-                        {{ $facturas->links() }}
-                        {{ "Total de facturas registrados: " . $facturas->total() }}
+                        {{-- {{ $facturas->links() }}
+                        {{ "Total de facturas registrados: " . $facturas->total() }} --}}
                     <!-- CIERRE PAGINACION BLADE -->
 
                     </div>
