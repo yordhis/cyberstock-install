@@ -235,8 +235,8 @@ const componenteListaDeProductoFiltrados = (producto) => {
             <td>${producto.codigo}</td>
             <td>${producto.descripcion}</td>
             <td>
-                ${producto.pvpBs} <br>
-                REF: ${producto.pvp}
+                ${darFormatoDeNumero(producto.pvpBs)} <br>
+                REF: ${darFormatoDeNumero(producto.pvp)}
             </td>
         
             <td>${producto.cantidad}</td>
@@ -332,7 +332,7 @@ const componenteFactura = async (factura) => {
 
     let botonDeProcesarHtml = ``,
     inputObservacionHtml = ``;
-    if(factura.concepto != 'CONSUMO'){
+    if(factura.concepto == 'VENTA'){
         botonDeProcesarHtml = `
             <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
                 <i class='bx bx-cart'></i> VENDER 
@@ -349,7 +349,7 @@ const componenteFactura = async (factura) => {
 
         botonDeProcesarHtml = `
         <button class="btn btn-success  w-100 fs-3 acciones-factura" id="procesarConsumo"  >
-            <box-icon name='cart-download'></box-icon> PROCESAR CONSUMO 
+            <box-icon name='cart-download'></box-icon> PROCESAR ${factura.concepto} 
         </button>
         `;
     }
@@ -852,8 +852,8 @@ const hanledAgregarAFactura = async (e) => {
                             if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
                             else {
                                 producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal =  productoAdaptado.cantidad *  productoAdaptado.costo;
-                                producto.subtotalBs =  productoAdaptado.cantidad *  productoAdaptado.costoBs;
+                                producto.subtotal =  producto.cantidad *  productoAdaptado.costo;
+                                producto.subtotalBs =  producto.cantidad *  productoAdaptado.costoBs;
                             }; 
                         }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                             banderaDeProductoNuevo++;
@@ -991,8 +991,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = producto.costo * cantidad;
-                        producto.subtotalBs = cantidad * producto.costoBs;
+                        producto.subtotal = producto.costo * producto.cantidad;
+                        producto.subtotalBs = producto.costoBs * producto.cantidad;
                     };
                     return producto;
                 });
@@ -1273,7 +1273,7 @@ const procesarConsumo = async (e) => {
     carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
     /** VACIAMOS EL CODIGO DE FACTURA */
-    facturaVender.codigo_factura = "";
+    facturaVender.codigo_factura = facturaVender.concepto == "CREDITO" ? facturaVender.codigo_factura : "";
     facturaVender.observacion = d.querySelector('#observacion').value 
                                 ? d.querySelector('#observacion').value 
                                 : "Sin observación asignada.";
@@ -1310,7 +1310,7 @@ const procesarConsumo = async (e) => {
             localStorage.removeItem('carritoSalida');
             localStorage.removeItem('facturaSalida');
             // e.target.parentElement.children[1].classList.add('d-none');
-            e.target.innerHTML = componenteAlerta("NO SE PROCESO LA FACTURA DE CONSUMO (ERROR)", 404, 'fs-1 m-2');
+            e.target.innerHTML = componenteAlerta(`NO SE PROCESO LA FACTURA DE ${facturaVender.concepto} (ERROR)`, 404, 'fs-1 m-2');
             setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
         }
     }, 1000);

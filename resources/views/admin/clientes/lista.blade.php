@@ -26,7 +26,7 @@
                 <div class="card">
                     <div class="card-body table-responsive">
                         <!-- LISTA DE CLIENTES -->
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -67,8 +67,8 @@
                         <!-- End LISTA DE CLIENTES -->
 
                         <!-- PAGINACION BLADE -->
-                            {{ $clientes->links() }}
-                            {{ "Total de clientes registrados: " . $clientes->total() }}
+                            {{-- {{ $clientes->links() }}
+                            {{ "Total de clientes registrados: " . $clientes->total() }} --}}
                         <!-- CIERRE PAGINACION BLADE -->
                     </div>
                 </div>

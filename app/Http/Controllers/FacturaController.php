@@ -98,29 +98,6 @@ class FacturaController extends Controller
 
     }
 
-       /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Factura $factura)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateFacturaRequest  $request
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateFacturaRequest $request, Factura $factura)
-    {
-        //
-    }
-
     /**
      * Remove the specified resource from storage.
      *

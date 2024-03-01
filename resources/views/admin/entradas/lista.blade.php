@@ -19,7 +19,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -58,10 +58,10 @@
                         <!-- End Table with stripped rows -->
                         
                         <!-- PAGINACION LARAVEL-->
-                        {{ $entradas->links(); }}
+                        {{-- {{ $entradas->links(); }} --}}
                         
                         <!-- Total de facturas pendientes -->
-                        {{ "Total de movimientos: " . $entradas->total() }}
+                        {{-- {{ "Total de movimientos: " . $entradas->total() }} --}}
                     </div>
                 </div>
 

@@ -499,7 +499,18 @@ const htmlTicket = (factura) => {
     logo = '',
     metodosPagos = JSON.parse(factura.metodos),
     ivaHtml = '',
+    conceptoHtml = '',
     cambioHtml = '';
+
+    // concepto
+    if(factura.concepto != "VENTA"){
+        conceptoHtml = `
+            <tr>
+                <th class="text__left border"> CONCEPTO: </th>
+                <th colspan="2" class="text__right border"> ${factura.concepto} </th>
+            </tr>
+        `;
+    }
 
     // Recorremos el carrito
     factura.carrito.forEach(producto => {
@@ -534,25 +545,27 @@ const htmlTicket = (factura) => {
 
     // recorremos los metodos de pagos
     let cambio = 0;
-    metodosPagos.forEach((pago)=>{
-        if(pago.tipoDePago == "DIVISAS"){
-            metodosPagosHtml += `
-                <tr>
-                    <td class="text__left border">EFECTIVO 2:</td>
-                    <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }Bs</td>
-                </tr>
-            `;
-            cambio += parseFloat(pago.montoDelPago * factura.tasa); 
-        }else{
-            metodosPagosHtml += `
-                <tr>
-                    <td class="text__left border">${pago.tipoDePago}:</td>
-                    <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago) }Bs</td>
-                </tr>
-            `;
-            cambio += parseFloat(pago.montoDelPago); 
-        }
-    });
+    if(factura.concepto == "VENTA"){
+        metodosPagos.forEach((pago)=>{
+            if(pago.tipoDePago == "DIVISAS"){
+                metodosPagosHtml += `
+                    <tr>
+                        <td class="text__left border">EFECTIVO 2:</td>
+                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }Bs</td>
+                    </tr>
+                `;
+                cambio += parseFloat(pago.montoDelPago * factura.tasa); 
+            }else{
+                metodosPagosHtml += `
+                    <tr>
+                        <td class="text__left border">${pago.tipoDePago}:</td>
+                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago) }Bs</td>
+                    </tr>
+                `;
+                cambio += parseFloat(pago.montoDelPago); 
+            }
+        });
+    }
 
     if(cambio > factura.total){
         cambioHtml = `
@@ -595,6 +608,9 @@ const htmlTicket = (factura) => {
             
                         <th colspan="2" class="text__right border"> ${factura.codigo} </th>
                     </tr>
+                    
+                    ${conceptoHtml}
+                 
                     <tr>
                         <th class="text__left"> FECHA: </th>
             
@@ -767,7 +783,6 @@ const imprimirElemento = (elemento) => {
 const imprimirElementoPos = (elemento) => {
     var ventana = window.open('', 'PRINT', 'height=400,width=600');
     ventana.document.write('<html><head><title>Factura</title>');
-    // ventana.document.write(`<base href="${URL_BASE_APP}/public" target="objetivo">`);
     ventana.document.write(`<style>
         * {
         margin: 0%;

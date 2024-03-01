@@ -288,7 +288,7 @@ class InventarioController extends Controller
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
+        ])->orderBy('codigo', 'desc')->get();
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
@@ -319,11 +319,12 @@ class InventarioController extends Controller
     
         $menuSuperior = $this->data->menuSuperior;
         $pos = Po::all()[0];
-        $salidas = FacturaInventario::where([
-            "tipo" => "SALIDA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
-        
-        $cliente = [];
+
+        $salidas = FacturaInventario::select('factura_inventarios.codigo', 'factura_inventarios.tipo',  'factura_inventarios.*',
+        'clientes.identificacion', 'clientes.tipo as tipo_documento', 'clientes.nombre', 'clientes.telefono', 'clientes.direccion', 'clientes.correo'
+        )
+        ->join('clientes', 'clientes.identificacion', '=', 'factura_inventarios.identificacion')
+        ->where("factura_inventarios.tipo", '=', "SALIDA")->orderBy('factura_inventarios.codigo', 'desc')->get();
 
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
@@ -333,12 +334,6 @@ class InventarioController extends Controller
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
-            count(Cliente::where("identificacion", $salida->identificacion)->get()) 
-                            ? array_push( $cliente, Cliente::where("identificacion", $salida->identificacion)->get()[0])
-                            : array_push( $cliente, ["nombre" => "CLIENTE"]);
-
-            $salida->cliente = $cliente;
-            array_pop($cliente);
         }
      
         return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));

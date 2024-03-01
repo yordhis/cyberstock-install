@@ -9,6 +9,7 @@ use App\Models\DataDev;
 use App\Models\Factura;
 use App\Models\FacturaInventario;
 use App\Models\Helpers;
+use App\Models\Pago;
 use App\Models\Po;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -35,16 +36,26 @@ class CobrarController extends Controller
     
             $cobrar = FacturaInventario::where([
                 "tipo" => 'SALIDA',
-                "concepto" => 'CREDITO',
-            ])->paginate(10);
+                
+            ])->get();
+
             foreach ($cobrar as $key => $value) {
                 $value['cliente']= Cliente::where('identificacion', $value->identificacion)->get();
                 $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
-                $contador = 0;
+                $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
+                
+                $total_abono = 0;
+                foreach ($value['abonos'] as $key => $abono) {
+                    $total_abono = $total_abono + $abono->monto;
+                }
+
                 foreach($value['carrito'] as $cantidade){
                     $value['totalArticulos'] += $cantidade->cantidad; 
                 }
+                $value['total_abono'] = $total_abono;
             }
+
+       
             
             // return $cobrar;
             return view('admin.cobrar.lista', compact('cobrar', 'menuSuperior', 'pathname'));
@@ -60,29 +71,60 @@ class CobrarController extends Controller
      */
     public function store(Request $request)
     {
-       $facturaInventario = FacturaInventario::where('codigo', $request->codigo)->get();
-       $factura = Factura::where('codigo', $facturaInventario[0]->codigo_factura)->get();
-       if($factura){
 
-        $estatus = $factura[0]->update(["concepto" => "VENTA"]);
-        $estatus = $facturaInventario[0]->update([
-            "observacion" => $request->observacion,
-            "concepto" => "VENTA"
+        $dataValidada = $request->validate([
+            "codigo_factura" => "required",
+            "tipo_factura" => "required",
+            "metodo" => "required",
+            "monto" => "numeric | min:1 | required ",
+            "fecha" => "required",
         ]);
 
-        $mensaje = $estatus ? "El pago de la factura se porceso correctamente!": "No se registro el pago";
+        /** Registrar el pago del deudor */
+        Pago::create( $dataValidada );
 
-        /** registramos movimiento al usuario */
-        Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de Eliminar facturar de inventario (entra/salida), código de factura: ({$facturaInventario[0]->codigo_factura})");
+        /** Obtenemos todos los pagos */
+        $todosLosPagos = Pago::where([
+            "codigo_factura" => $request->codigo_factura,
+            "tipo_factura" => $request->tipo_factura,
+        ])->get();
 
-        return redirect()->route('admin.cuentas.por.cobrar.index', [
-            "mensaje" => $mensaje,
-            "estatus" => Response::HTTP_OK
-        ]);
+        /** Calculamos el total de abonas de la factura */
+        $total_abono = 0;
+        foreach ($todosLosPagos as $key => $abono) {
+            $total_abono = $total_abono + $abono->monto;
+        }
+
+        /** Consultamos la factura en proceso de pago */
+        $facturaInventario = FacturaInventario::where('codigo_factura', $request->codigo_factura)->get();
+        $factura = Factura::where('codigo', $facturaInventario[0]->codigo_factura)->get();
+
+        /** Validamos si los abonos cumplen con el total de la factura acreditada para cambiar el estatus a pagada (VENTA) */
+        if($total_abono >= $facturaInventario[0]->total){
+
+            $estatus = $factura[0]->update(["concepto" => "VENTA"]);
+            $estatus = $facturaInventario[0]->update([
+                "observacion" => $request->observacion,
+                "concepto" => "VENTA"
+            ]);
+
+            $mensaje = $estatus ? "¡Pago acreditado!, La factura está solvente.": "No se registro el pago";
+
+            /** registramos movimiento al usuario */
+            Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de Eliminar facturar de inventario (entra/salida), código de factura: ({$facturaInventario[0]->codigo_factura})");
+
+            return redirect()->route('admin.cuentas.por.cobrar.index', [
+                "mensaje" => $mensaje,
+                "estatus" => Response::HTTP_OK
+            ]);
+
        }else{
+        $factura[0]->update(["concepto" => "CREDITO"]);
+        $facturaInventario[0]->update([ "concepto" => "CREDITO" ]);
+        
         return redirect()->route('admin.cuentas.por.cobrar.index', [
-            "mensaje" => "El código de la factura no esta registrado.",
-            "estatus" => Response::HTTP_NOT_FOUND
+            "mensaje" => "¡Pago acreditado!, Factura aun pendiente.",
+            "estatus" => Response::HTTP_OK
         ]);
        }
     }
@@ -129,28 +171,6 @@ class CobrarController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -160,6 +180,34 @@ class CobrarController extends Controller
      */
     public function destroy($id)
     {
-        //
+        /** Obtener los datos del pago */
+        $abono = Pago::find($id);
+
+        /** Obtener la factura */
+        $facturaInventario = FacturaInventario::where('codigo_factura', $abono->codigo_factura)->get();
+        $factura = Factura::where('codigo', $abono->codigo_factura)->get();
+
+        /** Eliminamos el pago */
+        Pago::where('id', $id)->delete();
+
+        /** Calcular los abono  */
+        $abonos = Pago::where('codigo_factura', $abono->codigo_factura)->get();
+        $total_abono = 0;
+        foreach ($abonos as $key => $abono) {
+            $total_abono = $total_abono + $abono->monto;
+        }
+
+        if($total_abono >= $facturaInventario[0]->total){
+            $factura[0]->update(["concepto" => "VENTA"]);
+            $facturaInventario[0]->update([ "concepto" => "VENTA" ]);
+        }else{
+            $factura[0]->update(["concepto" => "CREDITO"]);
+            $facturaInventario[0]->update([ "concepto" => "CREDITO" ]);
+        }
+
+        return redirect()->route('admin.cuentas.por.cobrar.index', [
+            "mensaje" => "¡Pago eliminado!",
+            "estatus" => Response::HTTP_OK
+        ]);
     }
 }

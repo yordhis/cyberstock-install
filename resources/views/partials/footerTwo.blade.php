@@ -17,7 +17,22 @@
   <script src="{{ asset('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
   <script src="{{ asset('/js/partials/alert.js') }}" defer></script>
   <script src="{{ asset('/js/partials/preload.js') }}" defer></script>
+  
 
-
+  <script>
+    const dataTable = new simpleDatatables.DataTable("#myTable", {
+        searchable: true,
+        fixedHeight: false,
+        labels: {
+            placeholder: "Buscar...",
+            searchTitle: "Buecar",
+            pageTitle: "Pagina {page}",
+            perPage: "Entradas por página",
+            noRows: "No hay resultados",
+            info: "Demostración {start} a {end} de {rows} entradas",
+            noResults: "Ningún resultado coincide con su consulta de búsqueda",
+        },
+    })
+</script>
   
   

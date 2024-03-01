@@ -29,7 +29,7 @@ class ClienteController extends Controller
     public function index()
     {
         try {
-            $clientes = Cliente::orderBy('id', 'desc')->paginate(10);
+            $clientes = Cliente::orderBy('id', 'desc')->get();
             $pathname = Request::path();
       
             $menuSuperior = $this->data->menuSuperior;
