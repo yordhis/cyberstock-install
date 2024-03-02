@@ -375,7 +375,8 @@ const htmlTicket = (factura, moneda = "$") => {
     metodosPagos = JSON.parse(factura.metodos),
     ivaHtml = '',
     conceptoHtml = '',
-    cambioHtml = '';
+    cambioHtml = '',
+    capTasa = factura.tasa;
 
     if(moneda == "$"){
         factura.tasa = 1;
@@ -430,15 +431,15 @@ const htmlTicket = (factura, moneda = "$") => {
                 metodosPagosHtml += `
                     <tr>
                         <td class="text__left border">EFECTIVO 2:</td>
-                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) }${moneda}</td>
+                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) } ${moneda}</td>
                     </tr>
                 `;
-                cambio += parseFloat(pago.montoDelPago * factura.tasa); 
+                cambio += parseFloat(pago.montoDelPago * capTasa); 
             }else{
                 metodosPagosHtml += `
                     <tr>
-                        <td class="text__left border">${pago.tipoDePago}:</td>
-                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago) }${moneda}</td>
+                        <td class="text__left ">${pago.tipoDePago}:</td>
+                        <td colspan="2" class="text__right "> ${ darFormatoDeNumero(pago.montoDelPago) } Bs </td>
                     </tr>
                 `;
                 cambio += parseFloat(pago.montoDelPago); 
@@ -446,11 +447,12 @@ const htmlTicket = (factura, moneda = "$") => {
         });
     }
 
-    if(cambio > factura.total){
+
+    if(cambio > factura.total * capTasa){
         cambioHtml = `
             <tr>
                 <td class="text__left border">CAMBIO:</td>
-                <td colspan="2" class="text__right border"> ${ darFormatoDeNumero( cambio - ( factura.total * factura.tasa ) ) } ${moneda}</td>
+                <td colspan="2" class="text__right border"> ${ darFormatoDeNumero( cambio - ( factura.total * capTasa ) ) }</td>
             </tr>
         `;
     }
@@ -539,7 +541,7 @@ const htmlTicket = (factura, moneda = "$") => {
                     </tr> -->
 
                     ${metodosPagosHtml}
-                    ${cambioHtml}
+                    <!-- aqui iva el cambio  -->
 
                 </tbody>
                 <tfoot>
