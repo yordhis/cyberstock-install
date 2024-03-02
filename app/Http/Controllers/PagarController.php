@@ -49,6 +49,7 @@ class PagarController extends Controller
                     }
                     $total_abono = 0;
                     foreach ($value['abonos'] as $key => $abono) {
+                        $abono->fecha = date_format(date_create($abono->fecha), 'd-m-Y');
                         $total_abono = $total_abono + $abono->monto;
                     }
     

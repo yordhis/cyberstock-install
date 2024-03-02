@@ -292,7 +292,6 @@ class InventarioController extends Controller
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
-
             $totalArticulos = 0;
             foreach ($entrada->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
@@ -325,17 +324,19 @@ class InventarioController extends Controller
         )
         ->join('clientes', 'clientes.identificacion', '=', 'factura_inventarios.identificacion')
         ->where("factura_inventarios.tipo", '=', "SALIDA")->orderBy('factura_inventarios.codigo', 'desc')->get();
-
+       
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
-
+           
+            $salida->fecha = date_format(date_create($salida->fecha), 'd-m-Y h:i:sa');
             $totalArticulos = 0;
             foreach ($salida->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
         }
-     
+        
+        
         return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));
         
     }

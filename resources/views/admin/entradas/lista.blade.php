@@ -40,7 +40,7 @@
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
                                             <td>{{ $factura->proveedor[0]->empresa ?? 'Proveedor' }}</td>
-                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ number_format($factura->total, 2, ',', '.') }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
                                             

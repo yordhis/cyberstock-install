@@ -332,6 +332,8 @@ const componenteFactura = async (factura) => {
 
     let botonDeProcesarHtml = ``,
     inputObservacionHtml = ``;
+
+    
     if(factura.concepto == 'VENTA'){
         botonDeProcesarHtml = `
             <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
@@ -1281,7 +1283,7 @@ const procesarConsumo = async (e) => {
     /** PROCESAR CARRITO */
     carritoVender.forEach(async producto => {
         producto.identificacion = facturaVender.identificacion;
-        producto.codigo_factura = "";
+        producto.codigo_factura =  facturaVender.codigo_factura ;
         producto.concepto = facturaVender.concepto;
         await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
     });
@@ -1319,8 +1321,7 @@ const procesarConsumo = async (e) => {
 
 const procesarFactura = async (e) => {
     /** declaracion de variables */
-    let abonado = 0,
-    resultadoDefacturarCarrito = '';
+    let abonado = 0;
 
     /** validamos que halla productos en la factura */
     if(JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);

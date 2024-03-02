@@ -38,26 +38,33 @@ class CobrarController extends Controller
                 "tipo" => 'SALIDA'
             ])->get();
 
+            $cobrar_depurado = [];
             foreach ($cobrar as $key => $value) {
-                $value['cliente']= Cliente::where('identificacion', $value->identificacion)->get();
-                $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
-                $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
-                
-                foreach($value['carrito'] as $cantidade){
-                    $value['totalArticulos'] += $cantidade->cantidad; 
-                }
-                
-                $total_abono = 0;
-                foreach ($value['abonos'] as $key => $abono) {
-                    $total_abono = $total_abono + $abono->monto;
-                }
+                if($value->concepto != "CONSUMO"){
 
-                $value['total_abono'] = $total_abono;
+                    $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
+                    if( $value->concepto == "VENTA" && count($value['abonos']) == 0 ) continue;
+                    $value['cliente']= Cliente::where('identificacion', $value->identificacion)->get();
+                    $value['carrito'] = CarritoInventario::where('codigo', $value->codigo)->get();
+                    
+                    foreach($value['carrito'] as $cantidade){
+                        $value['totalArticulos'] += $cantidade->cantidad; 
+                    }
+    
+                    $total_abono = 0;
+                    foreach ($value['abonos'] as $key => $abono) {
+                        $abono->fecha = date_format(date_create($abono->fecha), 'd-m-Y');
+                        $total_abono = $total_abono + $abono->monto;
+                    }
+    
+                    $value['total_abono'] = $total_abono;
+                    array_push($cobrar_depurado, $value);
+                }
             }
 
        
             
-            // return $cobrar;
+            $cobrar = $cobrar_depurado;
             return view('admin.cobrar.lista', compact('cobrar', 'menuSuperior', 'pathname'));
     }
 
