@@ -36,7 +36,7 @@ class CobrarController extends Controller
     
             $cobrar = FacturaInventario::where([
                 "tipo" => 'SALIDA'
-            ])->get();
+            ])->orderBy('codigo_factura', 'desc')->get();
 
             $cobrar_depurado = [];
             foreach ($cobrar as $key => $value) {
@@ -154,7 +154,7 @@ class CobrarController extends Controller
                 $contador += $producto->cantidad;
             }
             $factura->tasa = 1;
-            $factura->totalArticulos = $contador;
+            $factura->totalArticulos = $contador;            
             $pos = count(Po::all()) ? Po::all()[0]: [];
         
             return view( 'admin.cobrar.ver', compact( 'factura', 'pos', 'menuSuperior' ) );

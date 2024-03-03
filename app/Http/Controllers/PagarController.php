@@ -34,7 +34,7 @@ class PagarController extends Controller
     
             $pagar = FacturaInventario::where([
                 "tipo" => 'ENTRADA',
-            ])->get();
+            ])->orderBy('codigo_factura', 'desc')->get();
             $pagar_depurado = [];
             foreach ($pagar as $key => $value) {
                 if($value->concepto != "DEVOLUCION"){
