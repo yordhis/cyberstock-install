@@ -146,35 +146,22 @@ class CobrarController extends Controller
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
-            $facturas = FacturaInventario::where('codigo', $id)->get();
-           
-            if(count($facturas)){
-                foreach ($facturas as $key => $factura) {
-                    $factura->carrito = CarritoInventario::where('codigo', $factura->codigo)->get();
-                    $contador = 0;
-                    foreach ($factura->carrito as $key => $producto) {
-                        $contador += $producto->cantidad;
-                    }
-                    $factura->totalArticulos = $contador;
-
-                }
-
-                $factura = $facturas[0];
-              
-            }else{
-                $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
-                $estatus = 404;
-                return redirect()->route('admin.cuentas.por.cobrar.index', compact('mensaje', 'estatus'));
+            $factura = FacturaInventario::findOrFail($id);
+            $factura->cliente = Cliente::where('identificacion', $factura->identificacion)->get();
+            $factura->carrito = CarritoInventario::where('codigo_factura', $factura->codigo_factura)->get();
+            $contador = 0;
+            foreach ($factura->carrito as $key => $producto) {
+                $contador += $producto->cantidad;
             }
-          
+            $factura->tasa = 1;
+            $factura->totalArticulos = $contador;
             $pos = count(Po::all()) ? Po::all()[0]: [];
-            // $pathname = FacadesRequest::path();
-            // $pathname = explode('/', $pathname)[0] . '/ver';
-     
+        
             return view( 'admin.cobrar.ver', compact( 'factura', 'pos', 'menuSuperior' ) );
         } catch (\Throwable $th) {
-            $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
-            return response()->view('errors.404', compact("errorInfo"), 404);
+            $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
+            $estatus = 404;
+            return redirect()->route('admin.cuentas.por.cobrar.index', compact('mensaje', 'estatus'));
         }
     }
 

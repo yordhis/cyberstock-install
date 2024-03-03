@@ -12,6 +12,7 @@ use App\Models\DataDev;
 use App\Models\FacturaInventario;
 use App\Models\Helpers;
 use App\Models\Inventario;
+use App\Models\Pago;
 use App\Models\Po;
 use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
@@ -108,6 +109,8 @@ class FacturaController extends Controller
     public function destroy(Factura $factura)
     {
         try {
+            Pago::where('codigo_factura', $factura->codigo)->delete();
+            FacturaInventario::where('codigo_factura', $factura->codigo)->delete();
             Carrito::where('codigo', $factura->codigo)->delete();
             $factura->delete();
 

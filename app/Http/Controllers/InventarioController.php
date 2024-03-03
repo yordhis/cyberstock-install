@@ -15,6 +15,7 @@ use App\Models\{
     FacturaInventario,
     Helpers,
     Marca,
+    Pago,
     Po,
     Proveedore,
     Utilidade,
@@ -372,6 +373,8 @@ class InventarioController extends Controller
     /** Eliminar factura de inventario */
     public function eliminarFacturaInventario($codigo){
         try {
+            $codigo_factura = FacturaInventario::where('codigo', $codigo)->get()[0]->codigo_factura;
+            Pago::where('codigo_factura', $codigo_factura)->delete();
             CarritoInventario::where('codigo', $codigo)->delete();
             FacturaInventario::where('codigo', $codigo)->delete();
 

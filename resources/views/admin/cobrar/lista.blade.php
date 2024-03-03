@@ -72,7 +72,7 @@
                                                 @include('admin.cobrar.partials.formpagar')
                                                 @include('admin.cobrar.partials.modaldialog')
 
-                                                <a href="{{ route('admin.cuentas.por.cobrar.show', $factura->codigo ) }}"  class="btn btn-success ">
+                                                <a href="{{ route('admin.cuentas.por.cobrar.show', $factura->id ) }}"  class="btn btn-success ">
                                                     <i class="bi bi-eye fs-4"></i>
                                                 </a>
                                             </td>
