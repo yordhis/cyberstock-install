@@ -107,15 +107,15 @@
                             <div class="p-2 bd-highlight">{{ number_format($factura->total * $factura->tasa, 2, ',', '.') }} $</div>
                           </div>
 
-                          <div class="w-100" id="metodosPagos">
+                          {{-- <div class="w-100" id="metodosPagos"> --}}
                               {{-- <div class="p-2 bd-highlight">tipo de pago</div>
                               <div class="p-2 bd-highlight">Bs 100</div> --}}
-                          </div>
+                          {{-- </div> --}}
 
-                          <div class="d-flex justify-content-between w-100 m-0 p-0" id="vuelto">
+                          {{-- <div class="d-flex justify-content-between w-100 m-0 p-0" id="vuelto"> --}}
                               {{-- <div class="p-2 bd-highlight">tipo de pago</div>
                               <div class="p-2 bd-highlight">Bs 100</div> --}}
-                          </div>
+                          {{-- </div> --}}
                           
                           <div class="d-flex justify-content-between w-100 m-2 p-0">
                             <a href="{{ route('admin.cuentas.por.cobrar.index')}}" class="col-sm-6 col-xs-12  btn btn-outline-danger pt-2" target="_self">VOLVER A LISTA</a>
