@@ -751,13 +751,13 @@ const hanledAgregarClienteFactura = async(e) =>{
         });
 
         /** Seteamos el cliente en la factura de local storage */
-        factura.identificacion = clientes.data[0].identificacion;
-        factura.tipoDocumento = clientes.data[0].tipo;
-        factura.razon_social = clientes.data[0].nombre;
+        factura.identificacion = clientes.data.data[0].identificacion;
+        factura.tipoDocumento = clientes.data.data[0].tipo;
+        factura.razon_social = clientes.data.data[0].nombre;
         localStorage.setItem('facturaSalida', JSON.stringify(factura));
    
         /** Cargamos la dat del cliente en el componentes tarjeta cliente */
-        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(clientes.data, clientes.mensaje);
+        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(clientes.data.data, clientes.mensaje);
       
         /** utilidad de cargar eventos de las acciones del cliente */
         cargarEventosAccionesDelCliente()

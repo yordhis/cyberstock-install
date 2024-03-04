@@ -59,7 +59,7 @@ class ClienteController extends Controller
                 foreach ($request->campo as $key => $campo) {
                     switch ($campo) {
                         case 'identificacion':
-                            $resultado = Cliente::where("{$campo}", $request->filtro)->get();
+                            $resultado = Cliente::where("{$campo}", $request->filtro)->paginate(1);
                             if (count($resultado)) {
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CEDULA",
