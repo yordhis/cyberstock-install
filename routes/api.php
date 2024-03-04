@@ -97,7 +97,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::resource('facturasInventarios', FacturaInventarioController::class)->names('api.facturasInventarios');
     
     /** CLIENTES */
-    Route::get('getCliente/{idCliente}', [ClienteController::class, 'getCliente'])->name('api.getCliente');
+    Route::post('getCliente', [ClienteController::class, 'getCliente'])->name('api.getCliente');
     Route::post('storeCliente', [ClienteController::class, 'storeCliente'])->name('api.storeCliente');
     Route::put('updateCliente/{id}', [ClienteController::class, 'updateCliente'])->name('api.updateCliente');
     

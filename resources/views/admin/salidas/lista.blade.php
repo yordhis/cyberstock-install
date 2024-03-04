@@ -41,14 +41,18 @@
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
                                             <td>{{ $factura->razon_social }}</td>
-                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ number_format($factura->total, 2, ',', '.') }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
                                             <td>{{ $factura->fecha }}</td>
-                                            <td>
+                                            <td class="flex  p-2">
 
                                                 @include('admin.salidas.partials.modalEliminar')
                                                 @include('admin.salidas.partials.modaldialog')
+
+                                                <a href="{{ route('admin.cuentas.por.cobrar.index') }}" class="btn btn-primary m-1" >
+                                                    <i class="bi bi-paypal fs-6"></i>
+                                                </a>
   
                                             </td>
                                         </tr>

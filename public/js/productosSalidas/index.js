@@ -683,37 +683,84 @@ const hanledAccionesCliente = async (e) => {
 
 
 };
+const componenteListaClientes = (clientes) =>{
+    let listaHtml = "";
+    clientes.forEach(cliente => {
+        listaHtml+=`
+            <button type="button" class="list-group-item list-group-item-action lista-cliente" id="${cliente.identificacion}">
+                ${cliente.nombre} - ${cliente.tipo}-${cliente.identificacion}  
+            </button>
+        `
+    })
+
+    return `
+        <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                Seleccione un cliente
+            </button>
+
+            ${listaHtml}
+            <div class="flex d-flex justify-content-center ">
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
+                    <i class="bi bi-search fs-4"></i>
+                </a>
+            
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
+                    <i class="bi bi-person-add fs-4"></i>
+                </a>
+            </div>
+        </div>
+        
+    `;
+}
 
 const hanledBuscarCliente = async (e) => {
     if(e.key == "Enter" && e.target.id == "buscarCliente"){
        
         /** Validando los datos ingresados */
         if(!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo es obligatorio!");
-        else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
-  
-        
+
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
-        let cliente = await getCliente( parseInt(e.target.value) );
 
-        /** Validamos si no hay data del cliente */
-        if(!cliente.data.length){
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);
-            cargarEventosAccionesDelCliente()
-        }else{
-            /** Cargamos la dat del cliente en el componentes tarjeta cliente */
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data, cliente.mensaje);
-            
-            /** Seteamos el cliente en la factura de local storage */
-            factura.identificacion = cliente.data[0].identificacion;
-            factura.tipoDocumento = cliente.data[0].tipo;
-            factura.razon_social = cliente.data[0].nombre;
-            localStorage.setItem('facturaSalida', JSON.stringify(factura));
-          
-            // utilidad de cargar eventos de las acciones del cliente
-            cargarEventosAccionesDelCliente()
-        }
+        /** realizamos la consulta */
+        log(e.target.value)
+        let clientes = await getCliente({ 
+            filtro: e.target.value,
+            campo:['identificacion', 'nombre']
+         });
+
+    
+         if(!clientes.data.data.length){
+            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, clientes.mensaje);
+            cargarEventosAccionesDelCliente();
+         }else{
+            elementoTarjetaCliente.innerHTML = componenteListaClientes(clientes.data.data);
+            cargarEventosAccionesDelCliente();
+            cargarEventosListaCliente();
+         }
     }
+};
+
+const hanledAgregarClienteFactura = async(e) =>{
+        log(e.target.id)
+        
+        let clientes = await getCliente({ 
+            filtro: e.target.id,
+            campo:['identificacion']
+        });
+
+        /** Seteamos el cliente en la factura de local storage */
+        factura.identificacion = clientes.data[0].identificacion;
+        factura.tipoDocumento = clientes.data[0].tipo;
+        factura.razon_social = clientes.data[0].nombre;
+        localStorage.setItem('facturaSalida', JSON.stringify(factura));
+   
+        /** Cargamos la dat del cliente en el componentes tarjeta cliente */
+        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(clientes.data, clientes.mensaje);
+      
+        /** utilidad de cargar eventos de las acciones del cliente */
+        cargarEventosAccionesDelCliente()
 };
 
 const hanledFormulario = async (e) => {
@@ -1414,6 +1461,13 @@ function cargarEventosAccionesDelCliente(){
     let accionesDelCliente = d.querySelectorAll('.acciones-cliente');
     accionesDelCliente.forEach(accionesCliente => {
         accionesCliente.addEventListener('click', hanledAccionesCliente);
+    });
+};
+
+function cargarEventosListaCliente(){
+    let accionesListaCliente = d.querySelectorAll('.lista-cliente');
+    accionesListaCliente.forEach(accionesListaCliente => {
+        accionesListaCliente.addEventListener('click', hanledAgregarClienteFactura);
     });
 };
 

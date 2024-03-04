@@ -42,36 +42,59 @@ class ClienteController extends Controller
     }
 
     /** API */
-    public function getCliente($idCliente)
+    public function getCliente(HttpRequest $request)
     {
-    
+       
         try {
             /** Validamos si el id esta definodo */
-            if($idCliente == "undefined"){
+            if($request == "undefined"){
                 return response()->json([
                     "mensaje" => "Indentificacion no definida.",
-                    "data" => $idCliente,
+                    "data" => $request,
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             }
 
-            /** Realizamos la consulta de la data del cliente */
-            $resultado = Cliente::where('identificacion', $idCliente)->get();
+              /** Buscamos por cedula y nombre de barra */
+                foreach ($request->campo as $key => $campo) {
+                    switch ($campo) {
+                        case 'identificacion':
+                            $resultado = Cliente::where("{$campo}", $request->filtro)->get();
+                            if (count($resultado)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CEDULA",
+                                    "data" => $resultado,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+                        case 'nombre':
+                            $resultados = Cliente::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('nombre', 'asc')->paginate(15);
+                            if (count($resultados)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR NOMBRE",
+                                    "data" => $resultados,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }else{
+                                return response()->json([
+                                    "mensaje" => "NO HAY REGISTROS.",
+                                    "data" => $resultados,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
 
-            /** Validamos si hay un resultado */
-            if(count($resultado)){
-                return response()->json([
-                    "mensaje" => "Consulta exitosa",
-                    "data" => $resultado,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }else{
-                return response()->json([
-                    "mensaje" => "Cliente NO registrado!",
-                    "data" => $resultado,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
-            }
+                        default:
+                            return response()->json([
+                                "mensaje" => "NO HAY REGISTROS.",
+                                "data" => [],
+                                "estatus" => Response::HTTP_OK
+                            ], Response::HTTP_OK);
+                            break;
+                    }
+                }
+          
         
         } catch (\Throwable $th) {
             return response()->json([
