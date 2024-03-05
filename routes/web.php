@@ -18,6 +18,7 @@ use App\Http\Controllers\{
     NotificacioneController,
     PagarController,
     PoController,
+    PorcentajeController,
     ProductoController,
     ProveedoreController,
     ReporteController,
@@ -49,6 +50,9 @@ Route::get('/preload', [ApiController::class, 'preload'])->name('api.preload');
 
 
 Route::middleware(['auth'])->group(function () {
+    /** RUTAS DE PORCENTAJES */
+        Route::get('/porcentajes', [PorcentajeController::class, 'index'])->name('admin.porcentajes.index');
+
     /** RUTAS DE PANEL */
         Route::get('/panel', [DashboardController::class, 'index'])->name('admin.panel.index');
 

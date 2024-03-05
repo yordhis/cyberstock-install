@@ -235,8 +235,8 @@ const componenteListaDeProductoFiltrados = (producto) => {
             <td>${producto.codigo}</td>
             <td>${producto.descripcion}</td>
             <td>
-                ${producto.pvpBs} <br>
-                REF: ${producto.pvp}
+                ${darFormatoDeNumero(producto.pvpBs)} <br>
+                REF: ${darFormatoDeNumero(producto.pvp)}
             </td>
         
             <td>${producto.cantidad}</td>
@@ -852,8 +852,8 @@ const hanledAgregarAFactura = async (e) => {
                             if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
                             else {
                                 producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal =  productoAdaptado.cantidad *  productoAdaptado.costo;
-                                producto.subtotalBs =  productoAdaptado.cantidad *  productoAdaptado.costoBs;
+                                producto.subtotal =  producto.cantidad *  productoAdaptado.costo;
+                                producto.subtotalBs =  producto.cantidad *  productoAdaptado.costoBs;
                             }; 
                         }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                             banderaDeProductoNuevo++;
@@ -976,7 +976,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
                     }, 3500);
-                }else if(!parseInt(cantidad)){
+                }else if(!parseFloat(cantidad)){
                     elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401); 
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
@@ -991,8 +991,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = producto.costo * cantidad;
-                        producto.subtotalBs = cantidad * producto.costoBs;
+
+                        producto.subtotal = producto.costo * producto.cantidad;
+                        producto.subtotalBs = producto.costoBs * producto.cantidad;
+
                     };
                     return producto;
                 });
@@ -1446,7 +1448,7 @@ function adaptadorDeProducto(data){
         numero: data.id,
         codigo: data.codigo,
         descripcion: data.descripcion,
-        cantidad: data.cantidad,
+        cantidad: parseFloat(data.cantidad),
         costo: parseFloat( data.costo ),
         costoBs: parseFloat( data.costo * data.tasa ),
         pvpBs: parseFloat( (data.tasa * data.pvp) ),
@@ -1565,6 +1567,5 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 };

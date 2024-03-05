@@ -1365,7 +1365,6 @@ async function cargarEventosAccionesDeFactura(){
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('facturaInventario', JSON.stringify(factura));
 };
 

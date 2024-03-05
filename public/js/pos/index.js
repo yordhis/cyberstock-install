@@ -1516,6 +1516,5 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('factura', JSON.stringify(factura));
 };
