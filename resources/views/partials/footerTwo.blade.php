@@ -6,7 +6,7 @@
               reservados
           </div>
           <div class="credits">
-               <a class="text-primary" href="https://cyberstaffstore.com/">Diseñado por el Equipo de desarrollo Cyber Staff</a>
+               <a class="text-primary" href="https://cyberstaffstore.com/" target="_blank">Diseñado por el Equipo de desarrollo Cyber Staff</a>
           </div>
       </footer><!-- End Footer -->
 

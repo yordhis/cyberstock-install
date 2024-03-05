@@ -21,7 +21,8 @@ factura = {
         concepto:'', // venta, compra ...
         descuento:0, // descuento
         fecha:'', // fecha venta, compra ...
-        metodos:''
+        metodos:'',
+        observacion: ''
 },
 metodosPagos = [{
     id: 1,
@@ -328,6 +329,32 @@ const componenteNumeroDeFactura = (data, nombre) =>{
 };
 
 const componenteFactura = async (factura) => {
+
+    let botonDeProcesarHtml = ``,
+    inputObservacionHtml = ``;
+    if(factura.concepto != 'CONSUMO'){
+        botonDeProcesarHtml = `
+            <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
+                <i class='bx bx-cart'></i> VENDER 
+            </button>
+        `;
+    }else{
+
+        inputObservacionHtml = `
+            <div class="col-sm-12 form-floating mb-2">
+                <input type="text" class="form-control acciones-factura" id="observacion" name="observacion" >
+                <label for="floatingInput"> Ingrese observación (OPCIONAL)</label>
+            </div>
+        `;
+
+        botonDeProcesarHtml = `
+        <button class="btn btn-success  w-100 fs-3 acciones-factura" id="procesarConsumo"  >
+            <box-icon name='cart-download'></box-icon> PROCESAR CONSUMO 
+        </button>
+        `;
+    }
+
+
     return `
         <div class="col-sm-6 form-floating mb-3">
             <input type="number" class="form-control acciones-factura" id="editarDescuento" >
@@ -352,6 +379,7 @@ const componenteFactura = async (factura) => {
                     <option value="${factura.concepto}" selected>${factura.concepto}</option>
                     <option value="VENTA">VENTA</option>
                     <option value="CREDITO">CREDITO</option>
+                    <option value="CONSUMO">CONSUMO</option>
                 </select>
                 <label for="concepto_salida">Concepto de salida</label>
             </div>
@@ -373,10 +401,9 @@ const componenteFactura = async (factura) => {
             
         </div>
 
+        ${inputObservacionHtml}
         <div class="col-sm-6">
-            <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
-                <i class='bx bx-cart '></i> VENDER
-            </button>
+           ${botonDeProcesarHtml}
         </div>
         <div class="col-sm-6">
             <button class="btn btn-danger  w-100 fs-3 acciones-factura"  id="eliminarFactura">
@@ -865,7 +892,7 @@ const hanledAgregarAFactura = async (e) => {
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito( JSON.parse(localStorage.getItem('carritoSalida')) );
     
                 /** Cargamos la factura y sus eventos de acciones del carrito de factura */
-                await cargarDatosDeFactura(carritoActual, factura);
+                await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
             }else{
                 alert(resultado.mensaje);
             }
@@ -918,8 +945,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     accion='',
     banderaDeError = 0,
     facturaActual = '',
-    acumuladorSubtotal = 0;
+    acumuladorSubtotal = 0,
+    inputObservacion  = "";
    
+   log(e.target)
+   log(e.target.localName)
     if(e.target.localName == 'button'){
         codigoProducto = e.target.name;
         accion = e.target.id;
@@ -934,6 +964,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         accion = e.target.id;
     }
 
+    log(accion)
 
     switch (accion) {
         case 'editarCantidadFactura':
@@ -960,8 +991,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
+
                         producto.subtotal = producto.costo * producto.cantidad;
                         producto.subtotalBs = producto.costoBs * producto.cantidad;
+
                     };
                     return producto;
                 });
@@ -974,15 +1007,15 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 }
 
                /** Guardamos en local el nuevo carrito */
-                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoB.reverse()));
+                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizadoB));
                 /** Cargamos la lista del carrito de compra */
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB.reverse());
+                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB);
             
 
                  /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
                 carritoActual = JSON.parse(localStorage.getItem('carritoSalida'));
 
-                await cargarDatosDeFactura(carritoActual, factura);
+                await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
 
 
             break;
@@ -992,7 +1025,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
 
                 /** Actualizamos la factura */
-                await cargarDatosDeFactura(carritoActualizadoC, factura);
+                await cargarDatosDeFactura(carritoActualizadoC, factura, factura.iva, factura.descuento);
             break;
         case 'eliminarFactura':
             /** validamos si hay factura para eliminar */
@@ -1039,6 +1072,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             await procesarFactura(e);
 
             break;
+        case 'procesarConsumo':
+            
+            await procesarConsumo(e);
+
+            break;
         case 'desactivarFacturaFiscal':
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
             break;
@@ -1049,8 +1087,12 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
         case 'concepto_salida':
-                factura.concepto = e.target.value;
-                localStorage.setItem('facturaSalida', JSON.stringify(factura));
+                if(e.target.value != factura.concepto){
+                    factura.concepto = e.target.value;
+                    localStorage.setItem('facturaSalida', JSON.stringify(factura));
+                    cargarDatosDeFactura(carritoActual, factura, factura.iva, 0);
+                }
+
             break;
         case 'imprimirFormulaLibre':
                 log('imprimiendo formula libre NOTA')
@@ -1211,6 +1253,70 @@ elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);
 
 
 /** ULTILIDADES */
+
+const procesarConsumo = async (e) => {
+ 
+    /** validamos que halla productos en la factura */
+    if(JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
+    
+     /** validamos si el cliente esta gregado a la factura  */
+    if(factura.identificacion == "") {
+        e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para procesar la salida de consumo.', 401);
+        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
+        return setTimeout( () => {
+            elementoAlertaVender.forEach(element => {
+                element.classList.add('d-none')
+            });
+            cargarEventosAccionesDeFactura();
+        }, 2500);
+    } 
+
+    let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
+    carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
+
+    /** VACIAMOS EL CODIGO DE FACTURA */
+    facturaVender.codigo_factura = "";
+    facturaVender.observacion = d.querySelector('#observacion').value 
+                                ? d.querySelector('#observacion').value 
+                                : "Sin observación asignada.";
+    log(facturaVender)
+    /** PROCESAR CARRITO */
+    carritoVender.forEach(async producto => {
+        producto.identificacion = facturaVender.identificacion;
+        producto.codigo_factura = "";
+        producto.concepto = facturaVender.concepto;
+        await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
+    });
+
+    /** MOSTRAR QUE ESTA CARGANDO  */
+    e.target.innerHTML = spinner();
+        
+    /** FACTURAR */
+    setTimeout( async ()=>{
+        /** Procesamos la factura y generamos el ticket */
+        resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
+               
+        /** Mostramos el dialogo de facturar */
+        if (resultadoDeFacturar.estatus == 201) {
+            /** Eliminamos la factura del Storagr */
+            localStorage.removeItem('carritoSalida');
+            localStorage.removeItem('facturaSalida');
+            confirmoLaImpresion = confirm('Se proceso correctamente la factura de consumo, presione aceptar para imprimir comprobante.');           
+            if(confirmoLaImpresion){
+                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data))
+            }
+            setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
+        } else {
+            /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
+            /** Eliminamos la factura del Storagr */
+            localStorage.removeItem('carritoSalida');
+            localStorage.removeItem('facturaSalida');
+            // e.target.parentElement.children[1].classList.add('d-none');
+            e.target.innerHTML = componenteAlerta("NO SE PROCESO LA FACTURA DE CONSUMO (ERROR)", 404, 'fs-1 m-2');
+            setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
+        }
+    }, 1000);
+}
 
 const procesarFactura = async (e) => {
     /** declaracion de variables */
