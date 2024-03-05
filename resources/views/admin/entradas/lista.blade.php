@@ -19,7 +19,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -40,7 +40,7 @@
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
                                             <td>{{ $factura->proveedor[0]->empresa ?? 'Proveedor' }}</td>
-                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ number_format($factura->total, 2, ',', '.') }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
                                             
@@ -58,10 +58,10 @@
                         <!-- End Table with stripped rows -->
                         
                         <!-- PAGINACION LARAVEL-->
-                        {{ $entradas->links(); }}
+                        {{-- {{ $entradas->links(); }} --}}
                         
                         <!-- Total de facturas pendientes -->
-                        {{ "Total de movimientos: " . $entradas->total() }}
+                        {{-- {{ "Total de movimientos: " . $entradas->total() }} --}}
                     </div>
                 </div>
 

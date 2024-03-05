@@ -15,6 +15,7 @@ use App\Models\{
     FacturaInventario,
     Helpers,
     Marca,
+    Pago,
     Po,
     Proveedore,
     Utilidade,
@@ -416,11 +417,10 @@ class InventarioController extends Controller
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
+        ])->orderBy('codigo', 'desc')->get();
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
-
             $totalArticulos = 0;
             foreach ($entrada->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
@@ -447,28 +447,25 @@ class InventarioController extends Controller
     
         $menuSuperior = $this->data->menuSuperior;
         $pos = Po::all()[0];
-        $salidas = FacturaInventario::where([
-            "tipo" => "SALIDA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
-        
-        $cliente = [];
 
+        $salidas = FacturaInventario::select('factura_inventarios.codigo', 'factura_inventarios.tipo',  'factura_inventarios.*',
+        'clientes.identificacion', 'clientes.tipo as tipo_documento', 'clientes.nombre', 'clientes.telefono', 'clientes.direccion', 'clientes.correo'
+        )
+        ->join('clientes', 'clientes.identificacion', '=', 'factura_inventarios.identificacion')
+        ->where("factura_inventarios.tipo", '=', "SALIDA")->orderBy('factura_inventarios.codigo', 'desc')->get();
+       
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
-
+           
+            $salida->fecha = date_format(date_create($salida->fecha), 'd-m-Y h:i:sa');
             $totalArticulos = 0;
             foreach ($salida->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
-            count(Cliente::where("identificacion", $salida->identificacion)->get()) 
-                            ? array_push( $cliente, Cliente::where("identificacion", $salida->identificacion)->get()[0])
-                            : array_push( $cliente, ["nombre" => "CLIENTE"]);
-
-            $salida->cliente = $cliente;
-            array_pop($cliente);
         }
-     
+        
+        
         return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));
         
     }
@@ -504,6 +501,8 @@ class InventarioController extends Controller
     /** Eliminar factura de inventario */
     public function eliminarFacturaInventario($codigo){
         try {
+            $codigo_factura = FacturaInventario::where('codigo', $codigo)->get()[0]->codigo_factura;
+            Pago::where('codigo_factura', $codigo_factura)->delete();
             CarritoInventario::where('codigo', $codigo)->delete();
             FacturaInventario::where('codigo', $codigo)->delete();
 

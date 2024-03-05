@@ -154,7 +154,7 @@ class ProveedoreController extends Controller
      */
     public function index()
     {
-        $proveedores = Proveedore::paginate(10);
+        $proveedores = Proveedore::all();
         $menuSuperior = $this->data->menuSuperior;
         return view('admin.proveedores.lista', compact('menuSuperior', 'proveedores'));
     }

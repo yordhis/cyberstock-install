@@ -26,37 +26,45 @@
                           <p class="p-0 m-0 fs-6">{{ $pos->direccion ?? '' }}</p>
                           <p class="p-0 m-0 fs-6">ZONA POSTAL {{ $pos->postal ?? '' }}</p>
                         </div>
-                        <span class="text-start ">Cliente: </span> {{ $factura->razon_social ?? '' }} <br>
-                        <span class="text-start ">RIF:</span> {{ number_format($factura->identificacion, 0, ',', '.') ?? '' }} <br>
+
                       </div>
                       <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                        {{-- <img src="{{ $factura->imagen }}" alt="Profile" class="rounded-circle">
-                        <h2>  {{ $factura->descripcion }}</h2> --}}
+                      
                           
                           <p class="text-center p-0 m-0">FACTURA</p>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight"><b>N° Factura: </b></div>
-                            <div class="p-2 bd-highlight" id="codigoFactura">{{ $factura->codigo }}</div>
+                            <div class="p-2 bd-highlight" id="codigoFactura">{{ $factura->codigo_factura }}</div>
+                          </div>
+                          
+                          <div class="d-flex justify-content-between w-100 m-0 p-0">
+                            <div class="p-2 bd-highlight"><b> Cliente: </b> {{ $factura->cliente[0]->nombre ?? '' }} </div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
-                            <div class="p-2 bd-highlight">Fecha: {{ date_format(date_create( explode( " ",$factura->created_at)[0] ), "d-m-Y")  }}</div>
-                            <div class="p-2 bd-highlight">Hora: {{ date_format(date_create( explode( " ",$factura->created_at)[1] ), "h:i:s") }}</div>
+                            <div class="p-2 bd-highlight"><b>RIF: </b> {{  $factura->cliente[0]->tipo . "-" . $factura->cliente[0]->identificacion }}</div>
+                          </div>
+
+                          <div class="d-flex justify-content-between w-100 m-0 p-0">
+                            <div class="p-2 bd-highlight"><b>Fecha:</b> {{ date_format(date_create( $factura->fecha ), "d-m-Y")  }}</div>
+                            <div class="p-2 bd-highlight"><b>Hora:</b> {{ date_format(date_create( $factura->fecha), "h:i:s") }}</div>
                             
                           </div>
     
                           <div class="bg-black m-1 w-100" style="height: 2px;"></div>
-                          <!-- Productos -->
-                          {{-- @php
-                                $subtotalAcumulador = 0;
-                            @endphp --}}
+                          
+                          <div class="d-flex justify-content-between w-100 m-0 p-0 ">
+                            <div class="p-2 bd-highlight" > <b>CANTIDAD X PRODUCTO</b> </div>
+                            <div class="p-2 bd-highlight" > <b>C/U</b> </div>
+                            <div class="p-2 bd-highlight" > <b>SUBTOTAL</b> </div>
+                          </div>
+                          <div class="bg-black m-1 w-100" style="height: 1px;"></div>
+
                           @foreach ($factura->carrito as $producto)
                             <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                               <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
-                              <div class="p-2 bd-highlight" >Bs {{ floatVal($producto->subtotal) *  $factura->tasa }}</div>
+                              <div class="p-2 bd-highlight" >{{ number_format($producto->costo *  $factura->tasa, 2, ',', '.') }} $</div>
+                              <div class="p-2 bd-highlight" >{{ number_format($producto->subtotal *  $factura->tasa, 2, ',', '.') }} $</div>
                             </div>
-                            {{-- @php
-                                $subtotalAcumulador = $producto->subtotal *  $factura->tasa + $subtotalAcumulador;
-                            @endphp --}}
                           @endforeach
     
                           <div class="bg-black m-1 w-100" style="height: 2px;"></div>
@@ -68,7 +76,7 @@
                               SUBTOTAL: <br>
                               |Total de Articulos: {{ $factura->totalArticulos }} |
                             </div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">{{ number_format($factura->subtotal *  $factura->tasa, 2, ',', '.') }} $</div>
                           </div>
     
 
@@ -81,14 +89,14 @@
                               Descuento: {{ $factura->descuento }}%
                              
                             </div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->descuento *  $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">{{ number_format($factura->descuento *  $factura->tasa, 2, ',', '.') }} $</div>
                           </div>
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">IVA:</div>
                             @php
                                 $subtotal = $factura->subtotal * $factura->tasa * ($factura->iva);
                             @endphp
-                            <div class="p-2 bd-highlight">Bs {{ number_format($subtotal, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight"> {{ number_format($subtotal, 2, ',', '.') }} $</div>
                           </div>
                           
     
@@ -96,18 +104,18 @@
 
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">TOTAL:</div>
-                            <div class="p-2 bd-highlight">Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</div>
+                            <div class="p-2 bd-highlight">{{ number_format($factura->total * $factura->tasa, 2, ',', '.') }} $</div>
                           </div>
 
-                          <div class="w-100" id="metodosPagos">
+                          {{-- <div class="w-100" id="metodosPagos"> --}}
                               {{-- <div class="p-2 bd-highlight">tipo de pago</div>
                               <div class="p-2 bd-highlight">Bs 100</div> --}}
-                          </div>
+                          {{-- </div> --}}
 
-                          <div class="d-flex justify-content-between w-100 m-0 p-0" id="vuelto">
+                          {{-- <div class="d-flex justify-content-between w-100 m-0 p-0" id="vuelto"> --}}
                               {{-- <div class="p-2 bd-highlight">tipo de pago</div>
                               <div class="p-2 bd-highlight">Bs 100</div> --}}
-                          </div>
+                          {{-- </div> --}}
                           
                           <div class="d-flex justify-content-between w-100 m-2 p-0">
                             <a href="{{ route('admin.cuentas.por.cobrar.index')}}" class="col-sm-6 col-xs-12  btn btn-outline-danger pt-2" target="_self">VOLVER A LISTA</a>

@@ -1064,6 +1064,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     setTimeout(async ()=>{
                         
                         /** Procesamos la factura y generamos el ticket */
+                        facturaVender.tipo="ENTRADA";
                         resultadoDeFacturar = await setFactura( `${URL_BASE}/setFacturaEntrada`, facturaVender );
 
                         /** Mostramos el dialogo de facturar */

@@ -28,29 +28,45 @@
                       <p class="p-0 m-0 fs-6">{{ $pos->direccion ?? '' }}</p>
                       <p class="p-0 m-0 fs-6">ZONA POSTAL {{ $pos->postal ?? '' }}</p>
                     </div>
-                    <span class="text-start ">Cliente: </span> {{ $factura->razon_social ?? '' }} <br>
-                    <span class="text-start ">RIF:</span> {{ number_format($factura->identificacion, 0, ',', '.') ?? '' }} <br>
+          
                   </div>
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                  
                       
-                      <p class="text-center p-0 m-0">FACTURA </p>
+                      <p class="text-center p-0 m-0 fs-4">{{  $factura->iva ? 'FACTURA' : 'NOTA DE ENTREGA' }} </p>
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight"><b>N° Factura: </b></div>
                         <div class="p-2 bd-highlight">{{ $factura->codigo }}</div>
                       </div>
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
-                        <div class="p-2 bd-highlight">Fecha: {{ date_format(date_create( explode( " ",$factura->created_at)[0] ), "d-m-Y")  }}</div>
-                        <div class="p-2 bd-highlight">Hora: {{ date_format(date_create( explode( " ",$factura->created_at)[1] ), "h:i:s") }}</div>
-                        
+                        <div class="p-2 bd-highlight"><b>Concepto: </b></div>
+                        <div class="p-2 bd-highlight">{{ $factura->concepto }}</div>
+                      </div>
+                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                        <div class="p-2 bd-highlight"><b>Cliente: </b> {{ $factura->razon_social ?? '' }}</div>
+                      </div>
+                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                        <div class="p-2 bd-highlight"><b>RIF: </b>{{ $factura->identificacion }}</div>
+                      </div>
+                  
+                      <div class="d-flex justify-content-between w-100 m-0 p-0">
+                        <div class="p-2 bd-highlight"><b>Fecha: </b> {{ date_format(date_create( $factura->fecha) , "d-m-Y")  }}</div>
+                        <div class="p-2 bd-highlight"><b>Hora: </b> {{ date_format(date_create( $factura->fecha), "h:i:s") }}</div>
                       </div>
 
+                      <p>------------------------------------------------------------------------------</p>
+                      <div class="d-flex justify-content-between w-100 m-0 p-0 ">
+                        <div class="p-2 bd-highlight" > <b>CANTIDAD X PRODUCTO</b> </div>
+                        <div class="p-2 bd-highlight" > <b>C/U</b> </div>
+                        <div class="p-2 bd-highlight" > <b>SUBTOTAL</b> </div>
+                      </div>
                       <p>------------------------------------------------------------------------------</p>
                       <!-- Productos -->
                       @foreach ($factura->carrito as $producto)
                         <div class="d-flex justify-content-between w-100 m-0 p-0" style="margin: 0%;  padding: 0%;">
                           <div class="p-2 bd-highlight" > {{ $producto->cantidad }} X {{ $producto->descripcion }} </div>
-                          <div class="p-2 bd-highlight" >Usd. {{ number_format($producto->subtotal, 2, ',', '.') }}</div>
+                          <div class="p-2 bd-highlight" >{{ number_format($producto->costo, 2, ',', '.') }} USD</div>
+                          <div class="p-2 bd-highlight" > {{ number_format($producto->subtotal, 2, ',', '.') }} USD</div>
                         </div>
                       @endforeach
 
@@ -58,28 +74,28 @@
 
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">
-                          SUBTOTAL: <br>
+                          <b>SUBTOTAL:</b> <br>
                           |Total de Articulos: {{ $factura->totalArticulos }} |
                         </div>
-                        <div class="p-2 bd-highlight">Usd {{ number_format($factura->subtotal, 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight"> {{ number_format($factura->subtotal, 2, ',', '.') }} USD</div>
                       </div>
                       
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
-                        <div class="p-2 bd-highlight">IVA:</div>
-                        <div class="p-2 bd-highlight">Usd. {{ number_format($factura->subtotal * $factura->iva, 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight"><b> IVA: </b></div>
+                        <div class="p-2 bd-highlight"> {{ number_format($factura->subtotal * $factura->iva, 2, ',', '.') }} USD</div>
                       </div>
 
                       <p>------------------------------------------------------------------------------</p>
 
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
-                        <div class="p-2 bd-highlight">TOTAL:</div>
-                        <div class="p-2 bd-highlight">Usd. {{ number_format($factura->total, 2, ',', '.') }}</div>
+                        <div class="p-2 bd-highlight"><b> TOTAL: </b></div>
+                        <div class="p-2 bd-highlight"> {{ number_format($factura->total, 2, ',', '.') }} USD</div>
                       </div>
                    
                       <p>------------------------------------------------------------------------------</p>
                       <div class="d-flex justify-content-between w-100 m-0 p-0">
                         <div class="p-2 bd-highlight">
-                          <b>OBSERVACIÓN DE PAGO</b>
+                          <b>OBSERVACIÓN DE {{ $factura->concepto }}</b>
                         </div>
                         <div class="p-2 bd-highlight">
                           {{ $factura->observacion ?? 'No hay observación'}}
