@@ -170,8 +170,14 @@ $subcategoria = 'LISTA';
 
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">
+                    <a class="nav-link"  href="{{ route('admin.porcentajes.index') }}" >
+                        <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
+                    </a>
+                </li><!-- End Components Nav | Utilidades -->
+                <!-- Start Components Nav | Utilidades -->
+                <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.utilidades.index') }}" >
-                        <i class='bi bi-cash fs-3'></i><span >Configurar Utilidades</span>
+                        <i class='bi bi-cash fs-3'></i><span >Configurar tasa e iva</span>
                     </a>
                 </li><!-- End Components Nav | Utilidades -->
 
