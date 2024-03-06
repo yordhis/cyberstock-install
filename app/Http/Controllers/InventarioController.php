@@ -195,9 +195,15 @@ class InventarioController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
     public function getInventariosFiltro(Request $request)
     {
         try {
+            $numeroDePagina = 15;
+            if(isset($request->numeroDePagina)){
+                $numeroDePagina = $request->numeroDePagina;
+            }
+
             $tasa = Utilidade::all()[0]->tasa;
             // filtramos por la descripcion
             if (request('filtro')) {
@@ -228,7 +234,7 @@ class InventarioController extends Controller
                                     "id_marca" => $request->id_marca
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
 
                 
                             }elseif ($request->id_categoria > 0){
@@ -236,7 +242,7 @@ class InventarioController extends Controller
                                     "id_categoria" => $request->id_categoria,
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
 
                             }elseif ($request->id_marca > 0) {
                                 
@@ -244,10 +250,10 @@ class InventarioController extends Controller
                                     "id_marca" => $request->id_marca
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
 
                             }else{
-                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
+                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
                             }
 
                             
@@ -291,12 +297,12 @@ class InventarioController extends Controller
                     $resultados = Inventario::where([
                         "id_categoria" => $request->id_categoria,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
                 }elseif ($request->id_marca > 0) {
                     $resultados = Inventario::where([
                         "id_marca" => $request->id_marca,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
                 }else{
                     return response()->json([
                         "mensaje" => "El filtro no poseé parametros de busquedas",

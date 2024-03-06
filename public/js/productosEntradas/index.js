@@ -675,6 +675,7 @@ const hanledBuscarProveedor = async (e) => {
         }
     }
 };
+
 /** MANEJO DE LOS FORMULARIOS PROVEEDOR */
 const hanledFormulario = async (e) => {
     e.preventDefault();
@@ -735,8 +736,6 @@ const hanledFormulario = async (e) => {
 
 };
 /** CIERRE PROVEEDOR */
-
-
 
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
@@ -832,7 +831,7 @@ const hanledAgregarAFactura = async (e) => {
             listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito( JSON.parse(localStorage.getItem('carritoInventario')) );
 
             /** Cargamos la factura y sus eventos de acciones del carrito de factura */
-            await cargarDatosDeFactura(carritoActual, factura);
+            await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
         }
     } // CIERRE agregarProductoAlCarrito
 };
@@ -843,7 +842,9 @@ const hanledBuscarProducto = async (e) => {
         let filtro = {
             filtro: `${e.target.value.trim()}`,
             campo: ['codigo', 'descripcion', 'default'],
+            numeroDePagina: 100
         };
+ 
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
         

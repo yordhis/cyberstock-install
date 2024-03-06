@@ -50,9 +50,11 @@
                                                 @include('admin.salidas.partials.modalEliminar')
                                                 @include('admin.salidas.partials.modaldialog')
 
-                                                <a href="{{ route('admin.cuentas.por.cobrar.index') }}" class="btn btn-primary m-1" >
-                                                    <i class="bi bi-paypal fs-6"></i>
-                                                </a>
+                                                @if ($factura->concepto == "CREDITO")
+                                                    <a href="{{ route('admin.cuentas.por.cobrar.index') }}" class="btn btn-primary m-1" >
+                                                        <i class="bi bi-paypal fs-6"></i>
+                                                    </a>
+                                                @endif
   
                                             </td>
                                         </tr>

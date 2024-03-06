@@ -127,7 +127,7 @@
                               <i class="bx bx-trash"></i>
                               ELIMINAR
                             </button> --}}
-                            <button type="button" class="col-sm-6 col-xs-12 ms-2 btn btn-outline-success acciones-factura" id="{{ $factura->codigo }}">
+                            <button type="button" class="col-sm-6 col-xs-12 ms-2 btn btn-outline-success acciones-factura" id="{{ $factura->codigo_factura }}">
                               <i class="bx bx-printer"></i>
                               IMPRIMIR
 

@@ -315,6 +315,12 @@ class ProductoController extends Controller
     public function getProductosFiltro(HttpRequest $request)
     {
         try {
+
+            $numeroDePagina = 15;
+            if(isset($request->numeroDePagina)){
+                $numeroDePagina = $request->numeroDePagina;
+            }
+
             $tasa = Utilidade::all()[0]->tasa;
             // filtramos por la descripcion
             if (request('filtro')) {
@@ -353,7 +359,7 @@ class ProductoController extends Controller
                                     "id_marca" => $request->id_marca
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
 
                 
                             }elseif ($request->id_categoria > 0){
@@ -362,7 +368,7 @@ class ProductoController extends Controller
                                         "id_categoria" => $request->id_categoria,
                                     ])
                                     ->where("{$campo}", "like", "%{$request->filtro}%")
-                                    ->orderBy('descripcion', 'asc')->paginate(15);
+                                    ->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
                                 
 
                             }elseif ($request->id_marca > 0) {                       
@@ -370,9 +376,9 @@ class ProductoController extends Controller
                                         "id_marca" => $request->id_marca
                                     ])
                                     ->where("{$campo}", "like", "%{$request->filtro}%")
-                                    ->orderBy('descripcion', 'asc')->paginate(15);
+                                    ->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
                             }else{
-                                $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
+                                $resultados = Producto::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
                             }
                             
                             /** añadimos los datos de inventario */
@@ -422,12 +428,12 @@ class ProductoController extends Controller
                     $resultados = Producto::where([
                         "id_categoria" => $request->id_categoria,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
                 }elseif ($request->id_marca > 0) {
                     $resultados = Producto::where([
                         "id_marca" => $request->id_marca,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->paginate( $numeroDePagina );
                 }else{
                     return response()->json([
                         "mensaje" => "El filtro no poseé parametros de busquedas",

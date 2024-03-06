@@ -96,23 +96,36 @@ class CobrarController extends Controller
             "tipo_factura" => $request->tipo_factura,
         ])->get();
 
-        /** Calculamos el total de abonas de la factura */
-        $total_abono = 0;
-        foreach ($todosLosPagos as $key => $abono) {
-            $total_abono = $total_abono + $abono->monto;
-        }
-
         /** Consultamos la factura en proceso de pago */
         $facturaInventario = FacturaInventario::where('codigo_factura', $request->codigo_factura)->get();
         $factura = Factura::where('codigo', $facturaInventario[0]->codigo_factura)->get();
 
+          /** Calculamos el total de abonas de la factura */
+          $total_abono = 0;
+          $metodosDePagos = [];
+          foreach ($todosLosPagos as $key => $abono) {
+              $total_abono = $total_abono + $abono->monto;
+              if($abono->metodo != "DIVISAS"){
+                  array_push($metodosDePagos, ["id"=>$key, "tipoDePago"=>$abono->metodo, "montoDelPago"=>$abono->monto * $facturaInventario[0]->tasa]);
+              }else{
+                  array_push($metodosDePagos, ["id"=>$key, "tipoDePago"=>$abono->metodo, "montoDelPago"=>$abono->monto]);
+              }
+          }
+
         /** Validamos si los abonos cumplen con el total de la factura acreditada para cambiar el estatus a pagada (VENTA) */
         if($total_abono >= $facturaInventario[0]->total){
+            // [{"id":"1","tipoDePago":"DIVISAS","montoDelPago":10.8228}]
+            /** Factura normal */
+            $estatus = $factura[0]->update([
+                "concepto" => "VENTA",
+                "metodos" => json_encode($metodosDePagos)
+            ]);
 
-            $estatus = $factura[0]->update(["concepto" => "VENTA"]);
+            /** Factura inventario */
             $estatus = $facturaInventario[0]->update([
                 "observacion" => $request->observacion,
-                "concepto" => "VENTA"
+                "concepto" => "VENTA",
+                "metodos" => json_encode($metodosDePagos)
             ]);
 
             $mensaje = $estatus ? "¡Pago acreditado!, La factura está solvente.": "No se registro el pago";

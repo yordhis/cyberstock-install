@@ -362,7 +362,7 @@ const htmlTicketEntrada = (factura, moneda = '$') => {
 };
 
 /** TICKET DE POS - VENTA */
-const htmlTicket = (factura, moneda = "$") => {
+const htmlTicket = (factura, moneda = "BS") => {
     // Declaracion de variables
     let carritoHtml = '', 
     descuentoHtml = '',
@@ -424,25 +424,27 @@ const htmlTicket = (factura, moneda = "$") => {
     // recorremos los metodos de pagos
     let cambio = 0;
     if(factura.concepto == "VENTA"){
-        metodosPagos.forEach((pago)=>{
-            if(pago.tipoDePago == "DIVISAS"){
-                metodosPagosHtml += `
-                    <tr>
-                        <td class="text__left border">EFECTIVO 2:</td>
-                        <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) } ${moneda}</td>
-                    </tr>
-                `;
-                cambio += parseFloat(pago.montoDelPago * capTasa); 
-            }else{
-                metodosPagosHtml += `
-                    <tr>
-                        <td class="text__left ">${pago.tipoDePago}:</td>
-                        <td colspan="2" class="text__right "> ${ darFormatoDeNumero(pago.montoDelPago) } Bs </td>
-                    </tr>
-                `;
-                cambio += parseFloat(pago.montoDelPago); 
-            }
-        });
+        if(metodosPagos){
+            metodosPagos.forEach((pago)=>{
+                if(pago.tipoDePago == "DIVISAS"){
+                    metodosPagosHtml += `
+                        <tr>
+                            <td class="text__left border">EFECTIVO 2:</td>
+                            <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(pago.montoDelPago * factura.tasa) } ${moneda}</td>
+                        </tr>
+                    `;
+                    cambio += parseFloat(pago.montoDelPago * capTasa); 
+                }else{
+                    metodosPagosHtml += `
+                        <tr>
+                            <td class="text__left ">${pago.tipoDePago}:</td>
+                            <td colspan="2" class="text__right "> ${ darFormatoDeNumero(pago.montoDelPago) } Bs </td>
+                        </tr>
+                    `;
+                    cambio += parseFloat(pago.montoDelPago); 
+                }
+            });
+        }
     }
 
 
@@ -532,11 +534,11 @@ const htmlTicket = (factura, moneda = "$") => {
                         <td colspan="2" class="text__right border" > ${ darFormatoDeNumero(factura.total * factura.tasa) } ${moneda}</td>
                     </tr>
 
-                    <!-- Oculto para la roca y punto queso
+                    <!-- Oculto para la roca y punto queso -->
                     <tr>
                         <td class="text__left border">TOTAL REF:</td>
                         <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
-                    </tr> -->
+                    </tr> 
 
                     ${metodosPagosHtml}
                     <!-- aqui iva el cambio  -->

@@ -959,6 +959,7 @@ const hanledBuscarProducto = async (e) => {
         let filtro = {
             filtro: `${e.target.value.trim()}`,
             campo: ['codigo', 'descripcion', 'default'],
+            numeroDePagina: 100
         };
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;

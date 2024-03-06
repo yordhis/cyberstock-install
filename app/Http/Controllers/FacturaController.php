@@ -111,6 +111,7 @@ class FacturaController extends Controller
         try {
             Pago::where('codigo_factura', $factura->codigo)->delete();
             FacturaInventario::where('codigo_factura', $factura->codigo)->delete();
+            CarritoInventario::where('codigo_factura', $factura->codigo)->delete();
             Carrito::where('codigo', $factura->codigo)->delete();
             $factura->delete();
 

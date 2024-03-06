@@ -20,3 +20,6 @@
 <link href="{{ asset('assets/css/stylepos.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/css/personalizado.css') }}" rel="stylesheet">
 
+<link href="{{ asset('assets/css/simple-datatables.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/simple-datatables.js') }}" ></script>
+

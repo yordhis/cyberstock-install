@@ -47,6 +47,11 @@
                                             <td>
                                                 @include('admin.entradas.partials.modalEliminar')
                                                 @include('admin.entradas.partials.modaldialog')
+                                                @if ($factura->concepto == "CREDITO")
+                                                <a href="{{ route('admin.cuentas.por.pagar.index') }}" class="btn btn-dark m-1" >
+                                                    <i class="bi bi-paypal fs-6"></i>
+                                                </a>
+                                            @endif
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp

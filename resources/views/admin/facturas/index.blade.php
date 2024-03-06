@@ -28,6 +28,7 @@
                                         <th scope="col">Fecha</th>
                                         <th scope="col">Total BS</th>
                                         <th scope="col">Total Divisas</th>
+                                        <th scope="col">CONCEPTO</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
@@ -39,10 +40,21 @@
                                             
                                                 <td>{{ $factura->codigo }}</td>
                                                 <td>{{ $factura->razon_social }}</td>
-                                                <td>{{ number_format($factura->identificacion, 0, ',', '.') }}</td>
+                                                <td>{{ $factura->identificacion }}</td>
                                                 <td>{{  date_format(date_create($factura->fecha), 'd-m-Y') }}</td>
                                                 <td>Bs {{ number_format($factura->total * $factura->tasa, 2, ',', '.') }}</td>
                                                 <td>REF: {{ number_format($factura->total, 2, ',', '.') }}</td>
+                                                <td>
+                                                    @if ( $factura->concepto == "CREDITO" )
+                                               
+                                                        <a href="{{ route('admin.cuentas.por.cobrar.index') }}" class="btn btn-outline-danger">PENDIENTE</a>
+                                                    
+                                                    @elseif(  $factura->concepto == "VENTA"  )
+                                                        <button type="button" class="btn btn-outline-success">PAGADO</button>    
+                                                    @else
+                                                        <button type="button" class="btn btn-outline-success">PAGADO</button>            
+                                                    @endif
+                                                </td>
                                                 <td> 
                                                     <a href="{{ route('admin.facturas.show', $factura->id) }}" >
                                                         <i class="bi bi-eye btn btn-success"></i>

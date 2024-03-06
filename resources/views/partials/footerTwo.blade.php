@@ -19,20 +19,24 @@
   <script src="{{ asset('/js/partials/preload.js') }}" defer></script>
   
 
-  <script>
-    const dataTable = new simpleDatatables.DataTable("#myTable", {
-        searchable: true,
-        fixedHeight: false,
-        labels: {
-            placeholder: "Buscar...",
-            searchTitle: "Buecar",
-            pageTitle: "Pagina {page}",
-            perPage: "Entradas por página",
-            noRows: "No hay resultados",
-            info: "Demostración {start} a {end} de {rows} entradas",
-            noResults: "Ningún resultado coincide con su consulta de búsqueda",
-        },
-    })
+  <script> 
+  try {
+        const dataTable = new simpleDatatables.DataTable("#myTable", {
+            searchable: true,
+            fixedHeight: false,
+            labels: {
+                placeholder: "Buscar...",
+                searchTitle: "Buecar",
+                pageTitle: "Pagina {page}",
+                perPage: "Entradas por página",
+                noRows: "No hay resultados",
+                info: "Demostración {start} a {end} de {rows} entradas",
+                noResults: "Ningún resultado coincide con su consulta de búsqueda",
+            },
+        })
+  } catch (error) {
+        console.log(error)
+  }
 </script>
   
   
