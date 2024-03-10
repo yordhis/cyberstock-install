@@ -22,6 +22,10 @@ class PorcentajeController extends Controller
      */
     public function index()
     {
+        return redirect()->route('admin.panel.index',[
+            "mensaje" => "Modulo no disponible, si desea este módulo debe contactar soporte y solicitar la activación",
+            "estatus" => 301
+        ]);
         $menuSuperior = [];
         $categorias = Categoria::all();
         $marcas = Marca::all();
