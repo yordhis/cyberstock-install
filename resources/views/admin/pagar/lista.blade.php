@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Lista de facturas por pagar')
+@section('title', 'Lista de facturas por cobrar')
 
 @section('content')
     <div id="alert"></div>
+    
     <section class="section">
         <div class="row">
 
@@ -19,39 +20,61 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">N° Movimiento</th>
-                                        <th scope="col">N° Factura</th>
-                                        <th scope="col">Proveedor</th>
-                                        <th scope="col">Monto</th>
-                                        <th scope="col">Total Art.</th>
-                                        <th scope="col">Concepto</th>
-                                        <th scope="col">Estatus</th>
-                                        <th scope="col">Acciones</th>
+                                        {{-- <th scope="col">N° Movimiento</th> --}}
+                                        <th scope="col">N° FACTURA</th>
+                                        <th scope="col">PROVEEDOR</th>
+                                        <th scope="col">MONTO</th>
+                                        <th scope="col">TOTAL ABONO</th>
+                                        <th scope="col">PENDIENTE</th>
+                                        <th scope="col">CONCEPTO</th>
+                                        <th scope="col">ESTATUS</th>
+                                        <th scope="col">ACCIONES</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $contador = 1; @endphp
                                     @foreach ($pagar as $factura)
                                         <tr>
-                                            <td scope="row">{{ $contador }}</td>
-                                            <td>{{ $factura->codigo }}</td>
+                                            {{-- <td scope="row">{{ $factura->codigo }}</td> --}}
                                             <td>{{ $factura->codigo_factura }}</td>
-                                            <td>
-                                                {{ $factura->proveedor[0]->empresa  ?? 'Proveedor'}} <br>
-                                                {{ $factura->proveedor[0]->telefono ?? ''}}
+                                            <td style="width: 250px">
+                                                {{ explode(" ", $factura->proveedor[0]->empresa)[0]  }} 
+                                                {{ explode(" ", $factura->proveedor[0]->empresa)[count(explode(" ", $factura->proveedor[0]->empresa))-1]  }} 
+                                                <br>
+                                                <i class="bi bi-phone-vibrate"></i>
+                                                {{ substr($factura->proveedor[0]->telefono, 0, 4)  }} -
+                                                {{ substr($factura->proveedor[0]->telefono, 4, 7)  }} 
                                             </td>
-                                            <td>{{ $factura->total }}</td>
-                                            <td>{{ $factura->totalArticulos }}</td>
-                                            <td>{{ $factura->concepto }}</td>
-                                            <td class="text-danger">{{ $factura->concepto == "CREDITO" ? "PENDIENTE" : "PAGADO" }}</td>
-                                            
+                                            <td>{{ number_format($factura->total, 2 ,',', '.') }} $</td>
+                                            <td class="text-success">{{  number_format($factura->total_abono, 2 ,',', '.') }}$</td>
+                                            <td class="text-danger">{{ number_format($factura->total - $factura->total_abono, 2 ,',', '.')  }}$  </td>
                                             <td>
+                                                @if ($factura->concepto == "COMPRA")
+                                                    <i class="bi bi-check2-square text-success fs-2"></i>
+                                                @else
+                                                    {{ $factura->concepto }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ( $factura->concepto == "CREDITO" )
+                                                    <button type="button" class="btn btn-outline-danger">PENDIENTE</button>
+                                                @elseif(  $factura->concepto == "CONSUMO"  )
+                                                    <button type="button" class="btn btn-outline-warning">CONSUMO</button>    
+                                                @else
+                                                    <button type="button" class="btn btn-outline-success">PAGADO</button>            
+                                                @endif
+                                            </td>
+                                            <td class="d-flex align-items-center" style="width: 100%">
+
                                                 @include('admin.pagar.partials.formpagar')
-                                                @include('admin.entradas.partials.modaldialog')
+                                                @include('admin.pagar.partials.modaldialog')
+                                               
+                                                {{-- <a href="{{ route('admin.cuentas.por.cobrar.show', $factura->codigo ) }}"  class="btn btn-success ">
+                                                    <i class="bi bi-eye fs-4"></i>
+                                                </a> --}}
                                             </td>
                                         </tr>
                                         @php $contador++; @endphp
@@ -61,7 +84,12 @@
                             </table>
                      
                         <!-- End Table with stripped rows -->
-
+                        
+                        <!-- PAGINACION LARAVEL-->
+                        {{-- {{ $cobrar->links(); }} --}}
+                        
+                        <!-- Total de facturas pendientes -->
+                        {{-- {{ "Total de facturas por cobrar: " . $cobrar->total() }} --}}
                     </div>
                 </div>
 
@@ -74,6 +102,8 @@
 
     
   
- 
+    {{-- <script src=" {{ asset('js/main.js') }}"></script> --}}
+    {{-- <script src=" {{ asset('js/cobrar/index.js') }}" defer></script> --}}
+
 
 @endsection

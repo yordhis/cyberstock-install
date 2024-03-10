@@ -63,27 +63,7 @@ class UtilidadeController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Utilidade  $utilidade
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Utilidade $utilidade)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Utilidade  $utilidade
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Utilidade $utilidade)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -111,6 +91,7 @@ class UtilidadeController extends Controller
             return view('errors.404', compact('mensajeError'));
         }
     }
+    
     public function update(UpdateUtilidadeRequest $request, Utilidade $utilidade)
     {
         try {
@@ -132,14 +113,4 @@ class UtilidadeController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Utilidade  $utilidade
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Utilidade $utilidade)
-    {
-        //
-    }
 }

@@ -118,6 +118,36 @@ $subcategoria = 'LISTA';
             </a>
         </li><!-- End Components Nav | FACTURAS -->
 
+        <!-- Start Components Nav | CONTROL DE PAGOS -->
+            <li class="nav-item">
+                <a class="nav-link {{ ($categoria == 'CONTROL DE PAGOS' ? 'collapse show' : $categoria == 'COBRAR') ? 'collapse show' : 'collapsed' }}"
+                    data-bs-target="#components-nav-11" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-gear"></i><span>CONTROL DE PAGO</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="components-nav-11"
+                    class="nav-content  {{ ($categoria == 'CONTROL DE PAGOS' ? 'collapse show' : $categoria == 'COBRAR') ? 'collapse show' : 'collapse' }} "
+                    data-bs-parent="#sidebar-nav">
+    
+                    <!-- Start Components Nav | COBRAR -->
+                    <li class="nav-item">
+                        <a class="nav-link"  href="{{ route('admin.cuentas.por.cobrar.index') }}" >
+                            <i class='bi bi-cash fs-3'></i><span >Cuentas por cobrar</span>
+                        </a>
+                    </li><!-- End Components Nav | Utilidades -->
+    
+    
+                    <!-- Start Components Nav | usuarios -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.cuentas.por.pagar.index') }}" >
+                            <i class="bi bi-card-list fs-3"></i><span>Cuentas por pagar</span>
+                        </a>
+                    </li><!-- End Components Nav | usuarios -->
+    
+                   
+    
+                </ul>
+            </li><!-- End Components Nav | CONTROL DE PAGO -->
+
         <!-- Start Components Nav | REPORTES -->
         <li class="nav-item">
             <a class="nav-link {{ $categoria == "REPORTES" ? "bg-white text-black": '' }}" href="{{ route('admin.reportes.index') }}">
@@ -140,8 +170,14 @@ $subcategoria = 'LISTA';
 
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">
+                    <a class="nav-link"  href="{{ route('admin.porcentajes.index') }}" >
+                        <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
+                    </a>
+                </li><!-- End Components Nav | Utilidades -->
+                <!-- Start Components Nav | Utilidades -->
+                <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.utilidades.index') }}" >
-                        <i class='bi bi-cash fs-3'></i><span >Configurar Utilidades</span>
+                        <i class='bi bi-cash fs-3'></i><span >Configurar tasa e iva</span>
                     </a>
                 </li><!-- End Components Nav | Utilidades -->
 
@@ -159,6 +195,14 @@ $subcategoria = 'LISTA';
                         <i class="bi bi-tools fs-3"></i><span>Configurar POS</span>
                     </a>
                 </li><!-- End Components Nav | usuarios -->
+                @if (Auth::user()->rol == 1)
+                    <!-- Start Components Nav | usuarios -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.importar.create') }} " >
+                            <i class="bi bi-tools fs-3"></i><span>Importación de datos</span>
+                        </a>
+                    </li><!-- End Components Nav | usuarios -->
+                @endif
 
             </ul>
         </li><!-- End Components Nav | configuraciones -->

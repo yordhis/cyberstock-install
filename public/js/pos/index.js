@@ -562,12 +562,12 @@ const hanledLoad = async (e) => {
         elementoTarjetaCliente.innerHTML = spinner();
         listaDeProductosEnFactura.innerHTML = spinner();
         if(factura.identificacion.length != 0){
-            resultadoCliente = await getCliente(factura.identificacion);
+            resultadoCliente = await getCliente({filtro: factura.identificacion, campo:['identificacion']});
         }
         
         /** Validamos que existe el cliente */
         if(resultadoCliente == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
-        else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data, "");
+        else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoCliente.data.data, "");
         cargarEventosAccionesDelCliente();
         
     }else{
@@ -653,20 +653,20 @@ const hanledBuscarCliente = async (e) => {
       
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
-        let cliente = await getCliente( parseInt(e.target.value) );
-
+        let cliente = await getCliente( {filtro: e.target.value, campo:['identificacion']} );
+   
         /** Validamos si no hay data del cliente */
-        if(!cliente.data.length){
+        if(!cliente.data.data.length){
             elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);
             cargarEventosAccionesDelCliente()
         }else{
             /** Cargamos la dat del cliente en el componentes tarjeta cliente */
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data, cliente.mensaje);
+            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data.data, cliente.mensaje);
             
             /** Seteamos el cliente en la factura de local storage */
-            factura.identificacion = cliente.data[0].identificacion;
-            factura.tipoDocumento = cliente.data[0].tipo;
-            factura.razon_social = cliente.data[0].nombre;
+            factura.identificacion = cliente.data.data[0].identificacion;
+            factura.tipoDocumento = cliente.data.data[0].tipo;
+            factura.razon_social = cliente.data.data[0].nombre;
             localStorage.setItem('factura', JSON.stringify(factura));
            
             // utilidad de cargar eventos de las acciones del cliente
@@ -842,6 +842,7 @@ const hanledBuscarProducto = async (e) => {
         let filtro = {
             filtro: `${e.target.value.trim()}`,
             campo: ['codigo', 'descripcion', 'default'],
+            numeroDePagina: 100
         };
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
@@ -1131,10 +1132,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
            
             cargarDatosDeFactura(carritoActual, factura, factura.iva, e.target.value);
             break;
-        // case 'imprimirFormulaLibre':
-        //         log('imprimiendo formula libre')
-        //         imprimirElementoFormulaLibre(formulaLibreHtml(resultadoDeFacturar.data));
-        //       break;
         case 'imprimirTicket':
                 log('imprimiendo ticket')
                 let hTicket = htmlTicket(resultadoDeFacturar.data);
@@ -1211,17 +1208,23 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             
             let datosDeLaFactura = await getFactura(inputCodigoDeLaFactura.value),
             carritoNormalizado = [];
-            if(!datosDeLaFactura.data) return inputCodigoDeLaFactura.nextElementSibling.textContent = datosDeLaFactura.mensaje;
-            datosDeLaFactura.data.estatusDeDevolucion = true;
 
-            carritoNormalizado = adaptadorDeProductoACarritoDeDevolucion(datosDeLaFactura.data.carrito, datosDeLaFactura.data)
-            localStorage.setItem('factura', JSON.stringify(datosDeLaFactura.data));
-            localStorage.setItem('carrito', JSON.stringify(carritoNormalizado));
-            inputCodigoDeLaFactura.nextElementSibling.innerHTML = componenteAlerta("Se cargó la factura correctamente.", 200);
+            if(datosDeLaFactura.data.concepto == "VENTA" ){
+                if(!datosDeLaFactura.data) return inputCodigoDeLaFactura.nextElementSibling.textContent = datosDeLaFactura.mensaje;
+                datosDeLaFactura.data.estatusDeDevolucion = true;
+    
+                carritoNormalizado = adaptadorDeProductoACarritoDeDevolucion(datosDeLaFactura.data.carrito, datosDeLaFactura.data)
+                localStorage.setItem('factura', JSON.stringify(datosDeLaFactura.data));
+                localStorage.setItem('carrito', JSON.stringify(carritoNormalizado));
+                inputCodigoDeLaFactura.nextElementSibling.innerHTML = componenteAlerta("Se cargó la factura correctamente.", 200);
+                // return log(datosDeLaFactura);
+                window.location.href="/pos";
+            }else{
+                inputCodigoDeLaFactura.nextElementSibling.innerHTML = componenteAlerta(`Esta factura no se puede cargar su concepto es:${datosDeLaFactura.data.concepto}. en esta sección solo se cargan facturas de ventas.`, 404);
+            }
+
             
             
-            // return log(datosDeLaFactura);
-            window.location.href="/pos";
             break;
         default:
             break;
@@ -1518,6 +1521,5 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('factura', JSON.stringify(factura));
 };

@@ -19,7 +19,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -40,15 +40,21 @@
                                             <td scope="row">{{ $factura->id  }}</td>
                                             <td>{{ $factura->codigo }}</td>
                                             <td>{{ $factura->codigo_factura }}</td>
-                                            <td>{{ $factura->cliente[0]['nombre'] }}</td>
-                                            <td>{{ $factura->total }}</td>
+                                            <td>{{ $factura->razon_social }}</td>
+                                            <td>{{ number_format($factura->total, 2, ',', '.') }}</td>
                                             <td>{{ $factura->totalArticulos }}</td>
                                             <td>{{ $factura->concepto }}</td>
                                             <td>{{ $factura->fecha }}</td>
-                                            <td>
+                                            <td class="flex  p-2">
 
                                                 @include('admin.salidas.partials.modalEliminar')
                                                 @include('admin.salidas.partials.modaldialog')
+
+                                                @if ($factura->concepto == "CREDITO")
+                                                    <a href="{{ route('admin.cuentas.por.cobrar.index') }}" class="btn btn-primary m-1" >
+                                                        <i class="bi bi-paypal fs-6"></i>
+                                                    </a>
+                                                @endif
   
                                             </td>
                                         </tr>
@@ -61,10 +67,10 @@
                         <!-- End Table with stripped rows -->
 
                         <!-- PAGINACION LARAVEL-->
-                        {{ $salidas->links(); }}
+                        {{-- {{ $salidas->links(); }} --}}
                         
                         <!-- Total de facturas pendientes -->
-                        {{ "Total de movimientos: " . $salidas->total() }}
+                        {{-- {{ "Total de movimientos: " . $salidas->total() }} --}}
 
                     </div>
                 </div>
@@ -77,7 +83,7 @@
     </section>
 
     
-    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
+    {{-- <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script> --}}
   
  
 

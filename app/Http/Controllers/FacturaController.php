@@ -12,6 +12,7 @@ use App\Models\DataDev;
 use App\Models\FacturaInventario;
 use App\Models\Helpers;
 use App\Models\Inventario;
+use App\Models\Pago;
 use App\Models\Po;
 use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
@@ -39,7 +40,7 @@ class FacturaController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = Request::path();
-            $facturas = Factura::where('codigo', '>', 0)->orderBy('codigo', 'DESC')->paginate(10);
+            $facturas = Factura::orderBy('codigo', 'DESC')->get();
            
             if(count($facturas)){
                 foreach ($facturas as $key => $factura) {
@@ -63,15 +64,16 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, $moneda="$")
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
             $factura = Factura::find($id);
-          
+            if($moneda == "$") $factura->tasa = 1;
             if($factura){
                     $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
+                    $factura->cliente = Cliente::where('identificacion', $factura->identificacion)->get();
                     $contador = 0;
                     foreach ($factura->carrito as $key => $producto) {
                         $contador += $producto->cantidad;
@@ -85,40 +87,17 @@ class FacturaController extends Controller
                 return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
             }
           
-
+            
             $pos = count(Po::all()) ? Po::all()[0]: [];
             $pathname = Request::path();
             $pathname = explode('/', $pathname)[0] . '/ver';
            
-            return view( 'admin.facturas.ver', compact( 'factura', 'pos', 'utilidades', 'menuSuperior' ) );
+            return view( 'admin.facturas.ver', compact( 'factura', 'moneda', 'pos', 'utilidades', 'menuSuperior' ) );
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
 
-    }
-
-       /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Factura $factura)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateFacturaRequest  $request
-     * @param  \App\Models\Factura  $factura
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateFacturaRequest $request, Factura $factura)
-    {
-        //
     }
 
     /**
@@ -130,6 +109,9 @@ class FacturaController extends Controller
     public function destroy(Factura $factura)
     {
         try {
+            Pago::where('codigo_factura', $factura->codigo)->delete();
+            FacturaInventario::where('codigo_factura', $factura->codigo)->delete();
+            CarritoInventario::where('codigo_factura', $factura->codigo)->delete();
             Carrito::where('codigo', $factura->codigo)->delete();
             $factura->delete();
 

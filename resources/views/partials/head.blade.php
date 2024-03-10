@@ -20,3 +20,10 @@
 <!-- ESTILOS PERSONALIZADOS -->
 <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" defer>
 <link href="{{ asset('assets/css/personalizado.css') }}" rel="stylesheet" defer>
+
+{{-- DataTable --}}
+{{-- <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css" > --}}
+{{-- <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script> --}}
+<link href="{{ asset('assets/css/simple-datatables.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/simple-datatables.js') }}" ></script>
+

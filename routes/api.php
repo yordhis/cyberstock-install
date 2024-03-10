@@ -18,6 +18,7 @@ use App\Http\Controllers\{
     MonitoreController,
     NotificacioneController,
     PoController,
+    PorcentajeController,
     ProductoController,
     ProveedoreController,
     ReporteController
@@ -37,7 +38,9 @@ use App\Http\Controllers\{
 // Route::resource('categorias', CategoriaController::class)->names('api.categorias');
 // Route::resource('marcas', MarcasController::class)->names('api.marcas');
 Route::group(['middleware' => ['cors']], function () {
-
+    /** RUTAS DE PORCENTAJES */
+    Route::put('/porcentajes', [PorcentajeController::class, 'update'])->name('admin.porcentajes.update');
+    
     /** CARRITO */
     Route::get('/realizarDevolucion/{codigoFactura}', [CarritoController::class, 'realizarDevolucion'])->name('api.realizarDevolucion');
    
@@ -71,6 +74,7 @@ Route::group(['middleware' => ['cors']], function () {
     
     /** INVENTARIOS */
     Route::get('getInventarios', [InventarioController::class, 'getInventarios'])->name('api.getInventarios');
+    Route::post('getInventariosFiltroAll', [InventarioController::class, 'getInventariosFiltroAll'])->name('api.getInventariosFiltroAll');
     Route::post('getInventariosFiltro', [InventarioController::class, 'getInventariosFiltro'])->name('api.getInventariosFiltro');
     Route::delete('deleteProductoDelInventario/{id}', [InventarioController::class, 'deleteProductoDelInventario'])->name('api.deleteProductoDelInventario');
     Route::put('editarProductoDelInventario/{id}', [InventarioController::class, 'editarProductoDelInventario'])->name('api.editarProductoDelInventario');
@@ -97,7 +101,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::resource('facturasInventarios', FacturaInventarioController::class)->names('api.facturasInventarios');
     
     /** CLIENTES */
-    Route::get('getCliente/{idCliente}', [ClienteController::class, 'getCliente'])->name('api.getCliente');
+    Route::post('getCliente', [ClienteController::class, 'getCliente'])->name('api.getCliente');
     Route::post('storeCliente', [ClienteController::class, 'storeCliente'])->name('api.storeCliente');
     Route::put('updateCliente/{id}', [ClienteController::class, 'updateCliente'])->name('api.updateCliente');
     

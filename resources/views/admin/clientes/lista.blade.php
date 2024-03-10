@@ -26,7 +26,7 @@
                 <div class="card">
                     <div class="card-body table-responsive">
                         <!-- LISTA DE CLIENTES -->
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -37,7 +37,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (count($clientes))
                                         @foreach ($clientes as $cliente)
                                             <tr>
                                                 <td scope="row">{{ $cliente->id }}</td>
@@ -55,21 +54,10 @@
                                             </tr>
                                         
                                         @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="5" class="text-danger text-center">No hay resultados</td>
-                                        </tr>
-                                    @endif
-                                   
                                     
                                 </tbody>
                             </table>
                         <!-- End LISTA DE CLIENTES -->
-
-                        <!-- PAGINACION BLADE -->
-                            {{ $clientes->links() }}
-                            {{ "Total de clientes registrados: " . $clientes->total() }}
-                        <!-- CIERRE PAGINACION BLADE -->
                     </div>
                 </div>
             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Inventario;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Http\Requests\UpdateInventarioRequest;
+use App\Imports\InventarioImportar;
 use App\Models\{
     Carrito,
     CarritoInventario,
@@ -15,6 +16,7 @@ use App\Models\{
     FacturaInventario,
     Helpers,
     Marca,
+    Pago,
     Po,
     Proveedore,
     Utilidade,
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventarioController extends Controller
 {
@@ -34,6 +37,21 @@ class InventarioController extends Controller
     {
         $this->data = new DataDev();
     }
+
+    /** vista importar datos */
+    public function importarCreate(){
+        $menuSuperior = $this->data->menuSuperior;
+        return view("admin.inventarios.importar", compact('menuSuperior'));
+    }
+
+    /** importar la data del archivo */
+    public function importarExcel(){
+
+        Excel::import(new InventarioImportar, request()->file('file'));
+
+        $menuSuperior = $this->data->menuSuperior;
+        return view("admin.inventarios.importar", compact('menuSuperior'));
+    }   
 
     /**
      *  Display a listing of the resource.
@@ -66,7 +84,7 @@ class InventarioController extends Controller
     }
 
     /** API REST FULL */
-    public function getInventariosFiltro(Request $request)
+    public function getInventariosFiltroAll(Request $request)
     {
         try {
             $tasa = Utilidade::all()[0]->tasa;
@@ -99,7 +117,7 @@ class InventarioController extends Controller
                                     "id_marca" => $request->id_marca
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->get();
 
                 
                             }elseif ($request->id_categoria > 0){
@@ -107,7 +125,7 @@ class InventarioController extends Controller
                                     "id_categoria" => $request->id_categoria,
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->get();
 
                             }elseif ($request->id_marca > 0) {
                                 
@@ -115,10 +133,10 @@ class InventarioController extends Controller
                                     "id_marca" => $request->id_marca
                                 ])
                                 ->where("{$campo}", "like", "%{$request->filtro}%")
-                                ->orderBy('descripcion', 'asc')->paginate(15);
+                                ->orderBy('descripcion', 'asc')->get();
 
                             }else{
-                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate(15);
+                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->get();
                             }
 
                             
@@ -162,12 +180,146 @@ class InventarioController extends Controller
                     $resultados = Inventario::where([
                         "id_categoria" => $request->id_categoria,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->get();
                 }elseif ($request->id_marca > 0) {
                     $resultados = Inventario::where([
                         "id_marca" => $request->id_marca,
                     ])
-                    ->orderBy('descripcion', 'asc')->paginate(15);
+                    ->orderBy('descripcion', 'asc')->get();
+                }else{
+                    return response()->json([
+                        "mensaje" => "El filtro no poseé parametros de busquedas",
+                        "data" => ["data" => []],
+                        "estatus" => Response::HTTP_NOT_FOUND
+                    ], Response::HTTP_NOT_FOUND);
+                }
+
+                $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+
+                return response()->json([
+                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                    "data" => $resultados,
+                    "tasa" => $tasa,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "ERROR AL FILTRAR LA BUSQUEDA DEL PRODUCTO,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => ["data" => []],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public function getInventariosFiltro(Request $request)
+    {
+        try {
+            $numeroDePagina = 15;
+            if(isset($request->numeroDePagina)){
+                $numeroDePagina = $request->numeroDePagina;
+            }
+
+            $tasa = Utilidade::all()[0]->tasa;
+            // filtramos por la descripcion
+            if (request('filtro')) {
+                /** Buscamos por codigo de barra */
+                foreach ($request->campo as $key => $campo) {
+                    switch ($campo) {
+                        case 'codigo':
+                            $resultados = Inventario::where("{$campo}", $request->filtro)->get();
+                            $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                            if (count($resultados)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CODIGO",
+                                    "data" =>  [
+                                        "data" => $resultados,
+                                        "total" => count($resultados)
+                                    ],
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+                        case 'descripcion':
+
+                            if($request->id_categoria > 0 && $request->id_marca > 0){
+                         
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
+
+                
+                            }elseif ($request->id_categoria > 0){
+                                $resultados = Inventario::where([
+                                    "id_categoria" => $request->id_categoria,
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
+
+                            }elseif ($request->id_marca > 0) {
+                                
+                                $resultados = Inventario::where([
+                                    "id_marca" => $request->id_marca
+                                ])
+                                ->where("{$campo}", "like", "%{$request->filtro}%")
+                                ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
+
+                            }else{
+                                $resultados = Inventario::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
+                            }
+
+                            
+            
+                            $resultados = Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
+                          
+
+                            if (count($resultados)) {
+
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => $resultados,
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }else{
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR DESCRIOCION",
+                                    "data" => $resultados,
+                                    "tasa" => $tasa,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+
+                        default:
+                            return response()->json([
+                                "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE, NO EXISTE ESTE PRODUCTO EN EL INVENTARIO.",
+                                "data" => [
+                                    "data" => [],
+                                    "total" => 0
+                                ],
+                                "tasa" => $tasa,
+                                "estatus" => Response::HTTP_OK
+                            ], Response::HTTP_OK);
+                            break;
+                    }
+                }
+            }else{
+                if ($request->id_categoria > 0) {
+                    $resultados = Inventario::where([
+                        "id_categoria" => $request->id_categoria,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
+                }elseif ($request->id_marca > 0) {
+                    $resultados = Inventario::where([
+                        "id_marca" => $request->id_marca,
+                    ])
+                    ->orderBy('descripcion', 'asc')->paginate($numeroDePagina);
                 }else{
                     return response()->json([
                         "mensaje" => "El filtro no poseé parametros de busquedas",
@@ -288,11 +440,10 @@ class InventarioController extends Controller
 
         $entradas = FacturaInventario::where([
             "tipo" => "ENTRADA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
+        ])->orderBy('codigo', 'desc')->get();
 
         foreach ($entradas as $key => $entrada) {
             $entrada->carrito = CarritoInventario::where("codigo", $entrada->codigo)->get();
-
             $totalArticulos = 0;
             foreach ($entrada->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
@@ -319,28 +470,25 @@ class InventarioController extends Controller
     
         $menuSuperior = $this->data->menuSuperior;
         $pos = Po::all()[0];
-        $salidas = FacturaInventario::where([
-            "tipo" => "SALIDA"
-        ])->orderBy('codigo', 'desc')->paginate(10);
-        
-        $cliente = [];
 
+        $salidas = FacturaInventario::select('factura_inventarios.codigo', 'factura_inventarios.tipo',  'factura_inventarios.*',
+        'clientes.identificacion', 'clientes.tipo as tipo_documento', 'clientes.nombre', 'clientes.telefono', 'clientes.direccion', 'clientes.correo'
+        )
+        ->join('clientes', 'clientes.identificacion', '=', 'factura_inventarios.identificacion')
+        ->where("factura_inventarios.tipo", '=', "SALIDA")->orderBy('factura_inventarios.codigo', 'desc')->get();
+       
         foreach ($salidas as $key => $salida) {
             $salida->carrito = CarritoInventario::where("codigo", $salida->codigo)->get();
-
+           
+            $salida->fecha = date_format(date_create($salida->fecha), 'd-m-Y h:i:sa');
             $totalArticulos = 0;
             foreach ($salida->carrito as $key => $articulos) {
                 $totalArticulos = $totalArticulos + $articulos->cantidad;
             }
             $salida->totalArticulos = $totalArticulos;
-            count(Cliente::where("identificacion", $salida->identificacion)->get()) 
-                            ? array_push( $cliente, Cliente::where("identificacion", $salida->identificacion)->get()[0])
-                            : array_push( $cliente, ["nombre" => "CLIENTE"]);
-
-            $salida->cliente = $cliente;
-            array_pop($cliente);
         }
-     
+        
+        
         return view('admin.salidas.lista', compact('menuSuperior', 'salidas', 'pos'));
         
     }
@@ -376,6 +524,8 @@ class InventarioController extends Controller
     /** Eliminar factura de inventario */
     public function eliminarFacturaInventario($codigo){
         try {
+            $codigo_factura = FacturaInventario::where('codigo', $codigo)->get()[0]->codigo_factura;
+            Pago::where('codigo_factura', $codigo_factura)->delete();
             CarritoInventario::where('codigo', $codigo)->delete();
             FacturaInventario::where('codigo', $codigo)->delete();
 

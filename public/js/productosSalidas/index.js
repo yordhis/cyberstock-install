@@ -235,8 +235,8 @@ const componenteListaDeProductoFiltrados = (producto) => {
             <td>${producto.codigo}</td>
             <td>${producto.descripcion}</td>
             <td>
-                ${producto.pvpBs} <br>
-                REF: ${producto.pvp}
+                ${darFormatoDeNumero(producto.pvpBs)} <br>
+                REF: ${darFormatoDeNumero(producto.pvp)}
             </td>
         
             <td>${producto.cantidad}</td>
@@ -332,7 +332,9 @@ const componenteFactura = async (factura) => {
 
     let botonDeProcesarHtml = ``,
     inputObservacionHtml = ``;
-    if(factura.concepto != 'CONSUMO'){
+
+    
+    if(factura.concepto == 'VENTA'){
         botonDeProcesarHtml = `
             <button class="btn btn-success  w-100 fs-3 acciones-factura" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="cargarModalMetodoPago"  >
                 <i class='bx bx-cart'></i> VENDER 
@@ -349,7 +351,7 @@ const componenteFactura = async (factura) => {
 
         botonDeProcesarHtml = `
         <button class="btn btn-success  w-100 fs-3 acciones-factura" id="procesarConsumo"  >
-            <box-icon name='cart-download'></box-icon> PROCESAR CONSUMO 
+            <box-icon name='cart-download'></box-icon> PROCESAR ${factura.concepto} 
         </button>
         `;
     }
@@ -683,37 +685,84 @@ const hanledAccionesCliente = async (e) => {
 
 
 };
+const componenteListaClientes = (clientes) =>{
+    let listaHtml = "";
+    clientes.forEach(cliente => {
+        listaHtml+=`
+            <button type="button" class="list-group-item list-group-item-action lista-cliente" id="${cliente.identificacion}">
+                ${cliente.nombre} - ${cliente.tipo}-${cliente.identificacion}  
+            </button>
+        `
+    })
+
+    return `
+        <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                Seleccione un cliente
+            </button>
+
+            ${listaHtml}
+            <div class="flex d-flex justify-content-center ">
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
+                    <i class="bi bi-search fs-4"></i>
+                </a>
+            
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
+                    <i class="bi bi-person-add fs-4"></i>
+                </a>
+            </div>
+        </div>
+        
+    `;
+}
 
 const hanledBuscarCliente = async (e) => {
     if(e.key == "Enter" && e.target.id == "buscarCliente"){
        
         /** Validando los datos ingresados */
         if(!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo es obligatorio!");
-        else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
-  
-        
+
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
-        let cliente = await getCliente( parseInt(e.target.value) );
 
-        /** Validamos si no hay data del cliente */
-        if(!cliente.data.length){
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);
-            cargarEventosAccionesDelCliente()
-        }else{
-            /** Cargamos la dat del cliente en el componentes tarjeta cliente */
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data, cliente.mensaje);
-            
-            /** Seteamos el cliente en la factura de local storage */
-            factura.identificacion = cliente.data[0].identificacion;
-            factura.tipoDocumento = cliente.data[0].tipo;
-            factura.razon_social = cliente.data[0].nombre;
-            localStorage.setItem('facturaSalida', JSON.stringify(factura));
-          
-            // utilidad de cargar eventos de las acciones del cliente
-            cargarEventosAccionesDelCliente()
-        }
+        /** realizamos la consulta */
+        log(e.target.value)
+        let clientes = await getCliente({ 
+            filtro: e.target.value,
+            campo:['identificacion', 'nombre']
+         });
+
+    
+         if(!clientes.data.data.length){
+            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, clientes.mensaje);
+            cargarEventosAccionesDelCliente();
+         }else{
+            elementoTarjetaCliente.innerHTML = componenteListaClientes(clientes.data.data);
+            cargarEventosAccionesDelCliente();
+            cargarEventosListaCliente();
+         }
     }
+};
+
+const hanledAgregarClienteFactura = async(e) =>{
+        log(e.target.id)
+        
+        let clientes = await getCliente({ 
+            filtro: e.target.id,
+            campo:['identificacion']
+        });
+
+        /** Seteamos el cliente en la factura de local storage */
+        factura.identificacion = clientes.data.data[0].identificacion;
+        factura.tipoDocumento = clientes.data.data[0].tipo;
+        factura.razon_social = clientes.data.data[0].nombre;
+        localStorage.setItem('facturaSalida', JSON.stringify(factura));
+   
+        /** Cargamos la dat del cliente en el componentes tarjeta cliente */
+        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(clientes.data.data, clientes.mensaje);
+      
+        /** utilidad de cargar eventos de las acciones del cliente */
+        cargarEventosAccionesDelCliente()
 };
 
 const hanledFormulario = async (e) => {
@@ -854,8 +903,8 @@ const hanledAgregarAFactura = async (e) => {
                             if(parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
                             else {
                                 producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal =  productoAdaptado.cantidad *  productoAdaptado.costo;
-                                producto.subtotalBs =  productoAdaptado.cantidad *  productoAdaptado.costoBs;
+                                producto.subtotal =  producto.cantidad *  productoAdaptado.costo;
+                                producto.subtotalBs =  producto.cantidad *  productoAdaptado.costoBs;
                             }; 
                         }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
                             banderaDeProductoNuevo++;
@@ -912,6 +961,7 @@ const hanledBuscarProducto = async (e) => {
         let filtro = {
             filtro: `${e.target.value.trim()}`,
             campo: ['codigo', 'descripcion', 'default'],
+            numeroDePagina: 100
         };
 
         if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
@@ -978,7 +1028,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
                     }, 3500);
-                }else if(!parseInt(cantidad)){
+                }else if(!parseFloat(cantidad)){
                     elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401); 
                     return setTimeout(()=>{
                         elementoAlertas.innerHTML="";
@@ -993,8 +1043,10 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     }
                     if(producto.codigo_producto == codigoProducto ) {
                         producto.cantidad = parseFloat(cantidad);
-                        producto.subtotal = producto.costo * cantidad;
-                        producto.subtotalBs = cantidad * producto.costoBs;
+
+                        producto.subtotal = producto.costo * producto.cantidad;
+                        producto.subtotalBs = producto.costoBs * producto.cantidad;
+
                     };
                     return producto;
                 });
@@ -1275,7 +1327,7 @@ const procesarConsumo = async (e) => {
     carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
     /** VACIAMOS EL CODIGO DE FACTURA */
-    facturaVender.codigo_factura = "";
+    facturaVender.codigo_factura = facturaVender.concepto == "CREDITO" ? facturaVender.codigo_factura : "";
     facturaVender.observacion = d.querySelector('#observacion').value 
                                 ? d.querySelector('#observacion').value 
                                 : "Sin observación asignada.";
@@ -1283,7 +1335,7 @@ const procesarConsumo = async (e) => {
     /** PROCESAR CARRITO */
     carritoVender.forEach(async producto => {
         producto.identificacion = facturaVender.identificacion;
-        producto.codigo_factura = "";
+        producto.codigo_factura =  facturaVender.codigo_factura ;
         producto.concepto = facturaVender.concepto;
         await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
     });
@@ -1294,6 +1346,7 @@ const procesarConsumo = async (e) => {
     /** FACTURAR */
     setTimeout( async ()=>{
         /** Procesamos la factura y generamos el ticket */
+        facturaVender.tipo = "SALIDA";
         resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
                
         /** Mostramos el dialogo de facturar */
@@ -1312,7 +1365,7 @@ const procesarConsumo = async (e) => {
             localStorage.removeItem('carritoSalida');
             localStorage.removeItem('facturaSalida');
             // e.target.parentElement.children[1].classList.add('d-none');
-            e.target.innerHTML = componenteAlerta("NO SE PROCESO LA FACTURA DE CONSUMO (ERROR)", 404, 'fs-1 m-2');
+            e.target.innerHTML = componenteAlerta(`NO SE PROCESO LA FACTURA DE ${facturaVender.concepto} (ERROR)`, 404, 'fs-1 m-2');
             setTimeout( ()=> window.location.href = "/inventarios/crearSalida", 1500 );
         }
     }, 1000);
@@ -1320,8 +1373,7 @@ const procesarConsumo = async (e) => {
 
 const procesarFactura = async (e) => {
     /** declaracion de variables */
-    let abonado = 0,
-    resultadoDefacturarCarrito = '';
+    let abonado = 0;
 
     /** validamos que halla productos en la factura */
     if(JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return  e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
@@ -1371,6 +1423,7 @@ const procesarFactura = async (e) => {
                 setTimeout( async ()=>{
 
                     /** Procesamos la factura y generamos el ticket */
+                    facturaVender.tipo="SALIDA";
                     resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
                     
                     /** Mostramos el dialogo de facturar */
@@ -1416,6 +1469,13 @@ function cargarEventosAccionesDelCliente(){
     });
 };
 
+function cargarEventosListaCliente(){
+    let accionesListaCliente = d.querySelectorAll('.lista-cliente');
+    accionesListaCliente.forEach(accionesListaCliente => {
+        accionesListaCliente.addEventListener('click', hanledAgregarClienteFactura);
+    });
+};
+
 /** Esta funcion obtiene todos los formularios de la vista */
 async function cargarEventosDeFormularios(){
     let formularios = d.forms;
@@ -1448,7 +1508,7 @@ function adaptadorDeProducto(data){
         numero: data.id,
         codigo: data.codigo,
         descripcion: data.descripcion,
-        cantidad: data.cantidad,
+        cantidad: parseFloat(data.cantidad),
         costo: parseFloat( data.costo ),
         costoBs: parseFloat( data.costo * data.tasa ),
         pvpBs: parseFloat( (data.tasa * data.pvp) ),
@@ -1567,6 +1627,5 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
 function vaciarDatosDelClienteDeLaFactura(factura){
     factura.identificacion = "";
     factura.razon_social = "";
-    factura.tipo = "";
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 };

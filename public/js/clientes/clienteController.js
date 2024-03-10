@@ -1,7 +1,7 @@
-const getCliente = async (idCliente) => {
-    return await fetch(`${URL_BASE}/getCliente/${idCliente}`, {
-        method: "GET", // or 'PUT'
-        // body: JSON.stringify(idProduct), // data can be `string` or {object}!
+const getCliente = async (filtro) => {
+    return await fetch(`${URL_BASE}/getCliente`, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(filtro), // data can be `string` or {object}!
         headers: {
             "Content-Type": "application/json",
         },
