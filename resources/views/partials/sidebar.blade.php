@@ -195,6 +195,14 @@ $subcategoria = 'LISTA';
                         <i class="bi bi-tools fs-3"></i><span>Configurar POS</span>
                     </a>
                 </li><!-- End Components Nav | usuarios -->
+                @if (Auth::user()->rol == 1)
+                    <!-- Start Components Nav | usuarios -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.importar.create') }} " >
+                            <i class="bi bi-tools fs-3"></i><span>Importación de datos</span>
+                        </a>
+                    </li><!-- End Components Nav | usuarios -->
+                @endif
 
             </ul>
         </li><!-- End Components Nav | configuraciones -->

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Inventario;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Http\Requests\UpdateInventarioRequest;
+use App\Imports\InventarioImportar;
 use App\Models\{
     Carrito,
     CarritoInventario,
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventarioController extends Controller
 {
@@ -35,6 +37,21 @@ class InventarioController extends Controller
     {
         $this->data = new DataDev();
     }
+
+    /** vista importar datos */
+    public function importarCreate(){
+        $menuSuperior = $this->data->menuSuperior;
+        return view("admin.inventarios.importar", compact('menuSuperior'));
+    }
+
+    /** importar la data del archivo */
+    public function importarExcel(){
+
+        Excel::import(new InventarioImportar, request()->file('file'));
+
+        $menuSuperior = $this->data->menuSuperior;
+        return view("admin.inventarios.importar", compact('menuSuperior'));
+    }   
 
     /**
      *  Display a listing of the resource.
