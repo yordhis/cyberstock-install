@@ -654,7 +654,7 @@ const hanledBuscarCliente = async (e) => {
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
         let cliente = await getCliente( {filtro: e.target.value, campo:['identificacion']} );
-   
+        
         /** Validamos si no hay data del cliente */
         if(!cliente.data.data.length){
             elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);

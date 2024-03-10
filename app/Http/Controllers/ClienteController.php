@@ -88,12 +88,17 @@ class ClienteController extends Controller
                         default:
                             return response()->json([
                                 "mensaje" => "NO HAY REGISTROS.",
-                                "data" => [],
+                                "data" => ["data" => []],
                                 "estatus" => Response::HTTP_OK
                             ], Response::HTTP_OK);
                             break;
                     }
                 }
+                return response()->json([
+                    "mensaje" => "NO HAY REGISTROS.",
+                    "data" => ["data" => []],
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
           
         
         } catch (\Throwable $th) {
