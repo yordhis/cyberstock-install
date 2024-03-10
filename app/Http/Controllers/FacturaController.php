@@ -64,7 +64,7 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function show($id, $moneda="$")
+    public function show($id, $moneda="Bs")
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
