@@ -1,3 +1,5 @@
+
+
 const getCliente = async (filtro) => {
     return await fetch(`${URL_BASE}/getCliente`, {
         method: "POST", // or 'PUT'
