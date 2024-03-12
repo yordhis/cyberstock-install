@@ -139,7 +139,7 @@ const htmlTicketSalidaV1 = (factura) => {
                     <th colspan="2" class="producto">CLIENTE: ${factura.razon_social}</th>
                 </tr>
                 <tr>
-                    <th colspan="2" class="producto">RIF: ${factura.identificacion}</th>
+                    <th colspan="2" class="producto">RIF: ${factura.cliente.tipo_documento}-${factura.identificacion}</th>
                 </tr>
                 <tr>
                     <th class="producto">N° FACTURA</th>
@@ -325,9 +325,6 @@ const htmlTicketEntrada = (factura, moneda = '$') => {
                 <tbody>
              
                     ${carritoHtml}
-                    
-                    
-            
             
                     <tr>
                         <td class="text__left border">
@@ -346,7 +343,6 @@ const htmlTicketEntrada = (factura, moneda = '$') => {
                         <td colspan="2" class="text__right border" > ${ darFormatoDeNumero(factura.total * factura.tasa) } ${moneda}</td>
                     </tr>
 
-                    
                     <tr>
                         <td class="text__left border">TOTAL REF:</td>
                         <td colspan="2" class="text__right border"> ${ darFormatoDeNumero(factura.total) }</td>
@@ -396,9 +392,11 @@ const htmlTicket = (factura, moneda = "$") => {
     factura.carrito.forEach(producto => {
         carritoHtml+=`
             <tr>
+
                 <td class="text__left">${producto.cantidad} X ${producto.descripcion} </td>
                 <td class="text__right">| ${darFormatoDeNumero(producto.costo * factura.tasa) } ${moneda} |</td>
                 <td class="text__right">${ darFormatoDeNumero(producto.subtotal * factura.tasa) } ${moneda}</td>
+
             </tr>
         `;
     });
@@ -505,7 +503,7 @@ const htmlTicket = (factura, moneda = "$") => {
                     <tr>
                         <th class="text__left border-mix"> CANT X PRODUCTO </th>
                         
-                        <th class="text__right border-mix"> |  C/U  | </th>
+                        <th class="text__right border-mix"> C/U </th>
                         <th class="text__right border-mix"> SUBTOTAL </th>
                     </tr>
                     
@@ -667,7 +665,7 @@ const imprimirElementoPos = (elemento) => {
     ventana.document.write(`<style>
         * {
         margin: 0%;
-        font-size: 10px;
+        font-size: 12px;
         font-family: 'Times New Roman';
         }
 
@@ -756,7 +754,7 @@ const imprimirElementoFormulaLibre = (elemento) => {
                 width: 60em;
             }
 
-            
+            th.descripcion,
             td.descripcion{
                 padding: 5px;
                 font-size: 10px;
@@ -863,7 +861,9 @@ const formulaLibreFacturaHtml = (factura) => {
         
         <tr class="border">
             <th colspan="3" class="text__left">CLIENTE: ${factura.cliente.nombre.toUpperCase()}</th>
-            <th colspan="2" class="text__right descripcion">FACTURA | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span></th>
+            <th colspan="2" class="text__right descripcion">
+                FACTURA |  N° ${factura.codigo} | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span>
+            </th>
         </tr>
         <tr>
             <th colspan="3" class="text__left">
@@ -873,16 +873,15 @@ const formulaLibreFacturaHtml = (factura) => {
             <th colspan="2" class="text__right descripcion">CÓDIGO CLIENTE: <span class="red">000${factura.cliente.id}</span></th>    
         </tr>
         <tr>
-            <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion : ""}</span></th>
+            <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion.toUpperCase() : ""}</span></th>
         </tr>
         <tr>
             <th colspan="3" class="text__left">
                 VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
             </th>
+            <th colspan="2" class="text__right">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
          </tr>
-        <tr>
-            <th colspan="5" class="text__left">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
-        </tr>
+        
         <tr class="border">
             <th class="text__left numero">CODIGO</th>
             <th class="text__left descripcion">DESCRIPCIÓN</th>
@@ -970,7 +969,8 @@ const formulaLibreHtml = (factura) => {
                     CLIENTE: ${factura.cliente.nombre.toUpperCase()}
                 </th>
             
-                <th colspan="2" class="text__right">NOTA | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span></th>
+                <th colspan="2" class="text__right descripcion">NOTA | N° ${factura.codigo} | <span class="red">${factura.concepto == "VENTA" ? "CONTADO" :  factura.concepto }</span></th>
+                
             </tr>
             <tr>
                 <th colspan="3" class="text__left">
@@ -980,7 +980,7 @@ const formulaLibreHtml = (factura) => {
                 <th colspan="2" class="text__right">CÓDIGO CLIENTE: <span class="red">000${factura.cliente.id}</span></th>
             </tr>
             <tr>
-                <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion : ""}</span></th>
+                <th colspan="5" class="text__left">DIRECCIÓN: <span class="">${factura.cliente.direccion ? factura.cliente.direccion.toUpperCase() : ""}</span></th>
             </tr>
             <tr>
                 <th colspan="3" class="text__left">
