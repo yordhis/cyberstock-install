@@ -657,7 +657,7 @@ const hanledBuscarProveedor = async (e) => {
   
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
-        let cliente = await getProveedor( parseInt(e.target.value) );
+        let cliente = await getProveedor( e.target.value );
 
         /** Validamos si no hay data del cliente */
         if(!cliente.data.length){
