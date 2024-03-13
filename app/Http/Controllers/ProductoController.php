@@ -164,6 +164,7 @@ class ProductoController extends Controller
     public function update(UpdateProductoRequest $request, Producto $producto)
     {
         try {
+            $estatusActualizar = false;
             $menuSuperior = $this->data->menuSuperior;
             $productos = Producto::all();
             $categorias = Categoria::all();
@@ -196,16 +197,17 @@ class ProductoController extends Controller
                 }
                 $url = Helpers::setFile($request);
                 $request['imagen'] = $url;
+            }else{
+                
+                $request['imagen'] = $producto->imagen;
              }
             
              // Capturamos el codigo en caso de ser diferente
             $codigo = $producto->codigo;
+          
              
-            // Actualizar el producto
-            $estatusActualizar = $producto->update($request->all());
+         
     
-            
-            if ($estatusActualizar) {
                 if($request->cantidad_inicial > 0){
                     if($request->cantidad_inicial > 0 && $request->costo > 0 && $request->pvp > 0){
                         // Procesar una entrada sin facturar
@@ -214,22 +216,23 @@ class ProductoController extends Controller
                                 "codigo" => $codigo,
                             ],
                             [
-                                "descripcion" => $producto->descripcion,
-                                "id_marca" => $producto->id_marca,
-                                "id_categoria" => $producto->id_categoria,
-                                "imagen" => $producto->imagen,
+                                "codigo" => $request->codigo,
+                                "descripcion" => $request->descripcion,
+                                "id_marca" => $request->id_marca,
+                                "id_categoria" => $request->id_categoria,
+                                "imagen" =>  $request['imagen'],
                                 "cantidad" => $request->cantidad_inicial ?? 0,
                                 "costo" =>$request->costo ?? 0,
                                 "pvp" => $request->pvp ?? 0,
                         ]);
+
+                           
+                        // Actualizar el producto
+                        $estatusActualizar = $producto->update($request->all());
                     }else{
                         $estatus = 401;
                         $mensaje = "Si ingresas la cantidad debes ingresar COSTO Y PVP del producto";
-                        return view('admin.productos.formulario', 
-                        compact(
-                            'producto', 'categorias', 'marcas', 'menuSuperior', 'pathname',
-                            'mensaje', 'estatus'
-                        ));
+                        return redirect()->route('admin.formularioEditarProducto', compact('codigo', 'mensaje', 'estatus'));
                     }
                 }else{
                     $estaEnInventario = Inventario::where('codigo', $codigo)->get();
@@ -239,14 +242,17 @@ class ProductoController extends Controller
                                 "codigo" => $codigo,
                             ],
                             [
-                                "descripcion" => $producto->descripcion,
-                                "id_marca" => $producto->id_marca,
-                                "id_categoria" => $producto->id_categoria,
-                                "imagen" => $producto->imagen,
+                                "codigo" => $request->codigo,
+                                "descripcion" => $request->descripcion,
+                                "id_marca" => $request->id_marca,
+                                "id_categoria" => $request->id_categoria,
+                                "imagen" => $request['imagen'],
                         ]);
                     }
+                    // Actualizar el producto
+                    $estatusActualizar = $producto->update($request->all());
                 }
-            }
+            
             
             $mensaje = $estatusActualizar ? "El producto se Actualizó correctamente." : "El producto No se Actualizo";
             $estatus = $estatusActualizar ? 200 : 404;
@@ -257,6 +263,7 @@ class ProductoController extends Controller
             
             return $estatusActualizar ? redirect()->route( 'admin.productos.index', compact('mensaje', 'estatus') )
             : view('admin.productos.lista', compact('mensaje', 'estatus', 'menuSuperior', 'request', 'categorias', 'marcas', 'productos'));
+        
         } catch (\Throwable $th) {
             $mensaje = "¡La acción en el producto no se pudo ejecutar, intente de nuevo!";
             $estatus = 404;

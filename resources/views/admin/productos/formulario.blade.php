@@ -3,7 +3,11 @@
 @section('title', 'Editar Producto')
 
 @section('content')
+
+
 <div id="alert"></div>
+@include('partials.alert')
+
 <section class="section">
     <div class="row">
         <div class="col-2"></div>
