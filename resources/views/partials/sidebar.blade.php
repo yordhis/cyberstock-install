@@ -119,7 +119,7 @@ $subcategoria = 'LISTA';
         </li><!-- End Components Nav | FACTURAS -->
 
         <!-- Start Components Nav | CONTROL DE PAGOS -->
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link {{ ($categoria == 'CONTROL DE PAGOS' ? 'collapse show' : $categoria == 'COBRAR') ? 'collapse show' : 'collapsed' }}"
                     data-bs-target="#components-nav-11" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-gear"></i><span>CONTROL DE PAGO</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -146,7 +146,8 @@ $subcategoria = 'LISTA';
                    
     
                 </ul>
-            </li><!-- End Components Nav | CONTROL DE PAGO -->
+            </li> --}}
+            <!-- End Components Nav | CONTROL DE PAGO -->
 
         <!-- Start Components Nav | REPORTES -->
         <li class="nav-item">
@@ -169,11 +170,12 @@ $subcategoria = 'LISTA';
                 data-bs-parent="#sidebar-nav">
 
                 <!-- Start Components Nav | Utilidades -->
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.porcentajes.index') }}" >
                         <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
                     </a>
-                </li><!-- End Components Nav | Utilidades -->
+                </li> --}}
+                <!-- End Components Nav | Utilidades -->
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.utilidades.index') }}" >

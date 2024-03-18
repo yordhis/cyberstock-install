@@ -4,6 +4,7 @@
 
 @section('content')
     <section class="section dashboard">
+        <div id="alert"></div>
         <div class="row">
             <!-- Left side columns -->
             <div class="col-lg-12">
