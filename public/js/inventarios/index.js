@@ -137,7 +137,7 @@ const componenteModalVer = (data) => {
                                 </div>
 
                                 <div class="col-md-12 label"> 
-                                <span class="text-primary">Fecha de creación:</span> ${ data.fechaEntrada }
+                                <span class="text-primary">Fecha de entrada:</span> ${ data.fechaEntrada }
                                 
                                 </div>     
                             </div>
@@ -433,7 +433,6 @@ elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
 
 /** FUNCIONES O UTILIDADES EXTRAS */
 function adaptadorDeProducto(data){
-    // log(data)
     return {
         id: data.id,
         numero: data.id,
@@ -450,7 +449,7 @@ function adaptadorDeProducto(data){
         pvpUsd_3:  parseFloat(data.pvp_3),
         marca: data.id_marca.nombre,
         imagen: data.imagen,
-        fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),
+        fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString('en-US'),
         categoria: data.id_categoria.nombre,
     };
 };

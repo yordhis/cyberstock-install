@@ -119,7 +119,7 @@ $subcategoria = 'LISTA';
         </li><!-- End Components Nav | FACTURAS -->
 
         <!-- Start Components Nav | CONTROL DE PAGOS -->
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link {{ ($categoria == 'CONTROL DE PAGOS' ? 'collapse show' : $categoria == 'COBRAR') ? 'collapse show' : 'collapsed' }}"
                     data-bs-target="#components-nav-11" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-gear"></i><span>CONTROL DE PAGO</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -128,25 +128,25 @@ $subcategoria = 'LISTA';
                     class="nav-content  {{ ($categoria == 'CONTROL DE PAGOS' ? 'collapse show' : $categoria == 'COBRAR') ? 'collapse show' : 'collapse' }} "
                     data-bs-parent="#sidebar-nav">
     
-                    <!-- Start Components Nav | COBRAR -->
+                    <!-- Start Components Nav | Cuentas por cobrar -->
                     <li class="nav-item">
                         <a class="nav-link"  href="{{ route('admin.cuentas.por.cobrar.index') }}" >
                             <i class='bi bi-cash fs-3'></i><span >Cuentas por cobrar</span>
                         </a>
-                    </li><!-- End Components Nav | Utilidades -->
+                    </li><!-- End Components Nav | Cuentas por cobrar -->
     
     
-                    <!-- Start Components Nav | usuarios -->
+                    <!-- Start Components Nav | Cuentas por pagar -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.cuentas.por.pagar.index') }}" >
                             <i class="bi bi-card-list fs-3"></i><span>Cuentas por pagar</span>
                         </a>
-                    </li><!-- End Components Nav | usuarios -->
+                    </li><!-- End Components Nav | Cuentas por pagar -->
     
                    
     
                 </ul>
-            </li> --}}
+            </li>
             <!-- End Components Nav | CONTROL DE PAGO -->
 
         <!-- Start Components Nav | REPORTES -->
@@ -170,11 +170,11 @@ $subcategoria = 'LISTA';
                 data-bs-parent="#sidebar-nav">
 
                 <!-- Start Components Nav | Utilidades -->
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.porcentajes.index') }}" >
                         <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
                     </a>
-                </li> --}}
+                </li>
                 <!-- End Components Nav | Utilidades -->
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">

@@ -99,10 +99,7 @@ class InventarioController extends Controller
                             if (count($resultados)) {
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CODIGO",
-                                    "data" =>  [
-                                        "data" => $resultados,
-                                        "total" => count($resultados)
-                                    ],
+                                    "data" =>   $resultados,
                                     "tasa" => $tasa,
                                     "estatus" => Response::HTTP_OK
                                 ], Response::HTTP_OK);

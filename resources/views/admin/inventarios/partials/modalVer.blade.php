@@ -46,7 +46,7 @@
                         </div>
 
                         <div class="col-md-12 label"> 
-                          <span class="text-primary">Fecha de creación:</span> {{ date_format(date_create($inventario->fecha_entrada), "d-m-Y") ?? ''}}
+                          <span class="text-primary">Fecha de entrada:</span> {{ $inventario->fecha_entrada ?? ''}}
                           
                         </div>     
                       </div>

@@ -104,7 +104,7 @@ const hanledPaginacion = async (e) => {
                 elementoTablaCuerpo.innerHTML='';
                 await inventarios.data.data.forEach( element => {
                     element.tasa = inventarios.tasa;
-                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config.porcentaje));
+                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
                 });
         
                 elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
@@ -137,7 +137,10 @@ const hanledFormulario = async (e) => {
 
                 console.log(config);
                 /** Configuramos el porcentaje a formato 1,x */
-                config.porcentaje = ((config.porcentaje / 100) +1);
+                config.porcentaje_costo = ((config.porcentaje_costo / 100) +1);
+                config.porcentaje_pvp = ((config.porcentaje_pvp / 100) +1);
+                config.porcentaje_pvp_2 = ((config.porcentaje_pvp_2 / 100) +1);
+                config.porcentaje_pvp_3 = ((config.porcentaje_pvp_3 / 100) +1);
 
                 /** Se configuran los campos */
                 config.campo = ['codigo', ' descripcion'];
@@ -153,11 +156,13 @@ const hanledFormulario = async (e) => {
 
                 /** consultamos todo para la actualización de precios y costos */
                 todosLosProductos = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltroAll`,  config);
-
+                console.log(todosLosProductos);
                 /** Se adaptan todos los productos para ser configurados */
                 await todosLosProductos.data.forEach(element => {
-                    inventarioAdaptado.push(adaptadorDeProducto(element, config.porcentaje));
+                    inventarioAdaptado.push(adaptadorDeProducto(element, config));
                 });
+
+               
 
                 /** mostras una precarga */
                 elementoTablaCuerpo.innerHTML = spinner();
@@ -172,7 +177,7 @@ const hanledFormulario = async (e) => {
                     elementoTablaCuerpo.innerHTML = "";
                     await inventarios.data.data.forEach( element => {
                         element.tasa = inventarios.tasa;
-                        elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config.porcentaje));
+                        elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
                     });
           
             
@@ -232,7 +237,10 @@ const hanledFormulario = async (e) => {
                             log(contador)
                             if(contador == inventarioAdaptado.length){
                                 inventarioAdaptado = [];
-                                config.porcentaje = 0;
+                                config.porcentaje_costo = 0;
+                                config.porcentaje_pvp = 0;
+                                config.porcentaje_pvp_2 = 0;
+                                config.porcentaje_pvp_3 = 0;
                                 getLista(config);
                                 elementoBarraDePorcentaje.innerHTML="";
                                 for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
@@ -293,7 +301,7 @@ async function validarDataDeFormulario(formulario){
 }
 
 /** Adaptar los datos del producto a la vista */
-function adaptadorDeProducto(data, porcentaje){
+function adaptadorDeProducto(data, config){
     // log(data)
     return {
         id: data.id,
@@ -307,10 +315,10 @@ function adaptadorDeProducto(data, porcentaje){
         pvp_2:  parseFloat(data.pvp_2),
         pvp_3: parseFloat(data.pvp_3),
         
-        costo_despues: parseFloat(data.costo * porcentaje),
-        pvp_despues:  parseFloat(data.pvp * porcentaje),
-        pvp_2_despues:  parseFloat(data.pvp_2 * porcentaje),
-        pvp_3_despues:  parseFloat(data.pvp_3 * porcentaje),
+        costo_despues: parseFloat(data.costo * config.porcentaje_costo),
+        pvp_despues:  parseFloat(data.pvp * config.porcentaje_pvp),
+        pvp_2_despues:  parseFloat(data.pvp_2 * config.porcentaje_pvp_2),
+        pvp_3_despues:  parseFloat(data.pvp_3 * config.porcentaje_pvp_3),
 
 
         imagen: data.imagen,
@@ -335,7 +343,7 @@ async function getLista(config, url = `${URL_BASE}/getInventariosFiltro`){
         elementoTablaCuerpo.innerHTML='';
         await inventarios.data.data.forEach( element => {
             element.tasa = inventarios.tasa;
-            elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
+            elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
         });
         elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
     }

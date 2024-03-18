@@ -20,12 +20,35 @@
                     <hr>
                 </div>
                 <div class="card-body">
-                    <form action="getInventariosFiltro" id="formularioFiltro" method="post" target="_self" >
+                    <form action="getInventariosFiltro" id="formularioFiltro" method="post" >
                         <div class="row">
                          
-                            <div class="col-sm-4 col-xs-12">
-                                <label for="porcentaje">Porcentaje</label>
-                                <input type="number" class="form-control" id="porcentaje" name="porcentaje" placeholder="Ingrese porcentaje" aria-label="Buscar producto" aria-describedby="basic-addon1" required>
+                            <div class="col-sm-3 col-xs-12 mb-3">
+                                <label for="porcentaje">Porcentaje de costo</label>
+                                <input  type="number" class="form-control" id="porcentaje_costo" name="porcentaje_costo" 
+                                        placeholder="Ingrese porcentaje al costo" aria-label="costo" aria-describedby="basic-addon1" 
+                                        value="0" required>
+                                <span class="text-danger "></span>
+                            </div>
+                            <div class="col-sm-3 col-xs-12 mb-3">
+                                <label for="porcentaje">Porcentaje de PVP detal</label>
+                                <input  type="number" class="form-control" id="porcentaje_pvp" name="porcentaje_pvp" 
+                                        placeholder="Ingrese porcentaje de PVP" aria-label="pvp" aria-describedby="basic-addon1" 
+                                        value="0" required>
+                                <span class="text-danger "></span>
+                            </div>
+                            <div class="col-sm-3 col-xs-12 mb-3">
+                                <label for="porcentaje">Porcentaje de PVP 2</label>
+                                <input type="number" class="form-control" id="porcentaje_pvp_2" name="porcentaje_pvp_2" 
+                                placeholder="Ingrese porcentaje de PVP 2" aria-label="porcentaje_pvp_2" aria-describedby="basic-addon1" 
+                                value="0" required>
+                                <span class="text-danger "></span>
+                            </div>
+                            <div class="col-sm-3 col-xs-12 mb-3">
+                                <label for="porcentaje">Porcentaje de PVP 3</label>
+                                <input type="number" class="form-control" id="porcentaje_pvp_3" name="porcentaje_pvp_3" 
+                                placeholder="Ingrese porcentaje de PVP 3" aria-label="porcentaje_pvp_3" aria-describedby="basic-addon1" 
+                                value="0" required>
                                 <span class="text-danger "></span>
                             </div>
 
