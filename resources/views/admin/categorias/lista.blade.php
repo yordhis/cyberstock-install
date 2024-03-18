@@ -21,7 +21,7 @@
                     
                         <!-- Table with stripped rows -->
                         
-                            <table class="table">
+                            <table class="table" id="myTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -49,9 +49,6 @@
                             </table>
                      
                         <!-- End Table with stripped rows -->
-
-                        {{ $categorias->links() }}
-                        {{ "Total de categoiras: " . $categorias->total() }}
 
                     </div>
                 </div>

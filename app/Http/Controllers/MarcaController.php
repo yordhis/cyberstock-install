@@ -59,7 +59,7 @@ class MarcaController extends Controller
     {
 
         try {
-            $marcas = Marca::orderBy('nombre', 'asc')->paginate(10);
+            $marcas = Marca::orderBy('nombre', 'asc')->get();
             $menuSuperior = $this->data->menuSuperior;
             return view('admin.marcas.lista', compact('menuSuperior', 'marcas') );
         } catch (\Throwable $th) {

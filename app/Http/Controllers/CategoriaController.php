@@ -60,7 +60,7 @@ class CategoriaController extends Controller
     public function index()
     {
         try {
-            $categorias = Categoria::orderBy('nombre', 'asc')->paginate(10);
+            $categorias = Categoria::orderBy('nombre', 'asc')->get();
             $menuSuperior = $this->data->menuSuperior;
             return view('admin.categorias.lista', compact('menuSuperior', 'categorias'));
         } catch (\Throwable $th) {
