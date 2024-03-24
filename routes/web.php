@@ -60,10 +60,10 @@ Route::middleware(['auth'])->group(function () {
     /** RUTAS DE PANEL */
         Route::get('/panel', [DashboardController::class, 'index'])->name('admin.panel.index');
 
-    /** RUTAS DE PANEL */
+    /** RUTAS DE ACTIVOS INMOBILIARIOS */
         Route::resource('/activos', ActivoInmobiliarioController::class)->names('admin.activos');
    
-    /** RUTAS DE PANEL */
+    /** RUTAS DE NOTIFICACIONES */
         Route::delete('/eliminarTodoNotificaciones', [NotificacioneController::class, 'destroyAll'])->name('admin.notificaciones.destroyAll');
         Route::put('/marcaComoLeidoTodo', [NotificacioneController::class, 'marcaComoLeidoAll'])->name('admin.notificaciones.marcaComoLeidoAll');
         Route::resource('/notificaciones', NotificacioneController::class)->names('admin.notificaciones');

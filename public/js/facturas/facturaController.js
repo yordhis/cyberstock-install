@@ -1,4 +1,19 @@
 /** TRAE EL CODIGO DE FACTURA ENTRADA - SALIDA - POS */
+const deleteFactura = async (url) => {
+    return await fetch(url, {      
+        method: "DELETE", // or 'PUT'
+        // body: JSON.stringify(data), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+        },
+    })
+    .then(response => response.json())
+    .catch(err => err)
+    .then(data => data)
+};
+
+
+/** TRAE EL CODIGO DE FACTURA ENTRADA - SALIDA - POS */
 const getCodigoFactura = async (url) => {
     return await fetch(`${url}`, {      
         method: "GET", // or 'PUT'
@@ -571,6 +586,18 @@ const getFacturaES = async (url, data) => {
 };
 
 /** BUSCA LAS FACTURA POR SU CODIGO */
+const getFacturaAdaptada = async (codigoFactura) => {
+    return await fetch(`${URL_BASE}/getFacturaAdaptada/${codigoFactura}`, {
+        method: "GET", // or 'PUT'
+        // body: JSON.stringify(codigoFactura), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+        },
+    })
+    .then((res) => res.json())
+    .catch((error) => error)
+    .then((response) => response )
+};
 const getFactura = async (codigoFactura) => {
     return await fetch(`${URL_BASE}/getFactura/${codigoFactura}`, {
         method: "GET", // or 'PUT'

@@ -89,14 +89,21 @@ Route::group(['middleware' => ['cors']], function () {
     Route::post('setFacturaSalida', [FacturaInventarioController::class, 'setFacturaSalida'])->name('admin.setFacturaSalida');
 
     
-    /** FACTURAS */
+    /** CARRITO */
     Route::get('getCarrito/{codigoFactura}', [CarritoController::class, 'getCarrito'])->name('admin.getCarrito');
     Route::post('facturarCarrito', [CarritoController::class, 'facturarCarrito'])->name('admin.facturarCarrito');
+
+    /** FACTURAS */
+    Route::post('setFacturaAnuladaPos', [FacturaController::class, 'setFacturaAnuladaPos'])->name('admin.setFacturaAnuladaPos');
+    Route::delete('deleteFactura/{codigoFactura}', [FacturaController::class, 'deleteFactura'])->name('admin.deleteFactura');
+    Route::get('getFacturaAdaptada/{codigoFactura}', [FacturaController::class, 'getFacturaAdaptada'])->name('admin.getFacturaAdaptada');
     Route::get('getFactura/{codigoFactura}', [FacturaController::class, 'getFactura'])->name('admin.getFactura');
     Route::get('getCodigoFactura/{tabla}', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
     
     /** FACTURAS INVENTARIO */
+    Route::post('setFacturaAnulada', [FacturaInventarioController::class, 'setFacturaAnulada'])->name('api.facturasInventarios.setFacturaAnulada');
+    Route::delete('deleteFacturaInventario/{codigoFacturaInventario}', [FacturaInventarioController::class, 'deleteFacturaInventario'])->name('api.facturasInventarios.deleteFacturaInventario');
     Route::post('storeSalida', [FacturaInventarioController::class, 'storeSalida'])->name('api.facturasInventarios.storeSalida');
     Route::resource('facturasInventarios', FacturaInventarioController::class)->names('api.facturasInventarios');
     

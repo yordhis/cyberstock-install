@@ -41,17 +41,17 @@ class FacturaController extends Controller
             $menuSuperior = $this->data->menuSuperior;
             $pathname = Request::path();
             $facturas = Factura::orderBy('codigo', 'DESC')->get();
-           
-            if(count($facturas)){
+
+            if (count($facturas)) {
                 foreach ($facturas as $key => $factura) {
                     $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
                     // $factura->total_articulos = Carrito::where('codigo', $factura->codigo)->count();
                 }
             }
-           
+
             // $pos = count(Po::all()) ? Po::all()[0]: [];
-     
-            return view('admin.facturas.index', compact( 'facturas','menuSuperior', 'pathname'));
+
+            return view('admin.facturas.index', compact('facturas', 'menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
@@ -64,40 +64,39 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function show($id, $moneda="Bs")
+    public function show($id, $moneda = "Bs")
     {
         try {
             $menuSuperior = $this->data->menuSuperior;
             $utilidades = $this->data->utilidades;
             $factura = Factura::find($id);
-            if($moneda == "$") $factura->tasa = 1;
-            if($factura){
-                    $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
-                    $factura->cliente = Cliente::where('identificacion', $factura->identificacion)->get();
-                    $contador = 0;
-                    foreach ($factura->carrito as $key => $producto) {
-                        $contador += $producto->cantidad;
-                    }
-                    $factura->totalArticulos = $contador;
-                    $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');               
-                    $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');   
-            }else{
+            if ($moneda == "$") $factura->tasa = 1;
+            if ($factura) {
+                $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
+                $factura->cliente = Cliente::where('identificacion', $factura->identificacion)->get();
+                $contador = 0;
+                foreach ($factura->carrito as $key => $producto) {
+                    $contador += $producto->cantidad;
+                }
+                $factura->totalArticulos = $contador;
+                $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');
+                $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');
+            } else {
                 $mensaje = "El código de la factura no esta registrado, verifique el codigo.";
                 $estatus = 404;
                 return redirect()->route('admin.facturas.index', compact('mensaje', 'estatus'));
             }
-          
-            
-            $pos = count(Po::all()) ? Po::all()[0]: [];
+
+
+            $pos = count(Po::all()) ? Po::all()[0] : [];
             $pathname = Request::path();
             $pathname = explode('/', $pathname)[0] . '/ver';
-           
-            return view( 'admin.facturas.ver', compact( 'factura', 'moneda', 'pos', 'utilidades', 'menuSuperior' ) );
+
+            return view('admin.facturas.ver', compact('factura', 'moneda', 'pos', 'utilidades', 'menuSuperior'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
-
     }
 
     /**
@@ -116,9 +115,9 @@ class FacturaController extends Controller
             $factura->delete();
 
             /** registramos movimiento al usuario */
-            Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK,"Acción de eliminar factura ({$factura->codigo})");
+            Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK, "Acción de eliminar factura ({$factura->codigo})");
 
-            return redirect()->route('admin.facturas.index',[
+            return redirect()->route('admin.facturas.index', [
                 "mensaje" => "Factura eliminada correctamente",
                 "estatus" => Response::HTTP_OK
             ]);
@@ -132,11 +131,12 @@ class FacturaController extends Controller
 
     /** API REST FULL */
     /** 
-     * OBTIENE EL ULTIMO CODIGO DE FACTUAS O LA TABLA DESEADA
+     * OBTIENE EL ULTIMO CODIGO DE FACTURAS O LA TABLA DESEADA
      * @param tabla string
      * @return \Illuminate\Http\Response string (codigo) 
      */
-    public function getCodigoFactura($tabla){
+    public function getCodigoFactura($tabla)
+    {
         try {
             $codigo = Helpers::getCodigo($tabla);
             return response()->json([
@@ -144,7 +144,6 @@ class FacturaController extends Controller
                 "estatus" => Response::HTTP_OK,
                 "data" => $codigo
             ], Response::HTTP_OK);
-            
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar el codigo de la factura,");
             return response()->json([
@@ -160,52 +159,95 @@ class FacturaController extends Controller
      * @param codigoFactura - string
      * @return \Illuminate\Http\Response object (factura) 
      */
-    public function getFactura($codigoFactura){
+    public function getFacturaAdaptada($codigoFactura)
+    {
         try {
             $factura = Factura::where('codigo', $codigoFactura)->get();
-            if(count($factura)){
-                $totalArticulos=0;
+            if (count($factura)) {
+                $totalArticulos = 0;
                 $factura = $factura[0];
                 $carritos = Carrito::where('codigo', $factura->codigo)->get();
                 foreach ($carritos as $key => $producto) {
-                    $producto['stock'] = Inventario::select('cantidad')->where('codigo',$producto->codigo_producto)->get()[0]->cantidad;
+                    $producto['stock'] = Inventario::select('cantidad')->where('codigo', $producto->codigo_producto)->get()[0]->cantidad;
+                    $totalArticulos = $totalArticulos  + $producto->cantidad;
+                }
+                $factura['carrito'] = $carritos;
+
+                return response()->json([
+                    "mensaje" => "Consulta de factura exitosa.",
+                    "data" =>  $factura,
+                    "estatus" =>  Response::HTTP_OK
+                ],  Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    "mensaje" =>  "No se encontró factura con el código solicitado.",
+                    "data" => null,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
+            }
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, "Error al consultar factura, ");
+            return response()->json([
+                "mensaje" => $mensaje,
+                "data" =>  [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function getFactura($codigoFactura)
+    {
+        try {
+            $factura = Factura::where('codigo', $codigoFactura)->get();
+            if ($factura[0]->concepto == "ANULADA") {
+                return response()->json([
+                    "mensaje" => "Consulta de factura exitosa.",
+                    "data" =>  $factura[0],
+                    "estatus" =>  Response::HTTP_OK
+                ],  Response::HTTP_OK);
+            }
+
+            if (count($factura)) {
+                $totalArticulos = 0;
+                $factura = $factura[0];
+                $carritos = Carrito::where('codigo', $factura->codigo)->get();
+                foreach ($carritos as $key => $producto) {
+                    $producto['stock'] = Inventario::select('cantidad')->where('codigo', $producto->codigo_producto)->get()[0]->cantidad;
                     $totalArticulos = $totalArticulos  + $producto->cantidad;
                 }
 
                 // $carritos = Carrito::where('codigo', $factura->codigo)->get();
                 $cliente = Cliente::where('identificacion', $factura->identificacion)->get();
-                if(count($cliente)) $factura['cliente'] = $cliente[0];
+                if (count($cliente)) $factura['cliente'] = $cliente[0];
                 else $factura['cliente'] = ["nombre" => "El Cliente fue eliminado"];
-                $factura['carrito'] = $carritos; 
+                $factura['carrito'] = $carritos;
                 $factura['pos'] = Po::all()[0];
-                $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');               
-                $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');   
+                $factura['hora']  =  date_format(date_create(explode('T', $factura->fecha)[1]), 'h:i:sa');
+                $factura['fecha']  =  date_format(date_create(explode('T', $factura->fecha)[0]), 'd-m-Y');
                 $factura['totalArticulo']  = $totalArticulos;
-            
-        
+
+
                 return response()->json([
                     "mensaje" => "Consulta de factura exitosa.",
-                    "data" =>  $factura, 
-                    "estatus" =>  Response::HTTP_OK  
-                ],  Response::HTTP_OK ); 
-            }else{
+                    "data" =>  $factura,
+                    "estatus" =>  Response::HTTP_OK
+                ],  Response::HTTP_OK);
+            } else {
                 return response()->json([
                     "mensaje" =>  "No se encontró factura con el código solicitado.",
-                    "data" => null, 
-                    "estatus" => Response::HTTP_OK  
-                ], Response::HTTP_OK ); 
+                    "data" => null,
+                    "estatus" => Response::HTTP_OK
+                ], Response::HTTP_OK);
             }
-            
         } catch (\Throwable $th) {
             $mensaje = Helpers::getMensajeError($th, "Error al consultar factura, ");
             return response()->json([
                 "mensaje" => $mensaje,
-                "data" =>  [], 
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR  
-            ], Response::HTTP_INTERNAL_SERVER_ERROR ); 
+                "data" =>  [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
 
     /**
      * REGISTRAR FACTURA
@@ -213,72 +255,138 @@ class FacturaController extends Controller
      * @param  \App\Http\Requests\StoreFacturaRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(HttpRequest $request){
+    public function store(HttpRequest $request)
+    {
 
         try {
+
+            /** eliminamos la factura temporal de concepto anulada para la multicaja */
+            Factura::where([
+                'codigo' => $request->codigo,
+                'concepto' => "ANULADA"
+            ])->delete();
+
+            /** consultamos si el codigo de factura existe */
+            $codigoExiste = Factura::where([
+                'codigo' => $request->codigo,
+                'concepto' => "VENTA"
+            ])->get();
+
             /** validamos que el codigo no se repita */
-            $codigoExiste = Factura::where('codigo', $request->codigo)->get();
-            if( count($codigoExiste) && $request->estatusDeDevolucion == false ){
+            if (count($codigoExiste) && $request->estatusDeDevolucion == false) {
                 return response()->json([
                     "mensaje" => "El codigo de la factura ya EXISTE!",
                     "data" => $codigoExiste[0],
                     "estatus" => Response::HTTP_UNAUTHORIZED
-               ], Response::HTTP_UNAUTHORIZED);
+                ], Response::HTTP_UNAUTHORIZED);
             }
 
-            if($request->estatusDeDevolucion){
+            /** Si es una devolución eliminamos la factura y la volvemos a crear con los nuevos datos */
+            if ($request->estatusDeDevolucion) {
                 Factura::where('codigo', $request->codigo)->delete();
             }
 
+            /** Creamos la factura */
             $resultado = Factura::create($request->all());
 
-            if($resultado){
-                // Procedemos a descontar del inventario
+            if ($resultado) {
+
+                /** Consultamos el carrito de compra de la factura */
                 $carritos = Carrito::where("codigo", $request->codigo)->get();
                 $totalArticulos = 0;
+
+                /** Procedemos a descontar del inventario */
                 foreach ($carritos as $key => $producto) {
                     $cantidadActualProducto = Inventario::where("codigo", $producto->codigo_producto)->get()[0]->cantidad;
                     Inventario::where("codigo", $producto->codigo_producto)->update([
                         "cantidad" =>  $cantidadActualProducto - $producto->cantidad
                     ]);
                     $totalArticulos = $totalArticulos  + $producto->cantidad;
-                } 
+                }
 
+
+                /** Configuramos los datos de la factura para imprimir */
                 $resultado['carrito'] = $carritos;
                 $resultado['cliente'] = Cliente::where('identificacion', $request->identificacion)->get()[0];
                 $resultado['pos'] = Po::all()[0];
-                $resultado['hora']  =  date_format(date_create(explode('T', $resultado->fecha)[1]), 'h:i:sa');               
-                $resultado['fecha']  =  date_format(date_create(explode('T', $resultado->fecha)[0]), 'd-m-Y');               
+                $resultado['hora']  =  date_format(date_create(explode('T', $resultado->fecha)[1]), 'h:i:sa');
+                $resultado['fecha']  =  date_format(date_create(explode('T', $resultado->fecha)[0]), 'd-m-Y');
                 $resultado['totalArticulo']  = $totalArticulos;
 
 
                 return response()->json([
-                     "mensaje" => "Factura registrada correctamente",
-                     "data" => $resultado,
-                     "estatus" => Response::HTTP_CREATED
+                    "mensaje" => "Factura registrada correctamente",
+                    "data" => $resultado,
+                    "estatus" => Response::HTTP_CREATED
                 ], Response::HTTP_CREATED);
-            }else{
+            } else {
                 return response()->json([
                     "mensaje" => "No se registró la Factura, intente de nuevo",
                     "data" => $resultado,
                     "estatus" => Response::HTTP_NOT_FOUND
-               ], Response::HTTP_NOT_FOUND);
+                ], Response::HTTP_NOT_FOUND);
             }
-           
-
         } catch (\Throwable $th) {
             $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
             return response()->json([
                 "mensaje" => $mensaje,
-                "data" =>  $request->request, 
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR 
+                "data" =>  $request->request,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
-    }   
+    }
 
 
+    /** Registrar factura anulada */
+    public function setFacturaAnuladaPos(HttpRequest $request)
+    {
+        try {
+                $resultadoFacturaVenta = Factura::updateOrCreate(
+                    [
+                        "codigo" => $request->codigo
+                    ],
+                    [
+                        "codigo" => $request->codigo,
+                        "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                        "identificacion" => $request->identificacion, // numero de documento
+                        "subtotal" => $request->subtotal, // se guarda en divisas
+                        "total" => $request->total,
+                        "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                        "iva" => $request->iva, // impuesto
+                        "tipo" => $request->tipo, // fiscal o no fialcal
+                        "concepto" => $request->concepto, // venta, compra ...
+                        "descuento" => $request->descuento, // descuento
+                        "fecha" => $request->fecha, // fecha venta, compra ...
+                        "metodos" => $request->metodos
+                    ]
+                );
+            
+
+            /** Respuesta json */
+            return Helpers::getRespuestaJson("La factura del pos venta se anuló correctamente", $resultadoFacturaVenta);
+        } catch (\Throwable $th) {
+            return Helpers::getRespuestaJson($th->getMessage(), $th, Response::HTTP_NOT_FOUND);
+        }
+    }
+
+
+    public function deleteFactura($codigoFactura)
+    {
+        try {
+
+            Factura::where('codigo', $codigoFactura)->delete();
+            return response()->json([
+                "mensaje" => "Se eliminó la factura",
+                "data" => [],
+                "estatus" => Response::HTTP_OK,
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "mensaje" => "NO se eliminó la factura",
+                "data" => [],
+                "estatus" => Response::HTTP_NOT_FOUND,
+            ], Response::HTTP_NOT_FOUND);
+        }
+    }
     /** CIERRE DE LA API REST FULL */
-
- 
 }

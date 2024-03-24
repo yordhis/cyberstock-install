@@ -103,27 +103,56 @@ class FacturaInventarioController extends Controller
     public function setFacturaSalida(Request $request)
     {
         try {
-            
-            // Se factura dos veces 
-            $resultado = FacturaInventario::create($request->all());
-            if($request->concepto != 'CONSUMO'){
-                $resultadoFacturaVenta = Factura::create([
-                    "codigo" => $request->codigo_factura,
-                    "razon_social" => $request->razon_social, // nombre de cliente o proveedor
-                    "identificacion" => $request->identificacion, // numero de documento
-                    "subtotal" => $request->subtotal, // se guarda en divisas
-                    "total" => $request->total,
-                    "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
-                    "iva" => $request->iva, // impuesto
-                    "tipo" => $request->tipo, // fiscal o no fialcal
-                    "concepto" => $request->concepto, // venta, compra ...
-                    "descuento" => $request->descuento, // descuento
-                    "fecha" => $request->fecha, // fecha venta, compra ...
-                    "metodos" => $request->metodos
-                ]);
-            }
+                /** Creamos las facturas anuladas */
+                $resultado =FacturaInventario::updateOrCreate(
+                    [
+                        "codigo" => $request->codigo
+                    ],
+                    [
+                        "codigo" => $request->codigo,
+                        "codigo_factura" => $request->codigo_factura,
+                        "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                        "identificacion" => $request->identificacion, // numero de documento
+                        "subtotal" => $request->subtotal, // se guarda en divisas
+                        "total" => $request->total,
+                        "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                        "iva" => $request->iva, // impuesto
+                        "tipo" => $request->tipo, // fiscal o no fialcal
+                        "concepto" => $request->concepto, // venta, compra ...
+                        "descuento" => $request->descuento, // descuento
+                        "fecha" => $request->fecha, // fecha venta, compra ...
+                        "metodos" => $request->metodos
+                    ]
+                );
+
+                if($request->concepto != 'CONSUMO'){
+                    $resultadoFacturaVenta = Factura::updateOrCreate(
+                        [
+                            "codigo" => $request->codigo_factura
+                        ],
+                        [
+                            "codigo" => $request->codigo_factura,
+                            "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                            "identificacion" => $request->identificacion, // numero de documento
+                            "subtotal" => $request->subtotal, // se guarda en divisas
+                            "total" => $request->total,
+                            "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                            "iva" => $request->iva, // impuesto
+                            "tipo" => $request->tipo, // fiscal o no fialcal
+                            "concepto" => $request->concepto, // venta, compra ...
+                            "descuento" => $request->descuento, // descuento
+                            "fecha" => $request->fecha, // fecha venta, compra ...
+                            "metodos" => $request->metodos
+                    ]);
+                }else{
+                    /** eliminamos la factura temporal de concepto anulada para la multicaja */
+                    Factura::where([
+                        'codigo' => $request->codigo_factura,
+                        'concepto' => "ANULADA"
+                    ])->delete();
+                }
        
-            $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente correctamente." : "No se registro la factura";
+            $mensaje = $resultado ? "Se proceso la venta o el movimiento de inventario correctamente." : "No se registro la factura";
             $estatus = $resultado ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
 
             if($resultado){
@@ -203,5 +232,73 @@ class FacturaInventarioController extends Controller
 
     }
 
+    /** Registrar factura anulada */
+    public function setFacturaAnulada(Request $request){
+        try {
+            /** Creamos las facturas anuladas */
+            $resultado =FacturaInventario::updateOrCreate(
+                    [
+                        "codigo" => $request->codigo
+                    ],
+                    [
+                        "codigo" => $request->codigo,
+                        "codigo_factura" => $request->codigo_factura,
+                        "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                        "identificacion" => $request->identificacion, // numero de documento
+                        "subtotal" => $request->subtotal, // se guarda en divisas
+                        "total" => $request->total,
+                        "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                        "iva" => $request->iva, // impuesto
+                        "tipo" => $request->tipo, // fiscal o no fialcal
+                        "concepto" => $request->concepto, // venta, compra ...
+                        "descuento" => $request->descuento, // descuento
+                        "fecha" => $request->fecha, // fecha venta, compra ...
+                        "metodos" => $request->metodos
+                    ]
+            );
+
+            if($request->concepto != 'CONSUMO'){
+                $resultadoFacturaVenta = Factura::updateOrCreate(
+                    [
+                        "codigo" => $request->codigo_factura
+                    ],
+                    [
+                        "codigo" => $request->codigo_factura,
+                        "razon_social" => $request->razon_social, // nombre de cliente o proveedor
+                        "identificacion" => $request->identificacion, // numero de documento
+                        "subtotal" => $request->subtotal, // se guarda en divisas
+                        "total" => $request->total,
+                        "tasa" => $request->tasa, // tasa en el momento que se hizo la transaccion
+                        "iva" => $request->iva, // impuesto
+                        "tipo" => $request->tipo, // fiscal o no fialcal
+                        "concepto" => $request->concepto, // venta, compra ...
+                        "descuento" => $request->descuento, // descuento
+                        "fecha" => $request->fecha, // fecha venta, compra ...
+                        "metodos" => $request->metodos
+                ]);
+            }
+
+            /** Respuesta json */
+            return Helpers::getRespuestaJson("La factura se anuló correctamente", $resultado);
+
+   
+        } catch (\Throwable $th) {
+            return Helpers::getRespuestaJson($th->getMessage(), $th, Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    /** eliminar factura temporal */
+    public function deleteFacturaInventario($codigoFactura){
+        try {
+          
+            FacturaInventario::where('codigo', $codigoFactura)->delete();
+            
+            /** Respuesta json */
+            return Helpers::getRespuestaJson("Se eliminó la factura inventario");
+        } catch (\Throwable $th) {
+            /** Respuesta json */
+            return Helpers::getRespuestaJson("NO se eliminó la factura inventario", [], Response::HTTP_NOT_FOUND);
+        }
+    }
 
 }

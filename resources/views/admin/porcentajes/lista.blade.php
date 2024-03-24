@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Inventario')
+@section('title', 'Precios y costos')
 
 @section('content')
 
@@ -8,6 +8,14 @@
         @include('partials.alert')
     @endisset
 
+    <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+            }
+        input[type=number] { -moz-appearance:textfield; }
+    </style>
 
     <section class="section">
         <div class="row">
@@ -116,19 +124,18 @@
                                     <th scope="col" class="bg-primary text-white border">Marca</th>
                                     <th scope="col" class="bg-primary text-white border">Categoria</th>
                                     {{-- <th scope="col">fecha de entrada</th> --}}
-                                    <th scope="col"  class="bg-primary text-white border">Costo antes</th>
-                                    <th scope="col" class="bg-primary text-white border">PVP 1 antes</th>
-                                    <th scope="col" class="bg-primary text-white border">PVP 2 antes</th>
-                                    <th scope="col" class="bg-primary text-white border">PVP 3 antes</th>
+                                    <th scope="col"  class="bg-danger text-white border">Costo actual</th>
+                                    <th scope="col" class="bg-primary text-white border">PVP 1 actual</th>
+                                    <th scope="col" class="bg-primary text-white border">PVP 2 actual</th>
+                                    <th scope="col" class="bg-primary text-white border">PVP 3 actual</th>
                                     
-                                    <th scope="col" class="bg-warning text-secondary border">Costo despues</th>
-                                    <th scope="col" class="bg-warning text-secondary border">PVP 1 despues</th>
-                                    <th scope="col" class="bg-warning text-secondary border">PVP 2 despues</th>
-                                    <th scope="col" class="bg-warning text-secondary border">PVP 3 despues</th>
+                                    <th scope="col" class="bg-danger text-white border">Costo despues</th>
+                                    <th scope="col" class="bg-warning border">PVP 1 despues</th>
+                                    <th scope="col" class="bg-warning border">PVP 2 despues</th>
+                                    <th scope="col" class="bg-warning border">PVP 3 despues</th>
                                 </tr>
                             </thead>
                             <tbody id="lista">
-                               
 
                             </tbody>
                         </table>

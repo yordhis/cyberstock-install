@@ -225,15 +225,12 @@ class InventarioController extends Controller
                 foreach ($request->campo as $key => $campo) {
                     switch ($campo) {
                         case 'codigo':
-                            $resultados = Inventario::where("{$campo}", $request->filtro)->get();
+                            $resultados = Inventario::where("{$campo}", $request->filtro)->paginate($numeroDePagina);
                             $resultados =   Helpers::setNameElementId($resultados, 'id,nombre', 'categorias,marcas');
                             if (count($resultados)) {
                                 return response()->json([
                                     "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CODIGO",
-                                    "data" =>  [
-                                        "data" => $resultados,
-                                        "total" => count($resultados)
-                                    ],
+                                    "data" =>   $resultados,
                                     "tasa" => $tasa,
                                     "estatus" => Response::HTTP_OK
                                 ], Response::HTTP_OK);

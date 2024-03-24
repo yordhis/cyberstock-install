@@ -36,7 +36,7 @@
                                    
                                         @foreach ($facturas as $factura)
                                    
-                                            <tr>
+                                            <tr class="{{ $factura->concepto == "ANULADA" ? 'table-danger' : '' }}">
                                             
                                                 <td>{{ $factura->codigo }}</td>
                                                 <td>{{ $factura->razon_social }}</td>
@@ -51,14 +51,20 @@
                                                     
                                                     @elseif(  $factura->concepto == "VENTA"  )
                                                         <button type="button" class="btn btn-outline-success">PAGADO</button>    
+                                                
+                                                    @elseif(  $factura->concepto == "ANULADA"  )
+                                                        <button type="button" class="btn btn-outline-dark">{{ $factura->concepto }}</button>    
                                                     @else
                                                         <button type="button" class="btn btn-outline-success">PAGADO</button>            
                                                     @endif
                                                 </td>
                                                 <td> 
-                                                    <a href="{{ route('admin.facturas.show', $factura->id) }}" >
-                                                        <i class="bi bi-eye btn btn-success"></i>
-                                                    </a>
+
+                                                    @if ( $factura->concepto != "ANULADA"  )
+                                                        <a href="{{ route('admin.facturas.show', $factura->id) }}" >
+                                                            <i class="bi bi-eye btn btn-success"></i>
+                                                        </a>
+                                                    @endif
                                     
                                                 
                                                     @include('admin.facturas.partials.modal')

@@ -1,5 +1,4 @@
 
-log('conectado a porcentajes')
 /** VARIABLES */
 let elementoTablaCuerpo = d.querySelector('#lista'),
 elementoAlert = d.querySelector('#alert'),
@@ -12,11 +11,10 @@ elementoTablaPaginacion = d.querySelector('.paginacion'),
 elementoBotonResetearFiltro = d.querySelector('#limpiarFiltro'),
 formularios = d.forms,
 inventarios = {},
-inventarioAdaptado= [];
-
-
-console.log(elementoTablaCuerpo);
-config = {};
+inventarioAdaptado= [],
+config = {
+    href: ""
+};
 
 
 
@@ -38,15 +36,34 @@ const componenteFila = (data) => {
                 <td>${data.marca}</td>
                 <td>${data.categoria}</td>
                 
-                <td>${darFormatoDeNumero(data.costo)}</td>
+                <td class="table-danger"><b> ${darFormatoDeNumero(data.costo)} </b></td>
                 <td>${darFormatoDeNumero(data.pvp)}</td>
                 <td>${darFormatoDeNumero(data.pvp_2)}</td>
                 <td>${darFormatoDeNumero(data.pvp_3)}</td>
                 
-                <td class="table-warning">${data.costo_despues ? darFormatoDeNumero(data.costo_despues) : 0 }</td>
-                <td class="table-warning">${data.pvp_despues ? darFormatoDeNumero(data.pvp_despues) : 0 }</td>
-                <td class="table-warning">${data.pvp_2_despues ? darFormatoDeNumero(data.pvp_2_despues) : 0 }</td>
-                <td class="table-warning">${data.pvp_3_despues ? darFormatoDeNumero(data.pvp_3_despues) : 0 }</td>
+                <!-- COSTO DESPUES -->
+                <td class="table-danger" id="${data.codigo}">
+                    <input type="number" step="0.01" value="${data.costo_despues ? darFormatoDeNumero(data.costo_despues) : 0 }" 
+                    class="form-control form-control-lg costo_despues" id="costo_despues">
+                </td>
+
+                <!-- PVP DETAL DESPUES -->
+                <td class="table-warning" id="${data.codigo}">
+                    <input type="number" step="0.01" value="${data.pvp_despues ? darFormatoDeNumero(data.pvp_despues) : 0 }" 
+                    class="form-control form-control-lg pvp_despues" id="pvp_despues">
+                </td>
+
+                <!-- PVP 2 DESPUES -->
+                <td class="table-warning" id="${data.codigo}">
+                    <input type="number" step="0.01" value="${data.pvp_2_despues ? darFormatoDeNumero(data.pvp_2_despues) : 0 }" 
+                    class="form-control form-control-lg pvp_2_despues" id="pvp_2_despues">
+                </td>
+
+                <td class="table-warning"  id="${data.codigo}">
+                    <input type="number" step="0.01" value="${data.pvp_3_despues ? darFormatoDeNumero(data.pvp_3_despues) : 0 }" 
+                    class="form-control form-control-lg pvp_3_despues" id="pvp_3_despues">
+               
+                </td>
             </tr>
         `;
     }
@@ -54,27 +71,30 @@ const componenteFila = (data) => {
 
 const componentePaginacion = (data) => {
     let itemsLi = '';
-    data.links.forEach(link => {
-        if (link.label.includes('Anterior')) {
-            itemsLi += ` 
-                <li class="page-item ${link.url ? '' : 'disabled'}">
-                    <a class="page-link" href="${link.url}" >${link.label}</a>
-                </li>
-            `;
-        } else if (link.label.includes('Siguiente')) {
-            itemsLi += ` 
-                <li class="page-item ${link.url ? '' : 'disabled'}">
-                    <a class="page-link" href="${link.url}" >${link.label}</a>
-                </li>
-            `;
-        }else{
-            itemsLi += ` 
-                <li class="page-item ${link.label == data.current_page ? 'active' : ''}">
-                    <a class="page-link" href="${link.url}" >${link.label}</a>
-                </li>
-            `;
-        }
-    });
+    // console.log(data.data.links);
+    if(data.data.links.length){
+        data.data.links.forEach(link => {
+            if (link.label.includes('Anterior')) {
+                itemsLi += ` 
+                    <li class="page-item ${link.url ? '' : 'disabled'}">
+                        <a class="page-link" href="${link.url}" >${link.label}</a>
+                    </li>
+                `;
+            } else if (link.label.includes('Siguiente')) {
+                itemsLi += ` 
+                    <li class="page-item ${link.url ? '' : 'disabled'}">
+                        <a class="page-link" href="${link.url}" >${link.label}</a>
+                    </li>
+                `;
+            }else{
+                itemsLi += ` 
+                    <li class="page-item ${link.active ? 'active' : ''}">
+                        <a class="page-link" href="${link.url}" >${link.label}</a>
+                    </li>
+                `;
+            }
+        });
+    }
 
     return `
         <ul class="pagination justify-content-center">
@@ -85,43 +105,30 @@ const componentePaginacion = (data) => {
 
 
 /** MANEJADORES DE EVENTO */
-const hanledLoad = async (e) => {
-
-};
+const hanledLoad = async (e) => {};
 
 const hanledPaginacion = async (e) => {
     e.preventDefault();
     if(e.target.href){
         if(e.target.href.includes('getInventariosFiltro')){
-            elementoTablaPaginacion.innerHTML = '';
-            elementoTablaCuerpo.innerHTML = spinner();
-        
-            let inventarios = await getInventariosFiltro(`${e.target.href}`,  config);
-        
-            if(!inventarios.data.data.length){
-                elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
-            }else{
-                elementoTablaCuerpo.innerHTML='';
-                await inventarios.data.data.forEach( element => {
-                    element.tasa = inventarios.tasa;
-                    elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
-                });
-        
-                elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+            // elementoTablaPaginacion.innerHTML = '';
+            // elementoTablaCuerpo.innerHTML = spinner();
+            config.href = e.target.href;
+            await getLista(config,  e.target.href);
 
-                
-            }
         }else{
+            console.log('no entro en la paginacion normal');
+            console.log(e.target.href);
             elementoTablaPaginacion.innerHTML = '';
             await getLista(e.target.href);
         }
-    }
+    }else console.log('no hay dirección a donde paginar');
 };
 
 const hanledFormulario = async (e) => {
     if(e.target.id != "cerrarSesion"){
         e.preventDefault();
-        console.log(e.target);
+        // console.log(e.target);
         switch (e.target.id) {
             case 'formularioFiltro':
                 let banderaDeALertarConfig = 0;
@@ -135,67 +142,34 @@ const hanledFormulario = async (e) => {
                     }
                 }
 
-                console.log(config);
+                // console.log(config);
                 /** Configuramos el porcentaje a formato 1,x */
-                config.porcentaje_costo = ((config.porcentaje_costo / 100) +1);
-                config.porcentaje_pvp = ((config.porcentaje_pvp / 100) +1);
-                config.porcentaje_pvp_2 = ((config.porcentaje_pvp_2 / 100) +1);
-                config.porcentaje_pvp_3 = ((config.porcentaje_pvp_3 / 100) +1);
+                if(parseFloat(config.porcentaje_costo)) config.porcentaje_costo = ((config.porcentaje_costo / 100) +1);
+                if(parseFloat(config.porcentaje_pvp))   config.porcentaje_pvp = ((config.porcentaje_pvp / 100) +1);
+                if(parseFloat(config.porcentaje_pvp_2)) config.porcentaje_pvp_2 = ((config.porcentaje_pvp_2 / 100) +1);
+                if(parseFloat(config.porcentaje_pvp_3)) config.porcentaje_pvp_3 = ((config.porcentaje_pvp_3 / 100) +1);
 
                 /** Se configuran los campos */
                 config.campo = ['codigo', ' descripcion'];
 
-                /** consultamos para pagina y previsualizar */
-                inventarios = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`,  config);
-                log(inventarios)
-                /** Validamos si retorna un 404 */
-                if(inventarios.estatus == 404){
-                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
-                    return elementoAlert.innerHTML=componenteAlerta(inventarios.mensaje, inventarios.estatus);
-                }
-
                 /** consultamos todo para la actualización de precios y costos */
-                todosLosProductos = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltroAll`,  config);
-                console.log(todosLosProductos);
-                /** Se adaptan todos los productos para ser configurados */
-                await todosLosProductos.data.forEach(element => {
-                    inventarioAdaptado.push(adaptadorDeProducto(element, config));
-                });
-
-               
-
-                /** mostras una precarga */
-                elementoTablaCuerpo.innerHTML = spinner();
-
-                /** Si no hay datos entregamos un estatus 0 */
-                if(!inventarios.data.data.length) {
-                    for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
-                    return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0});
-                }
-
-                setTimeout(async ()=>{
-                    elementoTablaCuerpo.innerHTML = "";
-                    await inventarios.data.data.forEach( element => {
-                        element.tasa = inventarios.tasa;
-                        elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
+                getInventariosFiltro(`${URL_BASE}/getInventariosFiltroAll`,  config)
+                .then(async todosLosProductos => {
+                    // console.log(todosLosProductos);
+                    /** Se adaptan todos los productos para ser configurados */
+                    await todosLosProductos.data.forEach(element => {
+                        inventarioAdaptado.push(adaptadorDeProducto(element, config));
                     });
-          
-            
-                    if(inventarios.data.links){
-                        elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
-                    }
-    
-                    let elementoDePaginacion = d.querySelectorAll('.page-item');
-                    elementoDePaginacion.forEach( btnPaginacion => {
-                        btnPaginacion.addEventListener('click', hanledPaginacion);
-                    });
-
+                    
                     /** Activamos el boton */
                     for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
-                }, 1500)
+                    
+                    /** consultamos para pagina y previsualizar */
+                    await getLista(config);
+              
+                    
+                });
 
-
-                
                 break;
             case 'limpiarFiltro':
                     /** mostras una precarga */
@@ -232,9 +206,9 @@ const hanledFormulario = async (e) => {
                             resultadoSetPorcentaje = await editarProductoDelInventarioPorcentaje(`${URL_BASE}/porcentajes` , producto); 
                             
                             contador++;
-                            
                             elementoBarraDePorcentaje.innerHTML = barraDePorcentaje(inventarioAdaptado.length, contador);
-                            log(contador)
+                            // log(contador)
+
                             if(contador == inventarioAdaptado.length){
                                 inventarioAdaptado = [];
                                 config.porcentaje_costo = 0;
@@ -244,6 +218,7 @@ const hanledFormulario = async (e) => {
                                 getLista(config);
                                 elementoBarraDePorcentaje.innerHTML="";
                                 for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
+                                formularios[1].reset();
                                 elementoAlert.innerHTML = componenteAlerta(resultadoSetPorcentaje.mensaje, resultadoSetPorcentaje.estatus);
                             }
                             
@@ -263,6 +238,41 @@ const hanledFormulario = async (e) => {
 
 };
 
+const hanledInputsTable = async (e) => {
+    console.log(e.target);
+    console.log(e.target.id);
+    console.log(e.target.value);
+    switch (e.target.id) {
+        case 'costo_despues':
+                console.log(e.target.id);
+                console.log(e.target.parentElement.id);
+                inventarioAdaptado.forEach(producto => {
+                    producto.costo_despues = parseFloat(e.target.value);
+                    producto.pvp_despues = parseFloat(config.porcentaje_pvp) ? parseFloat(e.target.value * config.porcentaje_pvp)       :  producto.pvp_despues;
+                    producto.pvp_2_despues = parseFloat(config.porcentaje_pvp_2) ? parseFloat(e.target.value * config.porcentaje_pvp_2) :  producto.pvp_2_despues;
+                    producto.pvp_3_despues = parseFloat(config.porcentaje_pvp_3) ? parseFloat(e.target.value * config.porcentaje_pvp_3) : producto.pvp_3_despues;
+                })
+                console.log(inventarioAdaptado);
+                await getLista(config, config.href);
+            break;
+        case 'pvp_despues':
+            console.log(e.target.id);
+            console.log(e.target.parentElement.id);
+            break;
+        case 'pvp_2_despues':
+            console.log(e.target.id);
+            console.log(e.target.parentElement.id);
+            break;
+        case 'pvp_3_despues':
+            console.log(e.target.id);
+            console.log(e.target.parentElement.id);
+            break;
+    
+        default:
+            break;
+    }
+};
+
 /** EVENTOS */
 addEventListener('load', hanledLoad);
 
@@ -273,11 +283,23 @@ for (const formulario of formularios) {
 elementoTablaPaginacion.addEventListener('click', hanledPaginacion);
 elementoBotonResetearFiltro.addEventListener('click', hanledFormulario);
 
-
-
-
-
 /** FUNCIONES O UTILIDADES EXTRAS */
+
+/** CARGAR EVENTOS DE CAMBIO DE PRECIO Y COSTOS EN LOS INPUTS  */
+async function cargarEventosDeInputsDeTable(){
+    let inputsCosto = document.querySelectorAll('.costo_despues'),
+    inputsPvp = document.querySelectorAll('.pvp_despues'),
+    inputsPvp2 = document.querySelectorAll('.pvp_2_despues'),
+    inputsPvp3 = document.querySelectorAll('.pvp_3_despues');
+
+    inputsCosto.forEach(inpCost => inpCost.addEventListener('change', hanledInputsTable));
+  
+    inputsPvp.forEach(inpPvp => inpPvp.addEventListener('change', hanledInputsTable));
+   
+    inputsPvp2.forEach(inpPvp2 => inpPvp2.addEventListener('change', hanledInputsTable));
+  
+    inputsPvp3.forEach(inpPvp3 => inpPvp3.addEventListener('change', hanledInputsTable));
+};
 
 /** Validar formulario reportes y retorna la data si pasa la validación */
 async function validarDataDeFormulario(formulario){
@@ -295,57 +317,81 @@ async function validarDataDeFormulario(formulario){
             esquema[iterator.name] = iterator.value;
         }
     }
-    log(esquema);
+    // log(esquema);
     if(banderaDeALertar) return false;
     else return esquema;
 }
 
 /** Adaptar los datos del producto a la vista */
 function adaptadorDeProducto(data, config){
-    // log(data)
-    return {
-        id: data.id,
-        numero: data.id,
-        codigo: data.codigo,
-        descripcion: data.descripcion,
-        cantidad: parseFloat(data.cantidad),
+    let nuevoCosto = parseFloat(config.porcentaje_costo) ? parseFloat(data.costo * config.porcentaje_costo) : parseFloat(data.costo);
+    // console.log(nuevoCosto);
 
-        costo:  parseFloat(data.costo),
-        pvp: parseFloat(data.pvp),
-        pvp_2:  parseFloat(data.pvp_2),
-        pvp_3: parseFloat(data.pvp_3),
+        return {
+            id: data.id,
+            numero: data.id,
+            codigo: data.codigo,
+            descripcion: data.descripcion,
+            cantidad: parseFloat(data.cantidad),
+    
+            costo:  parseFloat(data.costo),
+            pvp: parseFloat(data.pvp),
+            pvp_2:  parseFloat(data.pvp_2),
+            pvp_3: parseFloat(data.pvp_3),
+            
+            costo_despues: parseFloat(config.porcentaje_costo) ? nuevoCosto : data.costo,
+            pvp_despues:  parseFloat(config.porcentaje_pvp) ?  parseFloat(nuevoCosto * config.porcentaje_pvp)        : data.pvp,
+            pvp_2_despues:  parseFloat(config.porcentaje_pvp_2) ?  parseFloat(nuevoCosto * config.porcentaje_pvp_2)  : data.pvp_2,
+            pvp_3_despues:  parseFloat(config.porcentaje_pvp_3) ?  parseFloat(nuevoCosto * config.porcentaje_pvp_3)  : data.pvp_3,
         
-        costo_despues: parseFloat(data.costo * config.porcentaje_costo),
-        pvp_despues:  parseFloat(data.pvp * config.porcentaje_pvp),
-        pvp_2_despues:  parseFloat(data.pvp_2 * config.porcentaje_pvp_2),
-        pvp_3_despues:  parseFloat(data.pvp_3 * config.porcentaje_pvp_3),
+    
+    
+            imagen: data.imagen,
+            fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),
+            marca: data.id_marca.nombre,
+            categoria: data.id_categoria.nombre,
+        };
+    
 
-
-        imagen: data.imagen,
-        fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),
-        marca: data.id_marca.nombre,
-        categoria: data.id_categoria.nombre,
-    };
 };
 
 /** Retorna la lista de inventario */
 async function getLista(config, url = `${URL_BASE}/getInventariosFiltro`){
+
+    /** Mostramos una precarga */
     elementoTablaCuerpo.innerHTML = spinner();
+
+    /** Realizamos la consulta a la API */
     inventarios = await getInventariosFiltro(url,  config);
 
+    /** Validamos si la respuesta es indefinda */
     if(typeof(inventarios.data.data) == 'undefined'){
         return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
     }
 
+    /** Validamos si la repuesta no tiene elementos */
     if(!inventarios.data.data.length){
         elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
     }else{
+        /** Vaciamos el cuerpo de la tabla */
         elementoTablaCuerpo.innerHTML='';
-        await inventarios.data.data.forEach( element => {
-            element.tasa = inventarios.tasa;
-            elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element, config));
+
+        /** Si tiene elementos adaptamos los datos para imprimir en la tabla */
+        await inventarios.data.data.forEach( producto => {
+            producto.tasa = inventarios.tasa;
+            elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(producto, config));
         });
-        elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios.data);
+
+        /** Cargamos la paginación de la tabla*/
+        elementoTablaPaginacion.innerHTML = componentePaginacion(inventarios);
+
+        let elementoDePaginacion = d.querySelectorAll('.page-item');
+        elementoDePaginacion.forEach( btnPaginacion => {
+            btnPaginacion.addEventListener('click', hanledPaginacion);
+        });
+
+        /** Cargamos los eventos de los inputs de los precios y costos */
+        await cargarEventosDeInputsDeTable();
     }
 }
 

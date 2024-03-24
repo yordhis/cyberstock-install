@@ -11,6 +11,7 @@ use App\Models\{
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,14 @@ class Helpers extends Model
     public static $productos;
     public static $fechaCuota;
 
+    /** Respuesta JSON */
+    public static function getRespuestaJson( $mensaje, $data = [], $estatus = Response::HTTP_OK  ){
+        return response()->json([
+            "mensaje" => $mensaje, 
+            "data" => $data,
+            "estatus" => $estatus
+        ], $estatus);
+    }
 
     public static function registrarMovimientoDeUsuario($request, $codigo="", $observacion=""){
         Monitore::create([
@@ -103,7 +112,7 @@ class Helpers extends Model
 
 
     /** Esta funcion retorna el siguiente codigo de la tabla solicitada */
-    public static function getCodigo($table)
+    public static function getCodigo($table, $tipoDeOperacion = "SALIDA")
     {
         $codigo = "00000000";
         $ultimoCodigo = DB::table($table)->max('codigo');
@@ -113,6 +122,8 @@ class Helpers extends Model
         }else{ 
             $codigo = Str::substr($codigo, 1, Str::length($codigo)) . "1";
         }
+
+        DB::insert("insert into {$table} (codigo,tipo,concepto) values(?,?,?)", [$codigo, $tipoDeOperacion, "ANULADA"]);
         return $codigo;
     }
 

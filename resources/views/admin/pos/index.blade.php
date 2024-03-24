@@ -193,6 +193,7 @@
     <script src="{{ asset('/js/inventarios/inventarioController.js') }}" defer></script>
     <script src="{{ asset('/js/facturas/facturaController.js') }}" defer></script>
     <script src="{{ asset('/js/clientes/clienteController.js') }}" defer></script>
+    <script src="{{ asset('/js/utilidad/getIva.js') }}" defer></script>
     <script src="{{ asset('/js/pos/index.js') }}" defer></script>
     <!-- CIERRE ! SCRIPT DE APP -->
 
