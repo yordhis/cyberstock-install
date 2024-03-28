@@ -11,6 +11,8 @@
     },
     "devDependencies": {
         "axios": "^0.21",
+        "jquery": "^3.7.1",
+        "jquery-confirm": "^3.3.4",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14"

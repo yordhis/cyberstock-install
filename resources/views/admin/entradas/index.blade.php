@@ -7,13 +7,12 @@
     @isset($respuesta)
         @include('partials.alert')
     @endisset
-    <div id="alert">
-    </div>
-
- 
+    
+    
     <div class="container-fluid ">
-
-        <div class="row position-relative">
+        <div class="" id="alert"></div>
+        
+        <div class="row position-relative" id="pos_entrada">
 
             {{-- Proveedor --}}
             <div class="col-sm-2 col-xs-12">
@@ -35,15 +34,15 @@
             </div> {{-- Cierre proveedor --}}
 
             {{-- Filtro de productos --}}
-            <div class="col-sm-4 col-xs-12">
+            <div class="col-sm-4 col-xs-12 ">
                 <div class="card" style=" height: 45rem; width: 100%;">
                     {{-- Input para filtrar --}}
-                    <div class="card-header" style="height: 8rem;">
-                        <h5 class="card-title text-danger">
+                    <div class="card-header " style="height: auto;">
+                        <h5 class="card-title text-danger p-0 mt-0">
                             <i class="bi bi-shop"></i>
                             Buscar producto
                         </h5>
-                         <div class="input-group mb-3">
+                         <div class="input-group p-0 m-0">
                             <span class="input-group-text bg-primary" id="basic-addon1">
                                 <i class="bi bi-box text-white"></i>
                             </span>
@@ -52,13 +51,13 @@
                     </div>
 
                     {{-- lista de productos --}}
-                    <div class="card-body table-responsive" style="height: 20rem; overflow: auto;" >
-                       <table class="table">
+                    <div class="card-body " style="height: 20rem; overflow: auto;" >
+                       <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th>Código</th>
-                                    <th>Descripción</th>
+                                    <th style="width: 255px;">Descripción</th>
                                     <th>Marca</th>
                                     <th>Categoria</th>
                                 </tr>
@@ -84,29 +83,30 @@
                         </div>
                     </div>
 
-                    <div class="card-header" style="height: 4rem;">
+                    <div class="card-header" style="">
                         <div class="d-flex justify-content-between">
-                            <h5 class="card-title text-danger" id="codigoFactura">
+                            <h5 class="card-title text-danger p-0 m-0" id="codigoFactura">
                                 {{-- aqui se carga el numero de la factura --}}
                             </h5>
-                            <h5 class="card-title text-danger" id="fechaFactura">
+                            <h5 class="card-title text-danger p-0 m-0" id="fechaFactura">
                                 Fecha: {{ date('d-m-Y h:ia') }}
                             </h5>
 
                         </div>
                     </div>
-                    <div class="card-header" style="height: 4rem;">
+                    <div class="card-header" style="">
                         <div class="d-flex justify-content-between p-0 m-0">
                             <label for="" class="text-danger">
                                 <i class="bi bi-square-half"></i>
                                 Ingrese número de factura Proveedor
                             </label>
-                            <input type="number" class=" text-danger" id="codigoFacturaProveedor" name="Codigo Factura Proveedor" style="width: 50%; height: 50%;"/>
+                            <input type="number" class="form-control my-2 text-danger" id="codigoFacturaProveedor" name="Codigo Factura Proveedor" />
                             <span class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="card-body table-responsive" style="height: 25rem; overflow: auto;">
-                       <table class="table ">
+
+                    <div class="card-body table-responsive" style="overflow: auto;">
+                       <table class="table table-hover w-100">
                             <thead>
                                 <tr>
                                     <th>Código</th>
@@ -123,6 +123,8 @@
                             </tbody>
                        </table>
                     </div>
+
+
                     <div class="card-footer">
                         <div class="row" id="componenteFactura">
                         </div>
@@ -135,12 +137,16 @@
               
   
             </div>
+
+            
         </div>
     </div>
 
     <!-- APP JS -->
     <script src="{{ asset('/js/main.js') }}" defer></script>
+   
     
+
     <script src="{{ asset('/js/productosEntradas/index.js') }}" defer></script>
     <script src="{{ asset('/js/proveedores/proveedorController.js') }}" defer></script>
     <script src="{{ asset('/js/productos/productoController.js') }}" defer></script>
@@ -152,5 +158,7 @@
     <!-- SCRIPT DE ESTILOS -->
     <script src="{{ asset('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js')}}" defer></script>
     <!-- CIERRE SCRIPT DE ESTILOS -->
+
+  
 
 @endsection

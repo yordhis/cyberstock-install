@@ -162,7 +162,7 @@
                     </div>
                     {{--  Boton de CARGAR FACTURA EN ESPERA PARA FACTURAR --}}
                     <div class="col-sm-12  acciones-factura">
-                        <button class="btn btn-info  w-100 my-2" 
+                        <button class="btn btn-primary  w-100 my-2" 
                             id="cargarFactura" >
                             <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
                             <p id="mensajeDeEspera"> En espera </p> 
@@ -171,10 +171,17 @@
 
                     {{--  Boton de ELIMINAR FACTURA DE ESPERA --}}
                     <div class="col-sm-12  acciones-factura">
-                        <button class="btn btn-warning  w-100 my-2" 
+                        <button class="btn btn-primary  w-100 my-2" 
                             id="limpiarBorrador" >
                             <i class='bx bxs-hourglass-top fs-3 text-white'></i> 
-                            <p> Limpiar </p> 
+                            <p> Limpiar factura en espera</p> 
+                        </button>
+                    </div>
+                    <div class="col-sm-12  acciones-factura">
+                        <button class="btn btn-warning  w-100 my-2" 
+                            id="finalizarFacturacion" >
+                            <i class="bi bi-arrow-clockwise fs-3 text-white"></i>
+                            <p> Resetear </p> 
                         </button>
                     </div>
                 </div>

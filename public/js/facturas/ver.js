@@ -6,9 +6,10 @@ elementoCodigoFactura = d.querySelector('#codigoFactura'),
 factura = {};
 
 const hanledLoad = async () => {
-// log(elementoCodigoFactura.textContent)
-    factura = await getFactura(elementoCodigoFactura.textContent);
-    // log(factura)
+    log(elementoCodigoFactura.textContent.trim())
+    log(typeof(elementoCodigoFactura.textContent.trim()))
+    factura = await getFactura(elementoCodigoFactura.textContent.trim());
+    log(factura)
  
     /** Si la factura existe mostramosl o metodos de pagos */
     if (factura.estatus == 200) {

@@ -135,6 +135,25 @@ class FacturaController extends Controller
      * @param tabla string
      * @return \Illuminate\Http\Response string (codigo) 
      */
+    public function getCodigoFacturaE($tabla)
+    {
+        try {
+            $codigo = Helpers::getCodigo($tabla, "ENTRADA");
+            return response()->json([
+                "mensaje" => "Consulta de codigo de factura exitoso",
+                "estatus" => Response::HTTP_OK,
+                "data" => $codigo
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            $errorInfo = Helpers::getMensajeError($th, "Error en la API al retornar el codigo de la factura,");
+            return response()->json([
+                "mensaje" => $errorInfo,
+                "data" => [],
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function getCodigoFactura($tabla)
     {
         try {
@@ -194,9 +213,11 @@ class FacturaController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
     public function getFactura($codigoFactura)
     {
         try {
+         
             $factura = Factura::where('codigo', $codigoFactura)->get();
             if ($factura[0]->concepto == "ANULADA") {
                 return response()->json([
@@ -227,22 +248,22 @@ class FacturaController extends Controller
 
 
                 return response()->json([
-                    "mensaje" => "Consulta de factura exitosa.",
+                    "mensaje" => "Consulta de factura exitosa. codigo:" . $codigoFactura,
                     "data" =>  $factura,
                     "estatus" =>  Response::HTTP_OK
                 ],  Response::HTTP_OK);
             } else {
                 return response()->json([
-                    "mensaje" =>  "No se encontró factura con el código solicitado.",
-                    "data" => null,
+                    "mensaje" =>  "No se encontró factura con el código solicitado. codigo:" . $codigoFactura,
+                    "data" =>  $factura ,
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             }
         } catch (\Throwable $th) {
             $mensaje = Helpers::getMensajeError($th, "Error al consultar factura, ");
             return response()->json([
-                "mensaje" => $mensaje,
-                "data" =>  [],
+                "mensaje" => $mensaje . "  codigo:" . $codigoFactura,
+                "data" =>  $th,
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

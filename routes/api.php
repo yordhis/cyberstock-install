@@ -102,6 +102,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::resource('facturas', FacturaController::class)->names('api.facturas');
     
     /** FACTURAS INVENTARIO */
+    Route::get('getCodigoFacturaE/{tabla}', [FacturaController::class, 'getCodigoFacturaE'])->name('admin.getCodigoFacturaE');
     Route::post('setFacturaAnulada', [FacturaInventarioController::class, 'setFacturaAnulada'])->name('api.facturasInventarios.setFacturaAnulada');
     Route::delete('deleteFacturaInventario/{codigoFacturaInventario}', [FacturaInventarioController::class, 'deleteFacturaInventario'])->name('api.facturasInventarios.deleteFacturaInventario');
     Route::post('storeSalida', [FacturaInventarioController::class, 'storeSalida'])->name('api.facturasInventarios.storeSalida');
@@ -113,7 +114,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::put('updateCliente/{id}', [ClienteController::class, 'updateCliente'])->name('api.updateCliente');
     
     /** PROVEEDORES */
-    Route::get('getProveedor/{idProveedor}', [ProveedoreController::class, 'getProveedor'])->name('api.getProveedor');
+    Route::post('getProveedor', [ProveedoreController::class, 'getProveedor'])->name('api.getProveedor');
     Route::post('storeProveedor', [ProveedoreController::class, 'storeProveedor'])->name('api.storeProveedor');
     Route::put('updateProveedor/{id}', [ProveedoreController::class, 'updateProveedor'])->name('api.updateProveedor');
 });

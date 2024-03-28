@@ -23,7 +23,7 @@ class ProveedoreController extends Controller
     }
 
     /** API PROVEEDOR */
-    public function getProveedor($idProveedor)
+    public function getProveedor_old($idProveedor)
     {
         
         try {
@@ -62,6 +62,75 @@ class ProveedoreController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getProveedor(HttpRequest $request)
+    {
+       
+        try {
+            /** Validamos si el id esta definodo */
+            if($request == "undefined"){
+                return response()->json([
+                    "mensaje" => "Indentificacion no definida.",
+                    "data" => $request,
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+              /** Buscamos por cedula y nombre de barra */
+                foreach ($request->campo as $key => $campo) {
+                    switch ($campo) {
+                        case 'codigo':
+                            $resultado = Proveedore::where("{$campo}", $request->filtro)->paginate(1);
+                            if (count($resultado)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR CEDULA",
+                                    "data" => $resultado,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+                        case 'empresa':
+                            $resultados = Proveedore::where("{$campo}", 'like', "%{$request->filtro}%")->orderBy('empresa', 'asc')->paginate(15);
+                            if (count($resultados)) {
+                                return response()->json([
+                                    "mensaje" => "CONSULTA FILTRADA EXITOSAMENTE POR NOMBRE",
+                                    "data" => $resultados,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }else{
+                                return response()->json([
+                                    "mensaje" => "NO HAY REGISTROS.",
+                                    "data" => $resultados,
+                                    "estatus" => Response::HTTP_OK
+                                ], Response::HTTP_OK);
+                            }
+                            break;
+
+                        default:
+                            return response()->json([
+                                "mensaje" => "NO HAY REGISTROS.",
+                                "data" => ["data" => []],
+                                "estatus" => Response::HTTP_OK
+                            ], Response::HTTP_OK);
+                            break;
+                    }
+                }
+                return response()->json([
+                    "mensaje" => "Debe agregar un proveedor.",
+                    "data" => ["data" => []],
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
+          
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                "mensaje" => "Error al consultar PROVEEDORES, " . $th->getMessage(),
+                "data" => [],
+                "estatus" => 500
+            ], 500);
+        }
+    }
+
 
     public function storeProveedor(HttpRequest $request){
         try {

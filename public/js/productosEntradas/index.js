@@ -1,40 +1,44 @@
 /** ELEMENTOS */
 let elementoTarjetaCliente = d.querySelector('#tarjetaCliente'),
-elementoBuscarProducto = d.querySelector('#buscarProducto'),
-elementoTablaBuscarProducto = d.querySelector('#tablaBuscarProducto'),
-elementoTotalProductos = d.querySelector('#totalProductosFiltrados'),
-codigoFactura = d.querySelector('#codigoFactura'),
-elementoAlertas = d.querySelector('#alertas'), 
-listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'), 
-elementoFactura = d.querySelector('#componenteFactura'), 
-elementoMetodoDePagoModal= d.querySelector('#elementoMetodoDePagoModal'), 
-factura = {
-        codigo:'', // codigo del movimiento
-        codigo_factura:'', // codigo de la factura adel proveedor
-        razon_social:'', // nombre de cliente o proveedor
-        identificacion:'', // numero de documento
-        subtotal:'', // se guarda en divisas
-        total:'',
-        tasa:'', // tasa en el momento que se hizo la transaccion
-        iva:'', // impuesto
-        tipo:'ENTRADA', // 
-        concepto:'', // venta, compra ...
-        descuento:'', // descuento
-        fecha:'', // fecha venta, compra ...
-        observacion:'', // fecha venta, compra ...
-        tipoDocumento:'', // fecha venta, compra ...
-        metodos:'' // metodos alamacenados como JSON
-},
-metodosPagos = [{
-    id: 1,
-    tipoDePago: null,
-    montoDelPago: 0,
-}];
+    elementoBuscarProducto = d.querySelector('#buscarProducto'),
+    elementoTablaBuscarProducto = d.querySelector('#tablaBuscarProducto'),
+    elementoTotalProductos = d.querySelector('#totalProductosFiltrados'),
+    codigoFactura = d.querySelector('#codigoFactura'),
+    elementoAlertas = d.querySelector('#alertas'),
+    alerta_main = d.querySelector('#alert'),
+    pos_entrada = d.querySelector('#pos_entrada'),
+    listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'),
+    elementoFactura = d.querySelector('#componenteFactura'),
+    elementoMetodoDePagoModal = d.querySelector('#elementoMetodoDePagoModal'),
+    factura = {
+        codigo: '', // codigo del movimiento
+        codigo_factura: '', // codigo de la factura adel proveedor
+        razon_social: '', // nombre de cliente o proveedor
+        identificacion: '', // numero de documento
+        subtotal: '', // se guarda en divisas
+        total: '',
+        tasa: '', // tasa en el momento que se hizo la transaccion
+        iva: '', // impuesto
+        tipo: 'ENTRADA', // 
+        concepto: '', // venta, compra ...
+        descuento: '', // descuento
+        fecha: '', // fecha venta, compra ...
+        observacion: '', // fecha venta, compra ...
+        tipoDocumento: '', // fecha venta, compra ...
+        metodos: '', // metodos alamacenados como JSON
+        estatus: false
+    },
+    metodosPagos = [{
+        id: 1,
+        tipoDePago: null,
+        montoDelPago: 0,
+    }];
+
 
 /** COMPONENTES */
 /** CLIENTE - PROVEEDOR */
 const componenteTarjetaCliente = (proveedor, mensaje) => {
-    if(proveedor.length){
+    if (proveedor.length) {
         proveedor = proveedor[0];
         return `
         <div class="card-body">
@@ -55,7 +59,7 @@ const componenteTarjetaCliente = (proveedor, mensaje) => {
             </a>
         </div>
         `;
-    }else{
+    } else {
         return `
         <div class="card-body">
             <h5 class="card-title text-danger">
@@ -63,8 +67,9 @@ const componenteTarjetaCliente = (proveedor, mensaje) => {
                 Proveedor
             </h5>
             
+            <h6 class="card-subtitle mb-2 text-muted">Buscar por RIF  o nombre</h6>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Rif o ID" id="buscarCliente">
+                <input type="text" class="form-control" placeholder="Rif o nombre" id="buscarCliente">
             </div>
 
             <h6 class="card-subtitle mb-2 text-danger">${mensaje}</h6>
@@ -80,8 +85,6 @@ const componenteTarjetaCliente = (proveedor, mensaje) => {
         </div>
         `;
     }
-    
-    
 };
 
 const componenteFormularioAgregarCliente = () => {
@@ -134,9 +137,9 @@ const componenteFormularioAgregarCliente = () => {
 };
 
 const componenteFormularioEditarCliente = (proveedor) => {
-    if(proveedor.length){
+    if (proveedor.length) {
         proveedor = proveedor[0];
-    
+
         return `
         <div class="card-header p-0">
         <p class="text-danger  card-title text-center">
@@ -180,40 +183,73 @@ const componenteFormularioEditarCliente = (proveedor) => {
         
         </div>
         `;
-    }else{
-        return componenteTarjetaCliente([], 'No se pudo obtener la data del cliente.')
+    } else {
+        return componenteTarjetaCliente([], 'No se pudo obtener la data del proveedor.')
     }
-}; /** CIERRE CLIENTE - PROVEEDOR */
+};
+
+const componenteListaClientes = (clientes) => {
+    let listaHtml = "";
+    clientes.forEach(cliente => {
+        listaHtml += `
+            <button type="button" class="list-group-item list-group-item-action lista-cliente" 
+                id="${cliente.codigo}">
+                ${cliente.empresa} - ${cliente.tipo_documento}-${cliente.codigo}  
+            </button>
+        `
+    })
+
+    return `
+        <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                Seleccione un cliente
+            </button>
+
+            ${listaHtml}
+            <div class="flex d-flex justify-content-center ">
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarInputBuscarCliente">
+                    <i class="bi bi-search fs-4"></i>
+                </a>
+            
+                <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
+                    <i class="bi bi-person-add fs-4"></i>
+                </a>
+            </div>
+        </div>
+        
+    `;
+}
+/** CIERRE CLIENTE - PROVEEDOR */
 
 /** FILTRO DE PRODUCTOS - AGREGAR AL CARRITO */
 const componenteListaDeProductoFiltrados = (producto) => {
-   
+
     if (producto.estatus == 0) {
-        return  `
+        return `
         <tr>
             <td colspan="5" class="text-center text-danger ">NO HAY RESULTADOS</td>
         </tr>
         `;
     } else {
-        return  `
+        return `
         <tr>
             <td>
               
                 <i class="bi bi-plus-square fs-5 hero__cta"></i>
                 
-                ${ componenteAgregarCantidadDeProductoModal(producto) }
+                ${componenteAgregarCantidadDeProductoModal(producto)}
             </td>
-            <td>${producto.codigo}</td>
-            <td>${producto.descripcion}</td>
-            <td>${producto.marca}</td>    
-            <td>${producto.categoria}</td>
+            <td style="font-size: 11px;">${producto.codigo}</td>
+            <td style="font-size: 11px;">${producto.descripcion}</td>
+            <td style="font-size: 11px;">${producto.marca}</td>    
+            <td style="font-size: 11px;">${producto.categoria}</td>
         
         </tr>
         `;
     }
 };
 
-const componenteAgregarCantidadDeProductoModal = (producto) =>{
+const componenteAgregarCantidadDeProductoModal = (producto) => {
     return `
         <!-- Modal -->
         <section class="modal__custom ">
@@ -275,8 +311,8 @@ const componenteListaDeProductoEnFactura = (producto) => {
                 <td>${producto.codigo_producto}</td>
                 <td>${producto.descripcion}</td>
                 <td>${producto.cantidad}</td>
-                <td>${darFormatoDeNumero( producto.costo )}</td>
-                <td>${darFormatoDeNumero( producto.subtotal )}</td>
+                <td>${darFormatoDeNumero(producto.costo)}</td>
+                <td>${darFormatoDeNumero(producto.subtotal)}</td>
                 <td class="d-flex d-inline">
                     <button class="btn btn-none acciones-factura" id="editarCantidadFactura" name="${producto.codigo_producto}">
                         <i class="bi bi-pencil fs-4"></i>
@@ -290,7 +326,7 @@ const componenteListaDeProductoEnFactura = (producto) => {
     }
 };
 
-const componenteNumeroDeFactura = (data) =>{
+const componenteNumeroDeFactura = (data) => {
     return `<i class="bi bi-back"></i> N° Movimiento: ${data.data}`;
 };
 
@@ -308,15 +344,15 @@ const componenteFactura = async (factura) => {
         <div class="col-sm-3 ">
             <label for="">F. Fiscal</label> <br>
             <div class="form-check form-check-inline">
-                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked': ''}>
+                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="activarFacturaFiscal" value="si" ${factura.iva > 0 ? 'checked' : ''}>
                 <label class="form-check-label" for="inlineRadio1">SI</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="desactivarFacturaFiscal" value="no" ${factura.iva == 0 ? 'checked': ''}>
+                <input class="form-check-input acciones-factura" type="radio" name="inlineRadioOptions" id="desactivarFacturaFiscal" value="no" ${factura.iva == 0 ? 'checked' : ''}>
                 <label class="form-check-label" for="inlineRadio2">NO</label>
             </div>
             <!--<label for="">Fiscal</label>
-            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '': 'checked'}>-->
+            <input type="checkbox" class="form-check acciones-factura" id="desactivaIva" value="1" ${factura.iva > 0 ? '' : 'checked'}>-->
         </div>
 
         <div class="col-sm-3 ">
@@ -333,18 +369,18 @@ const componenteFactura = async (factura) => {
 
         <div class="col-sm-2 text-black">
             <p>SUBTOTAL</p>
-            <p>IVA ${ factura.iva == "" ? 16 : (factura.iva * 100).toFixed(2) }%</p>
+            <p>IVA ${factura.iva == "" ? 16 : (factura.iva * 100).toFixed(2)}%</p>
             <p>DESCT.  ${factura.descuento == "" ? 0 : factura.descuento}%</p>
         </div>
         <div class="col-sm-4 ">
-            <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero( factura.subtotal )} USD</p>
-            <p>${ factura.subtotal == "" ? 0 : darFormatoDeNumero( factura.subtotal * factura.iva )} USD</p>
-            <p>${ factura.descuento == "" ? 0 :  darFormatoDeNumero( factura.subtotal * (factura.descuento/100) )} USD</p>
+            <p>${factura.subtotal == "" ? 0 : darFormatoDeNumero(factura.subtotal)} USD</p>
+            <p>${factura.subtotal == "" ? 0 : darFormatoDeNumero(factura.subtotal * factura.iva)} USD</p>
+            <p>${factura.descuento == "" ? 0 : darFormatoDeNumero(factura.subtotal * (factura.descuento / 100))} USD</p>
         </div>
         <div class="col-sm-6">
             <p>TOTAL</p>
-            <p class="fs-1 text-success">${ factura.total == "" ? 0 : (  darFormatoDeNumero(factura.total) ) } USD</p>
-            <!--<p class="fs-5 text-success">REF ${ factura.total == "" ? 0 : factura.total }</p>-->
+            <p class="fs-1 text-success">${factura.total == "" ? 0 : (darFormatoDeNumero(factura.total))} USD</p>
+            <!--<p class="fs-5 text-success">REF ${factura.total == "" ? 0 : factura.total}</p>-->
             
         </div>
 
@@ -355,7 +391,7 @@ const componenteFactura = async (factura) => {
         </div>
         <div class="col-sm-6">
             <button class="btn btn-danger  w-100 fs-3 acciones-factura"  id="eliminarFactura">
-                <i class='bx bx-trash '></i> ELIMINAR
+                <i class='bx bx-trash '></i> ANULAR
             </button>
         </div>
     `;
@@ -384,30 +420,30 @@ const componenteVueltoForm = () => {
                 <i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>
             </div>
         </div>
-    `; 
+    `;
 };
 
 const componenteVuelto = async (metodos, factura) => {
     let abonado = 0,
-    mensajeVuelto = "",
-    estilos = "",
-    vuelto = 0;
-  
-    metodos.forEach(elementoAbono => {
-        if(elementoAbono.tipoDePago == "DIVISAS" ) abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
-        else abonado = ( abonado + ( quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa)) ) );
-     
-    });
-   
-    vuelto = (Math.round(factura.total * 100)/100) - (Math.round(abonado*100)/100);
+        mensajeVuelto = "",
+        estilos = "",
+        vuelto = 0;
 
-    if(vuelto > 0){
+    metodos.forEach(elementoAbono => {
+        if (elementoAbono.tipoDePago == "DIVISAS") abonado += quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago));
+        else abonado = (abonado + (quitarFormato(darFormatoDeNumero(elementoAbono.montoDelPago)) / quitarFormato(darFormatoDeNumero(factura.tasa))));
+
+    });
+
+    vuelto = (Math.round(factura.total * 100) / 100) - (Math.round(abonado * 100) / 100);
+
+    if (vuelto > 0) {
         estilos = "text-danger";
         mensajeVuelto = "PENDIENTE";
-    }else if(vuelto < 0){
+    } else if (vuelto < 0) {
         estilos = "text-success";
         mensajeVuelto = "VUELTO O CAMBIO";
-    }else{
+    } else {
         estilos = "text-success";
         mensajeVuelto = "PAGO COMPLETADO";
     }
@@ -416,7 +452,7 @@ const componenteVuelto = async (metodos, factura) => {
         <div class="card m-2" style="">
             <div class="card-header fs-2 text-center">${mensajeVuelto}</div>
             <div class="card-body ${estilos}">
-                <p class="card-text fs-1 text-center">REF ${ darFormatoDeNumero(vuelto) } <br> BS ${darFormatoDeNumero(vuelto * factura.tasa) }  </p>
+                <p class="card-text fs-1 text-center">REF ${darFormatoDeNumero(vuelto)} <br> BS ${darFormatoDeNumero(vuelto * factura.tasa)}  </p>
             </div>
         </div>
     `;
@@ -425,20 +461,20 @@ const componenteVuelto = async (metodos, factura) => {
 const componenteMetodosForm = async (metodosPagos, factura) => {
 
     let listaMetodos = '',
-    metodoSeleccionado = "",
-    total=0;
+        metodoSeleccionado = "",
+        total = 0;
 
-    if(factura.total){
-        total =  quitarFormato( darFormatoDeNumero( factura.total * factura.tasa ) ) ;
+    if (factura.total) {
+        total = quitarFormato(darFormatoDeNumero(factura.total * factura.tasa));
     }
 
-  
-        metodosPagos.forEach(elementoPago => {
-            metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
-            : `<option selected>Método de pago</option>`; 
 
-            if( metodosPagos.length == 1 || elementoPago.tipoDePago == null ){
-                listaMetodos += `
+    metodosPagos.forEach(elementoPago => {
+        metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
+            : `<option selected>Método de pago</option>`;
+
+        if (metodosPagos.length == 1 || elementoPago.tipoDePago == null) {
+            listaMetodos += `
                     <div class="metodoAdd mt-2 row g-3">
                         <div class="col-md-6">
                             <select class="form-select acciones-pagos" id="tipoDePago" >
@@ -456,7 +492,7 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
         
                         <div class="col-md-4">
                             <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
-                            value="${ elementoPago.montoDelPago ? elementoPago.montoDelPago : 0 }" id="montoDelPago" >
+                            value="${elementoPago.montoDelPago ? elementoPago.montoDelPago : 0}" id="montoDelPago" >
                         </div>
         
                         <div class="col-md-2" id="${elementoPago.id}">
@@ -464,13 +500,13 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
                         </div>
                     </div>
                 `;
-            }else{
-    
-                listaMetodos += `
+        } else {
+
+            listaMetodos += `
                     <div class="metodoAdd mt-2 row g-3">
                         <div class="col-md-6">
                             <select class="form-select acciones-pagos" id="tipoDePago" >
-                                ${ metodoSeleccionado }
+                                ${metodoSeleccionado}
                                 <option value="EFECTIVO">EFECTIVO</option>
                                 <option value="DIVISAS">DIVISAS</option>
                                 <option value="PAGO MOVIL">PAGO MOVIL</option>
@@ -490,15 +526,15 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
                         </div>
                     </div>
                 `;
-            }
-        });
-    
+        }
+    });
 
-    return listaMetodos; 
+
+    return listaMetodos;
 };
 
 
-const componenteMetodoDePago  = async (factura) => {
+const componenteMetodoDePago = async (factura) => {
     return `
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -533,94 +569,135 @@ const componenteMetodoDePago  = async (factura) => {
 };
 
 /** MANEJADORES DE EVENTOS */
-const hanledLoad = async (e) => {
-    let resultadoProveedor = 0;
-    /** CLIENTE */
-    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
-    cargarEventosAccionesDelCliente();
-    
-    /** FILTRO PRODUCTOS */
-    elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
-    elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0});
-    
-    /** Numero de factura */ 
-    let resultado =  await getCodigoFactura(`${URL_BASE}/getCodigoFactura/factura_inventarios`);
-    codigoFactura.innerHTML = componenteNumeroDeFactura(resultado);
-    
-    facturaStorage = JSON.parse(localStorage.getItem('facturaInventario'))
+const hanledLoad = async () => {
+    let resultadoProveedor = 0,
+        codigoDeMovimiento = "",
+        confirmarInterrucion = false;
 
-    if(facturaStorage){
+    factura = JSON.parse(localStorage.getItem('facturaInventario')) ? JSON.parse(localStorage.getItem('facturaInventario')) : factura;
 
-        factura = facturaStorage;
-        factura.codigo = resultado.data;
-        factura.tipo = 'ENTRADA';
-        let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
-        localStorage.setItem('facturaInventario', JSON.stringify(factura));
-
-        /** CLIENTE */
-        elementoTarjetaCliente.innerHTML = spinner();
-        listaDeProductosEnFactura.innerHTML = spinner();
-        if(factura.identificacion.length != 0){
-            resultadoProveedor = await getProveedor(factura.identificacion);
-        }
-        
-            /** Validamos que existe el cliente */
-            if(resultadoProveedor == 0)  elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
-            else elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(resultadoProveedor.data, "");
-            cargarEventosAccionesDelCliente();
-        
-            localStorage.setItem('facturaInventario', JSON.stringify(factura));
-        
-    }else{
-        
-        /** ALMACENAMOS LA FACTURA */
-        factura.codigo = resultado.data;
-        factura.concepto = 'COMPRA';
-        factura.tipo = 'ENTRADA';
-        factura.iva = 0.16;
-        let fecha = new Date();
-        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
-        localStorage.setItem('facturaInventario', JSON.stringify(factura));
-    }
-
-    /** Cargamos el componente factura */
+    /** PRECARGA */
     elementoFactura.innerHTML = spinner();
+    elementoTarjetaCliente.innerHTML = spinner();
+    listaDeProductosEnFactura.innerHTML = spinner();
 
-    /** Validamos si el carrito tiene productos para cargarlos a la factura */
-    carritoStorage =  localStorage.getItem('carritoInventario')  ? JSON.parse(localStorage.getItem('carritoInventario')) : [];
-   
-    if( carritoStorage.length ){
-        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
+    /** interrucción */
+    if (!factura.estatus) {
+        $.confirm({
+            theme: 'supervan',
+            title: '¿Crear una factura?',
+            content: 'Click en Confirmar para crear factura o Cancelar para salir del pos',
+            buttons: {
+                confirm: {
+                    text: 'SI',
+                    btnClass: 'btn-green',
+                    action: async function () {
 
-        /** Cargamos los datos de la factura */
-        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+                        codigoDeMovimiento = await getCodigoFacturaE(`${URL_BASE}/getCodigoFacturaE/factura_inventarios`);
 
-    }else{
-        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito([]);
-        localStorage.setItem('carritoInventario', JSON.stringify(carritoStorage));
+                        /** ALMACENAMOS LA FACTURA */
+                        factura.codigo = codigoDeMovimiento.data;
+                        factura.concepto = 'COMPRA';
+                        factura.tipo = 'ENTRADA';
+                        factura.iva = 0.16;
+                        factura.estatus = true;
+                        let fecha = new Date();
+                        factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
+                        localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
-        /** Cargamos los datos de la factura */
-        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+                        /** CLIENTE */
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "");
+                        cargarEventosAccionesDelCliente();
+
+                        /** FILTRO PRODUCTOS */
+                        elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
+                        elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({ estatus: 0 });
+
+                        /** Asignamos el numero de movimiento en el DOM */
+                        codigoFactura.innerHTML = componenteNumeroDeFactura(codigoDeMovimiento);
+
+                        /** Validamos si el carrito tiene productos para cargarlos a la factura */
+                        carritoStorage = localStorage.getItem('carritoInventario') ? JSON.parse(localStorage.getItem('carritoInventario')) : [];
+
+                        localStorage.setItem('carritoInventario', JSON.stringify(carritoStorage));
+                        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito([]);
+                        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+
+                    },
+                },
+
+                cancel: {
+                    text: 'NO',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        localStorage.removeItem('facturaInventario');
+                        localStorage.removeItem('carritoInventario');
+                        return window.location.href = "/inventarios";
+                    }
+                },
+
+            }
+        });
+    } else {
+        /** CONSULTAR PROVEEDOR*/
+        await getProveedor({
+            filtro: factura.identificacion.trim(),
+            campo: ['codigo']
+        }).then(res => {
+            log(res)
+            /** Validamos que existe el cliente */
+            if (res.estatus == 200) {
+                elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data.data, "");
+                cargarEventosAccionesDelCliente();
+
+            } else {
+                elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], res.mensaje);
+
+                cargarEventosAccionesDelCliente();
+            }
+            /** Asignamos el numero de movimiento en el DOM */
+            codigoFactura.innerHTML = componenteNumeroDeFactura({ data: factura.codigo });
+            // localStorage.setItem('facturaInventario', JSON.stringify(factura));
+
+        });
+
+
+        /** Validamos si el carrito tiene productos para cargarlos a la factura */
+        carritoStorage = localStorage.getItem('carritoInventario') ? JSON.parse(localStorage.getItem('carritoInventario')) : [];
+
+        if (carritoStorage.length) {
+            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
+
+            /** Cargamos los datos de la factura */
+            await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+
+        } else {
+            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito([]);
+            localStorage.setItem('carritoInventario', JSON.stringify(carritoStorage));
+
+            /** Cargamos los datos de la factura */
+            await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+        }
+
+        /** Volvelmos a asignar el codigo de factura proveedor */
+        let elementoCodigoFacturaProveedor = d.querySelector('#codigoFacturaProveedor');
+        if (factura.codigo_factura != "") elementoCodigoFacturaProveedor.value = factura.codigo_factura;
+
+        let elementoVuelto = d.querySelector('#elementoVuelto');
     }
 
-    /** Volvelmos a asignar el codigo de factura proveedor */
-    let elementoCodigoFacturaProveedor = d.querySelector('#codigoFacturaProveedor');
-    if(factura.codigo_factura != "") elementoCodigoFacturaProveedor.value = factura.codigo_factura;
-
-    let elementoVuelto = d.querySelector('#elementoVuelto');
 }; /** HANLEDLOAD */
 
 /** PROVEEDOR */
 const hanledAccionesCliente = async (e) => {
     e.preventDefault();
-  
+
 
     switch (e.target.parentElement.id) {
         case 'activarInputBuscarCliente':
             /** vaciamos los datos del cliente */
             vaciarDatosDelClienteDeLaFactura(factura);
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([],'');
+            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], '');
             cargarEventosAccionesDelCliente();
             break;
         case 'activarFormCrearCliente':
@@ -634,13 +711,21 @@ const hanledAccionesCliente = async (e) => {
             break;
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner();
+            getProveedor({
+                filtro: e.target.href,
+                campo: ['codigo', 'empresa']
+            }).then(res => {
+                if (res.estatus == 200) {
+                    elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                } else {
+                    elementoAlertas.innerHTML = componenteAlerta(res.mensaje, res.estatus);
+                }
+            });
 
-            let proveedor = await getProveedor(e.target.parentElement.pathname.substring(1));
-            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(proveedor.data);
-            cargarEventosAccionesDelCliente();
-            cargarEventosDeFormularios();
             break;
-    
+
         default:
             break;
     }
@@ -649,88 +734,108 @@ const hanledAccionesCliente = async (e) => {
 };
 
 const hanledBuscarProveedor = async (e) => {
-    if(e.key == "Enter" && e.target.id == "buscarCliente"){
-       
+    if (e.key == "Enter" && e.target.id == "buscarCliente") {
+
         /** Validando los datos ingresados */
-        if(!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo es obligatorio!");
-        else if(!parseInt(e.target.value)) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, "El campo solo acepta números!");
-  
+        if (!e.target.value.trim().length) return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({ estatus: 0 }, "El campo es obligatorio!");
+
         /** Se cargar el spinner() para mostrar que esta procesando */
         elementoTarjetaCliente.innerHTML = spinner();
-        let cliente = await getProveedor( e.target.value );
 
-        /** Validamos si no hay data del cliente */
-        if(!cliente.data.length){
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({estatus: 0}, cliente.mensaje);
-            cargarEventosAccionesDelCliente()
-        }else{
-            /** Cargamos la dat del cliente en el componentes tarjeta cliente */
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data, cliente.mensaje);
-            
-            /** Seteamos el cliente en la factura de local storage */
-            factura.identificacion = cliente.data[0].codigo;
-            factura.tipoDocumento = cliente.data[0].tipo_documento;
-            factura.razon_social = cliente.data[0].empresa;
-            localStorage.setItem('facturaInventario', JSON.stringify(factura));
-            // utilidad de cargar eventos de las acciones del cliente
-            cargarEventosAccionesDelCliente()
+        /** realizamos la consulta */
+        log(e.target.value)
+        let proveedores = await getProveedor({
+            filtro: e.target.value,
+            campo: ['codigo', 'empresa']
+        });
+
+
+        if (!proveedores.data.data.length) {
+            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({ estatus: 0 }, proveedores.mensaje);
+            cargarEventosAccionesDelCliente();
+        } else {
+            elementoTarjetaCliente.innerHTML = componenteListaClientes(proveedores.data.data);
+            cargarEventosAccionesDelCliente();
+            cargarEventosListaCliente();
         }
     }
+};
+
+const hanledAgregarClienteFactura = async (e) => {
+    log(e.target.id)
+
+    let proveedores = await getProveedor({
+        filtro: e.target.id,
+        campo: ['codigo']
+    });
+
+    /** Seteamos el cliente en la factura de local storage */
+    factura.identificacion = proveedores.data.data[0].codigo;
+    factura.tipoDocumento = proveedores.data.data[0].tipo_documento;
+    factura.razon_social = proveedores.data.data[0].empresa;
+    localStorage.setItem('facturaInventario', JSON.stringify(factura));
+
+    /** Cargamos la dat del cliente en el componentes tarjeta cliente */
+    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(proveedores.data.data, proveedores.mensaje);
+
+    /** utilidad de cargar eventos de las acciones del cliente */
+    cargarEventosAccionesDelCliente()
 };
 
 /** MANEJO DE LOS FORMULARIOS PROVEEDOR */
 const hanledFormulario = async (e) => {
     e.preventDefault();
-    let resultado = '', 
-    cliente = '';
- 
+    let resultado = '',
+        cliente = '';
+
+    log(e.target)
     switch (e.target.id) {
         case 'formCrearCliente':
-                    resultado = await validarDataDeFormularioCliente(e.target)
-                    if(!resultado) return;
-                    e.target.innerHTML = spinner();
-                    
-                    proveedor = await storeProveedor(resultado);
+            resultado = await validarDataDeFormularioCliente(e.target)
+            if (!resultado) return;
+            e.target.innerHTML = spinner();
 
-                    if(proveedor.estatus == 401){
-                        elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
-                        let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
-                        elementoValidarFormCrearCliente.innerHTML = componenteAlerta(proveedor.mensaje, proveedor.estatus)
-                        cargarEventosAccionesDelCliente();
-                        cargarEventosDeFormularios();
-                        return setTimeout(()=>{
-                            elementoValidarFormCrearCliente.innerHTML = '';
-                        }, 1500);
-                    }else{
-                         /** Seteamos el proveedor en la factura de local storage */
-                            factura.identificacion = proveedor.data.codigo;
-                            factura.tipoDocumento = proveedor.data.tipo_documento;
-                            factura.razon_social = proveedor.data.empresa;
-                            localStorage.setItem('facturaInventario', JSON.stringify(factura));
-                            
-                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([proveedor.data], proveedor.mensaje);
-                        cargarEventosAccionesDelCliente();
-                        cargarEventosDeFormularios();  
-                    }
+            proveedor = await storeProveedor(resultado);
 
-        break;
+            if (proveedor.estatus == 401) {
+                elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
+                let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
+                elementoValidarFormCrearCliente.innerHTML = componenteAlerta(proveedor.mensaje, proveedor.estatus)
+                cargarEventosAccionesDelCliente();
+                cargarEventosDeFormularios();
+                return setTimeout(() => {
+                    elementoValidarFormCrearCliente.innerHTML = '';
+                }, 1500);
+            } else {
+                /** Seteamos el proveedor en la factura de local storage */
+                factura.identificacion = proveedor.data.codigo;
+                factura.tipoDocumento = proveedor.data.tipo_documento;
+                factura.razon_social = proveedor.data.empresa;
+                localStorage.setItem('facturaInventario', JSON.stringify(factura));
+
+                elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([proveedor.data], proveedor.mensaje);
+                cargarEventosAccionesDelCliente();
+                cargarEventosDeFormularios();
+            }
+
+            break;
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
-            if(!resultado) return;
+            if (!resultado) return;
             e.target.innerHTML = spinner();
             proveedor = await updateProveedor(e.target.action, resultado);
-               /** Seteamos el proveedor en la factura de local storage */
-               factura.identificacion = proveedor.data[0].codigo;
-               factura.tipoDocumento = proveedor.data[0].tipo_documento;
-               factura.razon_social = proveedor.data[0].empresa;
-               localStorage.setItem('facturaInventario', JSON.stringify(factura));
+            /** Seteamos el proveedor en la factura de local storage */
+            factura.identificacion = proveedor.data[0].codigo;
+            factura.tipoDocumento = proveedor.data[0].tipo_documento;
+            factura.razon_social = proveedor.data[0].empresa;
+            localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
             elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(proveedor.data, proveedor.mensaje);
             cargarEventosAccionesDelCliente();
-            cargarEventosDeFormularios();  
+            cargarEventosDeFormularios();
 
-        break
-    
+            break
+
         default:
             break;
     }
@@ -742,41 +847,41 @@ const hanledFormulario = async (e) => {
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
 
-    if(e.target.id == "cerrarModalCustom"){
-           /** CERRAMOS EL MODAL */
-           e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
+    if (e.target.id == "cerrarModalCustom") {
+        /** CERRAMOS EL MODAL */
+        e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
     }
 
-    if(e.target.id == "agregarProductoAlCarrito"){
+    if (e.target.id == "agregarProductoAlCarrito") {
         let carritoActualizado = [],
-        carritoActual = localStorage.getItem('carritoInventario') != 'undefined' ? JSON.parse(localStorage.getItem('carritoInventario')) : [],
-        banderaDeALertar = 0,
-        banderaDeProductoNuevo = 0,
-        acumuladorSubtotal = 0; 
+            carritoActual = localStorage.getItem('carritoInventario') != 'undefined' ? JSON.parse(localStorage.getItem('carritoInventario')) : [],
+            banderaDeALertar = 0,
+            banderaDeProductoNuevo = 0,
+            acumuladorSubtotal = 0;
 
         /** Configuramos el filtro de productos Inventario */
         let filtro = {
             filtro: e.target.name,
             campo: ["codigo"]
         },
-        resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro);
-       
-        if(resultado.estatus == 200){
-            /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
-            let  classIdentificadora = resultado.data.data[0].codigo + "_data",
-            datosDeEntrada = await d.getElementsByClassName(classIdentificadora),
-            esquemaDeDatosDeEntrada = {}; // tipo de dato OBJECT
+            resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro);
 
-           /** Validamos que la cantida sea agreagada y el costo y pvp detal */
+        if (resultado.estatus == 200) {
+            /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
+            let classIdentificadora = resultado.data.data[0].codigo + "_data",
+                datosDeEntrada = await d.getElementsByClassName(classIdentificadora),
+                esquemaDeDatosDeEntrada = {}; // tipo de dato OBJECT
+
+            /** Validamos que la cantida sea agreagada y el costo y pvp detal */
             for (const datosEntrantes of datosDeEntrada) {
-               if(datosEntrantes.name == "cantidad" || datosEntrantes.name == "costo" || datosEntrantes.name == "pvp"){
-                    if(datosEntrantes.value == "") banderaDeALertar++, datosEntrantes.parentElement.children[2].textContent = `El campo ${datosEntrantes.name.toUpperCase()} es obligatorio.`;
-                    else if(datosEntrantes.value <= 0) banderaDeALertar++, datosEntrantes.parentElement.children[2].textContent = `El campo ${datosEntrantes.name.toUpperCase()} debe poseer un número mayor a cero.`;
+                if (datosEntrantes.name == "cantidad" || datosEntrantes.name == "costo" || datosEntrantes.name == "pvp") {
+                    if (datosEntrantes.value == "") banderaDeALertar++, datosEntrantes.parentElement.children[2].textContent = `El campo ${datosEntrantes.name.toUpperCase()} es obligatorio.`;
+                    else if (datosEntrantes.value <= 0) banderaDeALertar++, datosEntrantes.parentElement.children[2].textContent = `El campo ${datosEntrantes.name.toUpperCase()} debe poseer un número mayor a cero.`;
                     else datosEntrantes.parentElement.children[2].textContent = "";
                 }
             }
             /** Si en el formulario de entrada hay algo mal paramos la ejecucion */
-            if(banderaDeALertar) return;
+            if (banderaDeALertar) return;
 
             /** Creamos el esquema de datos de entrada */
             for (const data of datosDeEntrada) {
@@ -786,51 +891,51 @@ const hanledAgregarAFactura = async (e) => {
             /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
             factura.tasa = resultado.tasa;
             localStorage.setItem('facturaInventario', JSON.stringify(factura));
-    
+
             /** Adaptamos el producto para añadirlo al carrito */
             productoAdaptado = adaptadorDeProductoACarrito(resultado.data.data[0], esquemaDeDatosDeEntrada, factura);
-        
-             /** Si ya existe un carrito añadimos a ese carrito */
-             if(carritoActual.length){
+
+            /** Si ya existe un carrito añadimos a ese carrito */
+            if (carritoActual.length) {
                 /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
                 carritoActualizado = carritoActual.map(producto => {
-                    if(productoAdaptado.codigo_producto == producto.codigo_producto){
-                        if(parseFloat(productoAdaptado.cantidad) > 0) banderaDeALertar++;
+                    if (productoAdaptado.codigo_producto == producto.codigo_producto) {
+                        if (parseFloat(productoAdaptado.cantidad) > 0) banderaDeALertar++;
                         else {
                             producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                            producto.subtotal =  darFormatoDeNumero( producto.cantidad * quitarFormato(producto.costo) );
+                            producto.subtotal = darFormatoDeNumero(producto.cantidad * quitarFormato(producto.costo));
                             // producto.subtotalBs = darFormatoDeNumero( producto.cantidad * quitarFormato(producto.costoBs) );
-                        }; 
-                    }else if(productoAdaptado.codigo_producto != producto.codigo_producto){
+                        };
+                    } else if (productoAdaptado.codigo_producto != producto.codigo_producto) {
                         banderaDeProductoNuevo++;
                     }
                     return producto;
                 });
 
                 /** Si se detecta que hay un producto nuevo se añade */
-                if(banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
-                
-            }else{
+                if (banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
+
+            } else {
                 /** si no hay nada en el carro solo agregamos */
                 carritoActualizado.push(productoAdaptado)
             }
 
-            
+
             /** Guardamos en localStorage */
-            localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizado.reverse()));
+            localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizado));
 
             /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
             carritoActual = JSON.parse(localStorage.getItem('carritoInventario'));
             elementoAlertas.innerHTML = componenteAlerta('El prodcuto se agregó a la factura', 200);
-            
+
             /** CERRAMOS EL MODAL */
             e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
-            setTimeout(()=>{
-                elementoAlertas.innerHTML="";
+            setTimeout(() => {
+                elementoAlertas.innerHTML = "";
             }, 2500);
-        
+
             /** Actualizamos la lista de productos en la factura */
-            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito( JSON.parse(localStorage.getItem('carritoInventario')) );
+            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(JSON.parse(localStorage.getItem('carritoInventario')).reverse());
 
             /** Cargamos la factura y sus eventos de acciones del carrito de factura */
             await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
@@ -838,36 +943,36 @@ const hanledAgregarAFactura = async (e) => {
     } // CIERRE agregarProductoAlCarrito
 };
 
-const hanledBuscarProducto = async (e) => {    
-   
-    if(e.key == "Enter"){
+const hanledBuscarProducto = async (e) => {
+
+    if (e.key == "Enter") {
         let filtro = {
             filtro: `${e.target.value.trim()}`,
             campo: ['codigo', 'descripcion', 'default'],
             numeroDePagina: 100
         };
- 
 
-        if(filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
-        
+
+        if (filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({ estatus: 0 }), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
+
         elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
-    
+
         let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
-        lista='';
+            lista = '';
         log(resultado)
-        if(!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({estatus:0}), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
-        resultado.data.data.forEach( async (producto) => {
+        if (!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
+        resultado.data.data.forEach(async (producto) => {
             producto.tasa = resultado.tasa;
             lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
         });
-   
+
         elementoTablaBuscarProducto.innerHTML = lista;
         elementoTotalProductos.innerHTML = `<p>Total resultados: ${resultado.data.total}</p>`;
         await cargarAccionesDelCustomModal();
         await cargarEventosDeAgregarProductoAFactura();
     }
-    
+
 };
 
 /** Esta funcion maneja los eventos de la FACTURA */
@@ -875,233 +980,349 @@ const hanledAccionesDeCarritoFactura = async (e) => {
     e.preventDefault();
     /** Declaracion de variables */
     let cantidad = 0,
-    carritoActual = JSON.parse(localStorage.getItem('carritoInventario')),
-    accion='',
-    banderaDeError = 0,
-    facturaActual = '',
-    acumuladorSubtotal = 0;
-  
-    if(e.target.localName == 'button'){
+        carritoActual = JSON.parse(localStorage.getItem('carritoInventario')),
+        accion = '',
+        banderaDeError = 0,
+        facturaActual = {},
+        acumuladorSubtotal = 0;
+
+    if (e.target.localName == 'button') {
         codigoProducto = e.target.name;
         accion = e.target.id;
-    }else if(e.target.localName == 'i'){
+    } else if (e.target.localName == 'i') {
         codigoProducto = e.target.parentElement.name;
         accion = e.target.parentElement.id;
-    }else if(e.target.localName == 'input'){
+    } else if (e.target.localName == 'input') {
         accion = e.target.id;
-    }else if(e.target.localName == 'option'){
+    } else if (e.target.localName == 'option') {
         accion = e.target.parentElement.id;
-    }else if(e.target.localName == 'select'){
+    } else if (e.target.localName == 'select') {
         accion = e.target.id;
     }
 
     switch (accion) {
         case 'editarCantidadFactura':
-              
-                cantidad = prompt('Ingrese nueva cantidad:');
-            
-                /** Validamos que la cantidad no este vacia */
-                if(cantidad.trim().length == 0){
-                    elementoAlertas.innerHTML = componenteAlerta('El campo cantidad es obligatorio, intente de nuevo.', 404); 
-                    return setTimeout(()=>{
-                        elementoAlertas.innerHTML="";
-                    }, 3500);
-                }else if(!parseInt(cantidad)){
-                    elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401); 
-                    return setTimeout(()=>{
-                        elementoAlertas.innerHTML="";
-                    }, 3500);
-                }
 
-                /** actualizamos el carrito */
-                let carritoActualizadoB = carritoActual.map(producto => {
-                    if( parseFloat(cantidad) <= 0 ){
-                        banderaDeError++;
-                        return producto;
-                    }
-                    if(producto.codigo_producto == codigoProducto ) {
-                        producto.cantidad = parseFloat( cantidad );
-                        producto.subtotal = parseFloat( producto.costo * cantidad );
-                        // producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
-                    };
+            cantidad = prompt('Ingrese nueva cantidad:');
+
+            /** Validamos que la cantidad no este vacia */
+            if (cantidad.trim().length == 0) {
+                elementoAlertas.innerHTML = componenteAlerta('El campo cantidad es obligatorio, intente de nuevo.', 404);
+                return setTimeout(() => {
+                    elementoAlertas.innerHTML = "";
+                }, 3500);
+            } else if (!parseInt(cantidad)) {
+                elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401);
+                return setTimeout(() => {
+                    elementoAlertas.innerHTML = "";
+                }, 3500);
+            }
+
+            /** actualizamos el carrito */
+            let carritoActualizadoB = carritoActual.map(producto => {
+                if (parseFloat(cantidad) <= 0) {
+                    banderaDeError++;
                     return producto;
-                });
-            
-                if(banderaDeError){
-                    elementoAlertas.innerHTML = componenteAlerta('La cantidad debe ser mayor a cero.', 401); 
-                    return setTimeout(()=>{
-                        elementoAlertas.innerHTML="";
-                    }, 3500);
                 }
+                if (producto.codigo_producto == codigoProducto) {
+                    producto.cantidad = parseFloat(cantidad);
+                    producto.subtotal = parseFloat(producto.costo * cantidad);
+                    // producto.subtotalBs = darFormatoDeNumero( cantidad * quitarFormato(producto.costoBs) );
+                };
+                return producto;
+            });
 
-               /** Guardamos en local el nuevo carrito */
-                localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoB.reverse()));
-                /** Cargamos la lista del carrito de compra */
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB.reverse());
-            
+            if (banderaDeError) {
+                elementoAlertas.innerHTML = componenteAlerta('La cantidad debe ser mayor a cero.', 401);
+                return setTimeout(() => {
+                    elementoAlertas.innerHTML = "";
+                }, 3500);
+            }
 
-                 /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
-                carritoActual = JSON.parse(localStorage.getItem('carritoInventario'));
-                await cargarDatosDeFactura(carritoActual, factura);
+            /** Guardamos en local el nuevo carrito */
+            localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoB));
+            /** Cargamos la lista del carrito de compra */
+            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoB);
+
+
+            /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
+            carritoActual = JSON.parse(localStorage.getItem('carritoInventario'));
+            await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
 
 
             break;
         case 'eliminarProductoFactura':
-                let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto );
-                localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoC.reverse()));
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC.reverse());
+            let carritoActualizadoC = carritoActual.filter(producto => producto.codigo_producto != codigoProducto);
+            localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoC));
+            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizadoC);
 
-                /** Actualizamos la factura */
-                await cargarDatosDeFactura(carritoActualizadoC, factura);
+            /** Actualizamos la factura */
+            await cargarDatosDeFactura(carritoActualizadoC, factura);
             break;
         case 'eliminarFactura':
-            /** validamos si hay factura para eliminar */
-            facturaActual = localStorage.getItem('facturaInventario');
-       
-            if(facturaActual){
-                /** Eliminamos la factura y el carrito del almacen local */
-                    localStorage.removeItem('carritoInventario');
-                    localStorage.removeItem('facturaInventario');
-    
-                elementoAlertas.innerHTML = componenteAlerta('La factura se elemino correctamente', 200);
-                setTimeout(()=>{
-                    elementoAlertas.innerHTML=spinner();
-                    window.location.href = `${URL_BASE_APP}/inventarios/crearEntrada`;
-                }, 2500);
-            }else{
-                elementoAlertas.innerHTML = componenteAlerta('No hay factura creada para eliminar', 404);
-                setTimeout(()=>{
-                    elementoAlertas.innerHTML="";
-                }, 2500);
-            }
-
-            break;
         case 'salirDelPos':
-            /** validamos si hay factura para eliminar */
-            facturaActual = localStorage.getItem('facturaInventario');
-       
-            if(facturaActual){
-                /** Eliminamos la factura y el carrito del almacen local */
-                    localStorage.removeItem('carritoInventario');
-                    localStorage.removeItem('facturaInventario');
-                    e.target.innerHTML = spinner('text-white');
-                    window.location.href = `${URL_BASE_APP}/inventarios`;
-            }
+
+            let redireccionar = "";
+            if(accion == "eliminarFactura") redireccionar = "/inventarios/crearEntrada";
+            if(accion == "salirDelPos")  redireccionar = "/inventarios/listaEntradas";
+
+            $.confirm({
+                title: "¿Desea anular factura?",
+                content: "Click en SI para anular y NO para seguir con este código de factura.",
+                type: "red",
+                theme: "supervan",
+                buttons: {
+                    confirm: {
+                        text: "SI, ANULAR.",
+                        btnClass: "btn-green",
+                        action: async function () {
+                            /** Mostramos la precarga */
+                            elementoAlertas.innerHTML = spinner();
+
+                            /** validamos si hay factura para eliminar */
+                            facturaActual = JSON.parse(localStorage.getItem('facturaInventario'));
+
+                            /** Se configura la factura para ser anulada */
+                            facturaActual.identificacion = facturaActual.identificacion.length ? facturaActual.identificacion : "12345678";
+                            facturaActual.razon_social = facturaActual.razon_social.length ? facturaActual.razon_social : "CLIENTE";
+                            facturaActual.concepto = "ANULADA";
+
+                            /** Seteamos la factura anulada */
+                            setFactura(`${URL_BASE}/setFacturaAnulada`, facturaActual)
+                                .then(res => {
+                                    if (res.estatus == 200) {
+                                        /** Eliminamos la factura y el carrito del almacen local */
+                                        localStorage.removeItem('carritoInventario');
+                                        localStorage.removeItem('facturaInventario');
+
+                                        $.alert({
+                                            title: "Anulando",
+                                            content: res.mensaje,
+                                            type: "green",
+                                            theme: "supervan"
+                                        })
+
+                                        window.location.href = redireccionar;
+                                    } else {
+                                        $.alert({
+                                            title: "Error al anular factura de compra",
+                                            content: res.mensaje,
+                                            type: "red",
+                                            theme: "supervan"
+                                        })
+                                    }
+                                })
+
+                        }
+                    },
+                    cancel: {
+                        text: "NO, CANCELAR ACCIÓN.",
+                        btnClass: "btn-red",
+                        action: async function () {}
+                    }
+                }
+            })
 
             break;
         case 'cargarModalMetodoPago':
-                if(factura.identificacion == ""){
-                    return alert("Debes Ingresar un cliente para poder vender");
-                }
-               
-               await cargarEventosAccionesDeFactura()
+            if (factura.identificacion == "") {
+                return alert("Debes Ingresar un cliente para poder vender");
+            }
+
+            await cargarEventosAccionesDeFactura()
 
             break;
         case 'vender':
             /** declaracion de variables */
-            let abonado = 0,
-            resultadoDefacturarCarritoZ = '',
-            resultadoDeFacturar = '',
-            carritoActualizadoZ = [],
-            confirmarProcesoDeEntrada = false,
-            contador = 0;
+            let resultadoDeFacturar = '',
+                carritoActualizadoZ = [],
+                confirmarProcesoDeEntrada = false;
 
             /** Obtenemos el codigo de factura del proveedor */
             let elementoCodigoFacturaProveedor = d.querySelector('#codigoFacturaProveedor');
-            if(factura.codigo_factura != "") elementoCodigoFacturaProveedor.value = factura.codigo_factura;
-            elementoCodigoFacturaProveedor.style=""
 
             /** Validamos el codigo de factura proveedor que no este vacio */
-            if(elementoCodigoFacturaProveedor.value == "") return elementoAlertas.innerHTML= componenteAlerta(`El campo ${elementoCodigoFacturaProveedor.name} es obligatorio.`, 401), setTimeout(()=>{elementoAlertas.innerHTML = ''}, 2500), elementoCodigoFacturaProveedor.style="border: 1px solid red";
+            if (elementoCodigoFacturaProveedor.value == "") return $.confirm({
+                title: 'El código de factura de proveedor es obligatorio!',
+                content: 'Por favor ingrese un código para poder procesar la compra.',
+                type: 'red',
+                typeAnimated: true,
+                buttons: {
+                    tryAgain: {
+                        text: 'Volver a intentar',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            elementoCodigoFacturaProveedor.autofocus = true;
+                            elementoCodigoFacturaProveedor.style = "border: 1px solid red";
+                        }
+                    },
+                    close: {
+                        text: 'Cerrar',
+                        action: function () {
+                        }
+                    }
+                }
+            });
 
-            
             /** Asignamos el codigo de la factura proveedor */
             factura.codigo_factura = elementoCodigoFacturaProveedor.value;
 
             /** Validamos si el codigo de la factura del proveedor no se repite */
-            let yaExisteElCodigoFacturaEntrada = await getFacturaES(`${URL_BASE}/getFacturaES`, factura );  
-            if(yaExisteElCodigoFacturaEntrada.estatus == 409) return elementoAlertas.innerHTML = componenteAlerta(yaExisteElCodigoFacturaEntrada.mensaje, 401), elementoCodigoFacturaProveedor.value = "", factura.codigo_factura = "", setTimeout(()=>{elementoAlertas.innerHTML = ''},2500);
-            
-            /** validamos si el cliente esta agregado a la factura  */
-            if(factura.identificacion == "") {
-                e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un PROVEEDOR para esta factura.', 401);
-                let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                return setTimeout( () => {
-                    elementoAlertaVender.forEach(element => {
-                        element.classList.add('d-none')
-                    });
-                    cargarEventosAccionesDeFactura();
-                }, 2500);
-            } 
+            await getFacturaES(`${URL_BASE}/getFacturaES`, factura)
+                .then(res => {
 
-            /** VALIDAMOS QUE HALLA PRODUCTOS EN LA FACTURA O CARRITO */
-            if(!carritoActual.length) return  elementoAlertas.innerHTML = componenteAlerta("Debes ingresar productos a la factura, para continuar.", 401), setTimeout(()=>{elementoAlertas.innerHTML=""},2500);
-            
-            localStorage.setItem( 'facturaInventario', JSON.stringify(factura) );
-            carritoActualizadoZ = carritoActual.map(productoEnCarrito => {
-                productoEnCarrito.identificacion = factura.identificacion;
-                productoEnCarrito.codigo_factura =  elementoCodigoFacturaProveedor.value;
-                return productoEnCarrito;
-            })
-            localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoZ));
-
-            /** Preguntamos si desea seguir con la acción */
-            confirmarProcesoDeEntrada = confirm('¿Desea Procesar esta ENTRADA al inventario? Click en aceptar para continuar.');
-
-            /** Validamos la respuesta del usuario */
-            if(confirmarProcesoDeEntrada){
-        
-                    /** Obtenemos el carrito y la factura actualizados */
-                    let facturaVender = JSON.parse(localStorage.getItem('facturaInventario')),
-                    carritoVender = JSON.parse(localStorage.getItem('carritoInventario'));
-                   
-                    /** Al procesar la facturacion del carrito agregamos al inventario las cantidades */
-                    carritoVender.forEach(async producto => {
-                        facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
-                    });
-
-                    /** MOSTRAR QUE ESTA CARGANDO  */
-                    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
-
-                    /** FACTURAR LA ENTRADA */
-                    setTimeout(async ()=>{
-                        
-                        /** Procesamos la factura y generamos el ticket */
-                        facturaVender.tipo="ENTRADA";
-                        resultadoDeFacturar = await setFactura( `${URL_BASE}/setFacturaEntrada`, facturaVender );
-
-                        /** Mostramos el dialogo de facturar */
-                         if ( resultadoDeFacturar.estatus == 201 ) {
-                            resultadoConfirm = confirm("Compra procesada correctamente, ¿Deseas imprimir el comprobante?");
-                            if (resultadoConfirm) {
-                                let facturaDeCompra = htmlTicketEntrada(resultadoDeFacturar.data)
-                                setTimeout(()=>imprimirElementoPos(facturaDeCompra),1000);
-                               
-                                /** Eliminamos la factura del Storagr */
-                                setTimeout(()=>{
-                                    localStorage.removeItem('carritoInventario');
-                                    localStorage.removeItem('facturaInventario');
-                                    window.location.href = "/inventarios/crearEntrada";
-                                },2500);
-    
-                            } else {
-                                 /** Eliminamos la factura del Storagr */
-                                 localStorage.removeItem('carritoInventario');
-                                 localStorage.removeItem('facturaInventario');
-                                window.location.href = "/inventarios/crearEntrada";
-                            }
-
-                    
-                        } else {
-                            alert(resultadoDeFacturar.mensaje)
+                    /** validando codigo de factura del proveedor */
+                    if (res.estatus == 409) return $.confirm({
+                        title: 'Conflicto!',
+                        content: res.mensaje,
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            tryAgain: {
+                                text: 'Volver a intentar',
+                                btnClass: 'btn-orange',
+                                action: function () {
+                                    elementoCodigoFacturaProveedor.style = "border: 1px solid red;";
+                                }
+                            },
                         }
-                    }, 2500);
+                    });
+
+                    elementoCodigoFacturaProveedor.style = "border: 1px solid green;";
+
+                    /** validamos si el PROVEEDOR esta agregado a la factura  */
+                    if (factura.identificacion == "") return $.confirm({
+                        title: '¡Faltan datos!',
+                        content: "Debe agregar un PROVEEDOR para esta factura.",
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            tryAgain: {
+                                text: 'Volver a intentar',
+                                btnClass: 'btn-orange',
+                                action: function () {
+                                    return elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "Debe agregar un proveedor, por favor.")
+                                }
+                            },
+                        }
+                    });
 
 
-            }else{
-                return alert('Acción cancelada.')
-            }
+                    /** VALIDAMOS QUE HALLA PRODUCTOS EN LA FACTURA O CARRITO */
+                    if (!carritoActual.length) return $.confirm({
+                        title: '¡Faltan datos!',
+                        content: "Debes ingresar productos a la factura de compra, para continuar.",
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            tryAgain: {
+                                text: 'Volver a intentar',
+                                btnClass: 'btn-orange',
+                                action: function () { }
+                            },
+                        }
+                    });
 
+
+                    /** CONFIG datos de l carrito */
+                    localStorage.setItem('facturaInventario', JSON.stringify(factura));
+                    carritoActualizadoZ = carritoActual.map(productoEnCarrito => {
+                        productoEnCarrito.identificacion = factura.identificacion;
+                        productoEnCarrito.codigo_factura = elementoCodigoFacturaProveedor.value;
+                        return productoEnCarrito;
+                    })
+                    localStorage.setItem('carritoInventario', JSON.stringify(carritoActualizadoZ));
+
+                    /** Preguntamos si desea seguir con la acción */
+                    $.confirm({
+                        title: '¿Desea Procesar la compra?',
+                        content: 'Click en SI para continuar o NO para seguir configurando.',
+                        type: "green",
+                        buttons: {
+                            confirm: {
+                                text: "Si, Procesar compra.",
+                                btnClass: "btn-green",
+                                action: async function () {
+                                    /** MOSTRAR QUE ESTA CARGANDO  */
+                                    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+
+                                    /** Obtenemos el carrito y la factura actualizados */
+                                    let facturaVender = JSON.parse(localStorage.getItem('facturaInventario')),
+                                        carritoVender = JSON.parse(localStorage.getItem('carritoInventario'));
+
+                                    /** Al procesar la facturacion del carrito agregamos al inventario las cantidades */
+                                    await carritoVender.forEach(async producto => {
+                                        facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
+                                    });
+
+                                    /** FACTURAR LA ENTRADA */
+
+                                    /** Procesamos la factura y generamos el ticket */
+                                    await setFactura(`${URL_BASE}/setFacturaEntrada`, facturaVender)
+                                        .then(res => {
+                                            if (res.estatus == 201) {
+                                                $.confirm({
+                                                    title: '¡Factura de compra registrada correctamente!',
+                                                    type: 'green',
+                                                    content: '',
+                                                    buttons: {
+
+                                                        confirm: {
+                                                            text: "Seguir comprando",
+                                                            btnClass: "btn-green",
+                                                            action: async function () {
+
+                                                                /** Eliminamos la factura del Storagr */
+                                                                localStorage.removeItem('carritoInventario');
+                                                                localStorage.removeItem('facturaInventario');
+                                                                window.location.href = "/inventarios/crearEntrada";
+                                                            }
+
+                                                        },
+                                                        cancel: {
+                                                            text: "Salir",
+                                                            btnClass: "btn-red",
+                                                            action: function () {
+                                                                /** Eliminamos la factura del Storagr */
+                                                                localStorage.removeItem('carritoInventario');
+                                                                localStorage.removeItem('facturaInventario');
+                                                                window.location.href = "/inventarios/listaEntradas";
+                                                            }
+                                                        },
+                                                        somethingElse: {
+                                                            text: 'Imprimir',
+                                                            btnClass: 'btn-orange',
+                                                            action: async function () {
+                                                                localStorage.removeItem('carritoInventario');
+                                                                localStorage.removeItem('facturaInventario');
+                                                                let facturaDeCompra = await htmlTicketEntrada(res.data);
+                                                                await imprimirElementoPos(facturaDeCompra);
+                                                                window.location.href = "/inventarios/crearEntrada";
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                $.alert({
+                                                    title: 'Error al registrar factura de compra!',
+                                                    type: "red",
+                                                    content: res.mensaje
+                                                });
+                                            }
+                                        });
+
+                                }
+                            },
+                            cancel: {
+                                text: "No, seguir configurando.",
+                                btnClass: "btn-red",
+                                action: function () {
+                                    $.alert('Termine de configurar la factura de compra, por favor.');
+                                }
+                            },
+                        }
+                    });
+                })
             break;
         case 'desactivarFacturaFiscal':
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
@@ -1117,77 +1338,77 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             log(e.target.value)
             log(factura)
             localStorage.setItem('facturaInventario', JSON.stringify(factura));
-        break;
+            break;
         default:
             break;
     }
 
-   
-   
-    
+
+
+
 };
 
 /** NO SE ESTA USANDO ESTE MANEJADOR */
 const hanledAccionesDeMetodoDePago = async (e) => {
     let accion = e.target.id,
-    elementoMetodoDePago = d.querySelector('#elementoMetodoDePago'),
-    metodosActuales = d.querySelectorAll('.metodoAdd'),
-    arregloDeMetodosDePago =[],
-    contadorID = 1,
-    banderaDeError = 0,
-    pendiente = 0;
+        elementoMetodoDePago = d.querySelector('#elementoMetodoDePago'),
+        metodosActuales = d.querySelectorAll('.metodoAdd'),
+        arregloDeMetodosDePago = [],
+        contadorID = 1,
+        banderaDeError = 0,
+        pendiente = 0;
 
     switch (accion) {
         case 'agregarMetodo':
-            if(metodosActuales.length >= 4) return alert('El limite de metodos de pago son 4.')
+            if (metodosActuales.length >= 4) return alert('El limite de metodos de pago son 4.')
 
-                metodosActuales.forEach((element, index) => {
+            metodosActuales.forEach((element, index) => {
+                arregloDeMetodosDePago.push({
+                    id: contadorID,
+                    tipoDePago: element.children[0].lastElementChild.value,
+                    montoDelPago: element.children[1].lastElementChild.value,
+                });
+                if (arregloDeMetodosDePago[index].tipoDePago == "Método de pago" || arregloDeMetodosDePago[0].tipoDePago == null) {
+                    banderaDeError++;
+                }
+                contadorID++;
+            });
+
+            if (banderaDeError) return alert('Debe seleccionar un metodo de pago, si desea agregar otro.');
+
+            arregloDeMetodosDePago.push({
+                id: contadorID + 1,
+                tipoDePago: null,
+                montoDelPago: 0,
+            });
+            metodosPagos = arregloDeMetodosDePago;
+            elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
+            await cargarEventosAccionesDeFactura();
+            break;
+        case 'eliminarMetodo':
+            // elementoMetodoDePago.innerHTML += componenteMetodosForm();
+            metodosActuales.forEach(element => {
+                if (element.children[2].id != e.target.parentElement.id) {
                     arregloDeMetodosDePago.push({
                         id: contadorID,
                         tipoDePago: element.children[0].lastElementChild.value,
                         montoDelPago: element.children[1].lastElementChild.value,
                     });
-                    if(arregloDeMetodosDePago[index].tipoDePago == "Método de pago" || arregloDeMetodosDePago[0].tipoDePago == null){
-                        banderaDeError++;
-                    } 
-                    contadorID++;
-                });
-
-                if(banderaDeError) return alert('Debe seleccionar un metodo de pago, si desea agregar otro.');
-
-                arregloDeMetodosDePago.push({
-                    id: contadorID + 1,
-                    tipoDePago: null,
-                    montoDelPago: 0,
-                });
-                metodosPagos = arregloDeMetodosDePago;
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
-                await cargarEventosAccionesDeFactura();
-            break;
-        case 'eliminarMetodo':
-                // elementoMetodoDePago.innerHTML += componenteMetodosForm();
-                metodosActuales.forEach(element => {
-                    if(element.children[2].id  != e.target.parentElement.id){
-                        arregloDeMetodosDePago.push({
-                            id: contadorID,
-                            tipoDePago: element.children[0].lastElementChild.value,
-                            montoDelPago: element.children[1].lastElementChild.value,
-                        });
-                    }
-                    contadorID++;
-                });
-                metodosPagos = arregloDeMetodosDePago; 
-                elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago.reverse(), factura);
-                elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
-                await cargarEventosAccionesDeFactura();
+                }
+                contadorID++;
+            });
+            metodosPagos = arregloDeMetodosDePago;
+            elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
+            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
+            await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
-            
-            if(metodosActuales.length == 1){
-                if(e.target.value == "DIVISAS" ) e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total));
+
+            if (metodosActuales.length == 1) {
+                if (e.target.value == "DIVISAS") e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total));
                 else e.target.parentElement.parentElement.children[1].lastElementChild.value = quitarFormato(darFormatoDeNumero(factura.total * factura.tasa));
             }
-           
+
             metodosActuales.forEach(element => {
                 arregloDeMetodosDePago.push({
                     id: contadorID,
@@ -1197,34 +1418,34 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                 contadorID++;
             });
 
-            metodosPagos = arregloDeMetodosDePago; 
-            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+            metodosPagos = arregloDeMetodosDePago;
+            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
             break;
         case 'montoDelPago':
             /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
             metodosActuales.forEach(element => {
-                if(e.target.parentElement.parentElement.children[2].lastElementChild.id == element.id){
+                if (e.target.parentElement.parentElement.children[2].lastElementChild.id == element.id) {
                     arregloDeMetodosDePago.push({
                         id: contadorID,
                         tipoDePago: element.children[0].lastElementChild.value,
-                        montoDelPago:e.target.value,
+                        montoDelPago: e.target.value,
                     });
-                    
-                }else{
+
+                } else {
                     arregloDeMetodosDePago.push({
                         id: contadorID,
                         tipoDePago: element.children[0].lastElementChild.value,
                         montoDelPago: element.children[1].lastElementChild.value,
                     });
                 }
-                
+
                 contadorID++;
             });
             metodosPagos = arregloDeMetodosDePago;
-            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos.reverse(), factura);
+            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
 
             break;
-        
+
         default:
             break;
     }
@@ -1241,15 +1462,22 @@ elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);
 
 /** ULTILIDADES */
 
-function cargarEventosAccionesDelCliente(){
+function cargarEventosAccionesDelCliente() {
     let accionesDelCliente = d.querySelectorAll('.acciones-cliente');
     accionesDelCliente.forEach(accionesCliente => {
         accionesCliente.addEventListener('click', hanledAccionesCliente);
     });
 };
 
+function cargarEventosListaCliente() {
+    let accionesListaCliente = d.querySelectorAll('.lista-cliente');
+    accionesListaCliente.forEach(accionesListaCliente => {
+        accionesListaCliente.addEventListener('click', hanledAgregarClienteFactura);
+    });
+};
+
 /** Esta funcion obtiene todos los formularios de la vista */
-async function cargarEventosDeFormularios(){
+async function cargarEventosDeFormularios() {
     let formularios = d.forms;
     for (const iterator of formularios) {
         iterator.addEventListener('submit', hanledFormulario);
@@ -1257,26 +1485,26 @@ async function cargarEventosDeFormularios(){
 };
 
 /** Validar formulario de cliente y retornar data */
-async function validarDataDeFormularioCliente(formulario){
+async function validarDataDeFormularioCliente(formulario) {
     let esquema = {},
-    banderaDeALertar = 0;
+        banderaDeALertar = 0;
     for (const iterator of formulario) {
-        if(iterator.localName == "input" || iterator.localName == "select"){
-            if(!iterator.value.length) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
-            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent=`${iterator.name}`, iterator.classList.add(['border-success']);
-            if(iterator.value == "Tipo de documento") iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent=`El campo ${iterator.name} es obligatorio`; 
+        if (iterator.localName == "input" || iterator.localName == "select") {
+            if (!iterator.value.length) iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent = `El campo ${iterator.name} es obligatorio`;
+            else iterator.classList.remove(['border-danger']), iterator.nextElementSibling.textContent = `${iterator.name}`, iterator.classList.add(['border-success']);
+            if (iterator.value == "Tipo de documento") iterator.classList.add(['border-danger']), banderaDeALertar++, iterator.nextElementSibling.textContent = `El campo ${iterator.name} es obligatorio`;
             // Asignamos el valor al esquema
             esquema[iterator.name] = iterator.value;
         }
     }
-    if(banderaDeALertar) return false;
+    if (banderaDeALertar) return false;
     else return esquema;
 }
 
 /** adaptadores de productos */
-function adaptadorDeProducto(data){
-    let dataInventario = ''; 
-    if(data.inventario.length){
+function adaptadorDeProducto(data) {
+    let dataInventario = '';
+    if (data.inventario.length) {
         dataInventario = data.inventario[0];
         return {
             id: data.id,
@@ -1289,13 +1517,13 @@ function adaptadorDeProducto(data){
             /** Data de inventario */
             idInventario: dataInventario.id,
             stock: parseFloat(dataInventario.cantidad),
-            costo: parseFloat( dataInventario.costo ),
-            pvp: parseFloat( ( dataInventario.pvp ) ),
-            pvp_2: parseFloat( ( dataInventario.pvp_2 ) ),
-            pvp_3: parseFloat( ( dataInventario.pvp_3 ) ),
+            costo: parseFloat(dataInventario.costo),
+            pvp: parseFloat((dataInventario.pvp)),
+            pvp_2: parseFloat((dataInventario.pvp_2)),
+            pvp_3: parseFloat((dataInventario.pvp_3)),
             // fechaEntrada: new Date(data.fecha_entrada).toLocaleDateString(),
         };
-    }else{
+    } else {
         return {
             id: data.id,
             numero: data.id,
@@ -1304,19 +1532,19 @@ function adaptadorDeProducto(data){
             marca: data.id_marca.nombre,
             categoria: data.id_categoria.nombre,
             imagen: data.imagen,
-             /** Data de inventario */
-             idInventario: 0,
-             stock: 0,
-             costo: 0,
-             pvp: 0,
-             pvp_2: 0,
-             pvp_3: 0,
+            /** Data de inventario */
+            idInventario: 0,
+            stock: 0,
+            costo: 0,
+            pvp: 0,
+            pvp_2: 0,
+            pvp_3: 0,
         };
 
     }
 };
 
-function adaptadorDeProductoACarrito(producto, data, factura){
+function adaptadorDeProductoACarrito(producto, data, factura) {
     return {
         codigo: factura.codigo, // Codigo del movimiento
         codigo_factura: factura.codigo_factura, // Codigo de la factura
@@ -1337,9 +1565,9 @@ function adaptadorDeProductoACarrito(producto, data, factura){
 /** CIERRE adaptadores de productos */
 
 /** funciones encargadas de los eventos de los componentes */
-async function cargarEventosDeAgregarProductoAFactura(){
+async function cargarEventosDeAgregarProductoAFactura() {
     let elementoAgregarAFactura = d.querySelectorAll('.agregar-producto'),
-    elementoCerrarModalCustom = d.querySelectorAll('.cerrar__ModalCustom');
+        elementoCerrarModalCustom = d.querySelectorAll('.cerrar__ModalCustom');
 
     elementoCerrarModalCustom.forEach(btnCerrarModal => {
         btnCerrarModal.addEventListener('click', hanledAgregarAFactura);
@@ -1350,62 +1578,62 @@ async function cargarEventosDeAgregarProductoAFactura(){
     })
 };
 
-async function cargarEventosAccionesDeFactura(){
+async function cargarEventosAccionesDeFactura() {
     let elementoAccionesCarritoFactura = d.querySelectorAll('.acciones-factura'),
-    elementoMetodoDePagoAcciones = d.querySelectorAll('.acciones-pagos');
+        elementoMetodoDePagoAcciones = d.querySelectorAll('.acciones-pagos');
     elementoAccionesCarritoFactura.forEach(acciones => {
-        if(acciones.localName == "input") acciones.addEventListener('change', hanledAccionesDeCarritoFactura);
+        if (acciones.localName == "input") acciones.addEventListener('change', hanledAccionesDeCarritoFactura);
         else acciones.addEventListener('click', hanledAccionesDeCarritoFactura);
     });
 
     elementoMetodoDePagoAcciones.forEach(element => {
-        if(element.localName == "input") element.addEventListener('change', hanledAccionesDeMetodoDePago);
-        else if(element.localName == "select") element.addEventListener('change', hanledAccionesDeMetodoDePago);
+        if (element.localName == "input") element.addEventListener('change', hanledAccionesDeMetodoDePago);
+        else if (element.localName == "select") element.addEventListener('change', hanledAccionesDeMetodoDePago);
         else element.addEventListener('click', hanledAccionesDeMetodoDePago);
     });
 };
 /** CIERRE funciones encargadas de los eventos de los componentes */
 
-function vaciarDatosDelClienteDeLaFactura(factura){
+function vaciarDatosDelClienteDeLaFactura(factura) {
     factura.identificacion = "";
     factura.razon_social = "";
     localStorage.setItem('facturaInventario', JSON.stringify(factura));
 };
 
 /** FUNCIONES que se encargar de llenar de datos los componentes */
-async function cargarListaDeProductoDelCarrito(carrito){
+async function cargarListaDeProductoDelCarrito(carrito) {
     let lista = '';
- 
-    if(carrito.length){
+
+    if (carrito.length) {
         carrito.forEach(producto => {
             lista += componenteListaDeProductoEnFactura(producto)
         });
         return lista;
-    }else{
-        return componenteListaDeProductoEnFactura({estatus:0});
+    } else {
+        return componenteListaDeProductoEnFactura({ estatus: 0 });
     }
 };
 
-async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuento = 0){
+async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuento = 0) {
     let acumuladorSubtotal = 0;
     carritoActual.forEach(producto => {
-        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal; 
+        acumuladorSubtotal = parseFloat(acumuladorSubtotal) + producto.subtotal;
     });
-    factura.iva = iva; 
+    factura.iva = iva;
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;
-    factura.total = (parseFloat( (acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento/100)));
-    
+    factura.total = (parseFloat((acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento / 100)));
+
     localStorage.setItem('facturaInventario', JSON.stringify(factura));
 
     /** Recargamos el componente factura */
     elementoFactura.innerHTML = spinner();
     elementoFactura.innerHTML = await componenteFactura(factura);
 
-       /** Cargamos el modal de metodos de pago */
-       elementoMetodoDePagoModal.innerHTML = await componenteMetodoDePago(factura);
+    /** Cargamos el modal de metodos de pago */
+    elementoMetodoDePagoModal.innerHTML = await componenteMetodoDePago(factura);
 
-       /** Obtenemos el elemento del componente M-pagos */
+    /** Obtenemos el elemento del componente M-pagos */
     //    let elementoMetodoDePago = d.querySelector('#elementoMetodoDePago');
     //    elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
 

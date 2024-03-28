@@ -38,7 +38,7 @@ class PagarController extends Controller
             ])->orderBy('codigo_factura', 'desc')->get();
             $pagar_depurado = [];
             foreach ($pagar as $key => $value) {
-                if($value->concepto != "DEVOLUCION"){
+                if($value->concepto != "DEVOLUCION" && $value->concepto != "ANULADA"){
 
                     $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
                     if( $value->concepto == "COMPRA" && count($value['abonos']) == 0 ) continue;

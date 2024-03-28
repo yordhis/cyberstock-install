@@ -51,8 +51,8 @@ class ClienteController extends Controller
                 return response()->json([
                     "mensaje" => "Indentificacion no definida.",
                     "data" => $request,
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
             }
 
               /** Buscamos por cedula y nombre de barra */
@@ -80,8 +80,8 @@ class ClienteController extends Controller
                                 return response()->json([
                                     "mensaje" => "NO HAY REGISTROS.",
                                     "data" => $resultados,
-                                    "estatus" => Response::HTTP_OK
-                                ], Response::HTTP_OK);
+                                    "estatus" => Response::HTTP_NOT_FOUND
+                                ], Response::HTTP_NOT_FOUND);
                             }
                             break;
 
@@ -89,24 +89,24 @@ class ClienteController extends Controller
                             return response()->json([
                                 "mensaje" => "NO HAY REGISTROS.",
                                 "data" => ["data" => []],
-                                "estatus" => Response::HTTP_OK
-                            ], Response::HTTP_OK);
+                                "estatus" => Response::HTTP_NOT_FOUND
+                            ], Response::HTTP_NOT_FOUND);
                             break;
                     }
                 }
                 return response()->json([
                     "mensaje" => "NO HAY REGISTROS.",
                     "data" => ["data" => []],
-                    "estatus" => Response::HTTP_OK
-                ], Response::HTTP_OK);
+                    "estatus" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
           
         
         } catch (\Throwable $th) {
             return response()->json([
                 "mensaje" => "Error al consultar CLIENTE, " . $th->getMessage(),
                 "data" => [],
-                "estatus" => 500
-            ], 500);
+                "estatus" => Response::HTTP_NOT_FOUND
+            ], Response::HTTP_NOT_FOUND);
         }
     }
 

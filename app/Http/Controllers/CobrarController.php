@@ -41,7 +41,7 @@ class CobrarController extends Controller
 
             $cobrar_depurado = [];
             foreach ($cobrar as $key => $value) {
-                if($value->concepto != "CONSUMO"){
+                if($value->concepto != "CONSUMO" && $value->concepto != "ANULADA"){
 
                     $value['abonos'] = Pago::where('codigo_factura', $value->codigo_factura)->get();
                     if( $value->concepto == "VENTA" && count($value['abonos']) == 0 ) continue;

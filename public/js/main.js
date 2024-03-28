@@ -138,4 +138,5 @@ const quitarFormato = (numeroString) =>{
         arraysinformato = arregloDeNumeros;
     }
     return parseFloat(arraysinformato.join(''));
-}
+};
+

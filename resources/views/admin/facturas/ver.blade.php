@@ -36,9 +36,9 @@
                           <div class="d-flex justify-content-between w-100 m-0 p-0">
                             <div class="p-2 bd-highlight">
                               @if ($factura->iva > 0)
-                                <b id="codigoFactura" >N° Factura: {{ $factura->codigo }}</b>  
+                                <b>N° Factura: </b><b id="codigoFactura" >{{ $factura->codigo }}</b>  
                               @else
-                                <b id="codigoFactura">N° Nota: {{ $factura->codigo }}</b>  
+                                <b>N° Nota: </b><b id="codigoFactura">{{ $factura->codigo }}</b>  
                               @endif
                             </div>
                           

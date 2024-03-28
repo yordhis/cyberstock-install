@@ -23,3 +23,9 @@
 <link href="{{ asset('assets/css/simple-datatables.css') }}" rel="stylesheet">
 <script src="{{ asset('assets/js/simple-datatables.js') }}" ></script>
 
+<script src="{{ asset('js/partials/jquery.min.js') }}" defer></script>  
+<script src="{{ asset('js/partials/jquery-confirm.min.js') }}" defer></script>
+<link rel="stylesheet" href="{{ asset('css/jquery-confirm.min.css') }}" >
+
+
+
