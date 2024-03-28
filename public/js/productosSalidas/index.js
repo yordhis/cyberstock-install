@@ -710,10 +710,19 @@ const hanledAccionesCliente = async (e) => {
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner();
 
-            let cliente = await getCliente(e.target.parentElement.pathname.substring(1));
-            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(cliente.data);
-            cargarEventosAccionesDelCliente();
-            cargarEventosDeFormularios();
+            await getCliente({
+                filtro: e.target.parentElement.pathname.substring(1),
+                campo: ['identificacion']
+            }).then(res =>{
+                if(res.estatus == 200){
+                    elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                }else{
+                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "Debe ingresar  un cliente, por favor.");
+                    cargarEventosAccionesDelCliente();
+                }
+            });
             break;
 
         default:
