@@ -135,38 +135,24 @@ class ProveedoreController extends Controller
     public function storeProveedor(HttpRequest $request){
         try {
           
-            $proveedorExiste = Proveedore::where('codigo', $request->identificacion)->get();
-        
-            if(count($proveedorExiste)){
-                $mensaje = "El Proveedor Ya existe.";
-                $estatus = Response::HTTP_UNAUTHORIZED;
-
-                return response()->json([
-                    "mensaje" => $mensaje,
-                    "data" => $proveedorExiste,
-                    "estatus" => $estatus
-                ], $estatus);
-
-            }else{
-                /** Procedemos a crear */
-                $estatusCrear = Proveedore::create($request->all());
-                $mensaje = $estatusCrear ? "El Proveedor se creo correctamente." : "El Proveedor no se creo";
-                $estatus = $estatusCrear ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
-            }
+            /** Procedemos a crear */
+            $data = Proveedore::create($request->all());
+            $mensaje = $data ? "El Proveedor se creo correctamente." : "El Proveedor no se creo";
+            $estatus = $data ? Response::HTTP_CREATED : Response::HTTP_NOT_FOUND;
 
             return response()->json([
                 "mensaje" => $mensaje,
-                "data" => $estatusCrear,
+                "data" => $data,
                 "estatus" => $estatus
             ], $estatus);
 
 
         } catch (\Throwable $th) {
             return response()->json([
-                "mensaje" => "Error al registrar el Proveedor, " . $th->getMessage(),
+                "mensaje" => "Un proveedor ya poseé el RIF o cédula ingresado, intente de nuevo con otro rif.",
                 "data" => [],
-                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                "estatus" => Response::HTTP_NOT_FOUND
+            ], Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -177,8 +163,8 @@ class ProveedoreController extends Controller
             $proveedor = Proveedore::where('id', $idProveedor)->get();
             /** Validamos si edito la cedula o rif */
             if(count($proveedor)){
-                if( $proveedor[0]->identificacion != $request->identificacion ){
-                    $proveedorExiste = Proveedore::where('identificacion', $request->identificacion)->get();
+                if( $proveedor[0]->codigo != $request->codigo ){
+                    $proveedorExiste = Proveedore::where('codigo', $request->codigo)->get();
                     
                     if(count($proveedorExiste)){
                         $mensaje = "El Proveedor Ya existe.";
@@ -194,7 +180,7 @@ class ProveedoreController extends Controller
                     $estatus = $estatusEditar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
                 }
             }else{
-                $mensaje = "El Proveedor se consiguio en los registros.";
+                $mensaje = "El Proveedor no se consiguio en los registros.";
                 $estatus = Response::HTTP_NOT_FOUND;
             }
             $proveedor = $estatusEditar ? $proveedor = Proveedore::where('id', $idProveedor)->get() : [];
@@ -207,8 +193,8 @@ class ProveedoreController extends Controller
 
         } catch (\Throwable $th) {
             return response()->json([
-                "mensaje" => "Error al editar el Proveedor, " . $th->getMessage(),
-                "data" => [],
+                "mensaje" => "Usted intento cambiar el RIF del proveedor pero uso uno ya existente, por favor use uno que no este registrado.",
+                "data" => $proveedor,
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

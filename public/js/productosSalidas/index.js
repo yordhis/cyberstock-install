@@ -1016,21 +1016,31 @@ const hanledBuscarProducto = async (e) => {
         elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
 
-        let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
-            lista = '';
+        // let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
+        let lista = '';
+        await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro)
+        .then(async res => {
+            if (!res.data.data.length) {
+                return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), 
+                elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value ="";
+            }else{
 
-        if (!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
+                await res.data.data.forEach(async (producto) => {      
+                    producto.tasa = res.tasa;
+                    lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
+                });
+       
+                elementoTablaBuscarProducto.innerHTML = lista;
+                elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
+                e.target.value ="";
+                await cargarAccionesDelCustomModal();
+                await cargarEventosDeAgregarProductoAFactura();
+            }
+            
+        })
 
-        resultado.data.data.forEach(async (producto) => {
 
-            producto.tasa = resultado.tasa;
-            lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
-        });
 
-        elementoTablaBuscarProducto.innerHTML = lista;
-        elementoTotalProductos.innerHTML = `<p>Total resultados: ${resultado.data.total}</p>`;
-        await cargarAccionesDelCustomModal();
-        await cargarEventosDeAgregarProductoAFactura();
     }
 
 };

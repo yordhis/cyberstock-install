@@ -52,7 +52,7 @@ const componenteTarjetaCliente = (proveedor, mensaje) => {
                 <i class="bi bi-search fs-4"></i>
             </a>
             <a href="${proveedor.codigo}" class="card-link me-3 acciones-cliente" id="activarFormEditarCliente">
-                <i class="bi bi-pencil-fill fs-4"></i>
+                <i class="bi bi-pencil-fill fs-4" id="${proveedor.codigo}"></i>
             </a>
             <a href="#" class="card-link me-3 acciones-cliente" id="activarFormCrearCliente">
                 <i class="bi bi-person-add fs-4"></i>
@@ -712,8 +712,8 @@ const hanledAccionesCliente = async (e) => {
         case 'activarFormEditarCliente':
             elementoTarjetaCliente.innerHTML = spinner();
             getProveedor({
-                filtro: e.target.href,
-                campo: ['codigo', 'empresa']
+                filtro: e.target.id,
+                campo: ['codigo']
             }).then(res => {
                 if (res.estatus == 200) {
                     elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
@@ -795,44 +795,66 @@ const hanledFormulario = async (e) => {
             if (!resultado) return;
             e.target.innerHTML = spinner();
 
-            proveedor = await storeProveedor(resultado);
+            await storeProveedor(resultado)
+            .then(res => {
+                log(res)
+                if (res.estatus != 201) {
+                    $.alert({
+                        title: "Error al registrar nuevo proveedor.",
+                        content: res.mensaje,
+                        type: "red"
+                    })
+                    elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                
+                } else {
+                    /** Seteamos el proveedor en la factura de local storage */
+                    factura.identificacion = res.data.codigo;
+                    factura.tipoDocumento = res.data.tipo_documento;
+                    factura.razon_social = res.data.empresa;
+                    localStorage.setItem('facturaInventario', JSON.stringify(factura));
+    
+                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                }
+                
+            })
 
-            if (proveedor.estatus == 401) {
-                elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
-                let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
-                elementoValidarFormCrearCliente.innerHTML = componenteAlerta(proveedor.mensaje, proveedor.estatus)
-                cargarEventosAccionesDelCliente();
-                cargarEventosDeFormularios();
-                return setTimeout(() => {
-                    elementoValidarFormCrearCliente.innerHTML = '';
-                }, 1500);
-            } else {
-                /** Seteamos el proveedor en la factura de local storage */
-                factura.identificacion = proveedor.data.codigo;
-                factura.tipoDocumento = proveedor.data.tipo_documento;
-                factura.razon_social = proveedor.data.empresa;
-                localStorage.setItem('facturaInventario', JSON.stringify(factura));
-
-                elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([proveedor.data], proveedor.mensaje);
-                cargarEventosAccionesDelCliente();
-                cargarEventosDeFormularios();
-            }
 
             break;
         case 'formEditarCliente':
             resultado = await validarDataDeFormularioCliente(e.target)
             if (!resultado) return;
             e.target.innerHTML = spinner();
-            proveedor = await updateProveedor(e.target.action, resultado);
-            /** Seteamos el proveedor en la factura de local storage */
-            factura.identificacion = proveedor.data[0].codigo;
-            factura.tipoDocumento = proveedor.data[0].tipo_documento;
-            factura.razon_social = proveedor.data[0].empresa;
-            localStorage.setItem('facturaInventario', JSON.stringify(factura));
+            await updateProveedor(e.target.action, resultado)
+            .then(res => {
+                log(res)
+                if(res.estatus != 200){
 
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(proveedor.data, proveedor.mensaje);
-            cargarEventosAccionesDelCliente();
-            cargarEventosDeFormularios();
+                    return $.alert({
+                        title:"Error al editar el proveedor",
+                        content: res.mensaje,
+                        type: "red",
+                        action: function(){
+                            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
+                            cargarEventosAccionesDelCliente();
+                            cargarEventosDeFormularios();
+                        }()
+                    });
+                }else{
+                    /** Seteamos el proveedor en la factura de local storage */
+                    factura.identificacion = res.data[0].codigo;
+                    factura.tipoDocumento = res.data[0].tipo_documento;
+                    factura.razon_social = res.data[0].empresa;
+                    localStorage.setItem('facturaInventario', JSON.stringify(factura));
+        
+                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                }
+            })
 
             break
 
@@ -952,25 +974,31 @@ const hanledBuscarProducto = async (e) => {
             numeroDePagina: 100
         };
 
-
         if (filtro.filtro == "") return elementoTablaBuscarProducto.innerHTML = componenteListaDeProductoFiltrados({ estatus: 0 }), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
 
         elementoTotalProductos.innerHTML = spinner();
         elementoTablaBuscarProducto.innerHTML = '';
 
-        let resultado = await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro),
-            lista = '';
-        log(resultado)
-        if (!resultado.data.data.length) return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`;
-        resultado.data.data.forEach(async (producto) => {
-            producto.tasa = resultado.tasa;
-            lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
-        });
+        let lista = '';
+        await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro)
+        .then(async res => {
 
-        elementoTablaBuscarProducto.innerHTML = lista;
-        elementoTotalProductos.innerHTML = `<p>Total resultados: ${resultado.data.total}</p>`;
-        await cargarAccionesDelCustomModal();
-        await cargarEventosDeAgregarProductoAFactura();
+            if (!res.data.data.length) {
+                return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), 
+                elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value="";
+            }else{
+                await res.data.data.forEach(async (producto) => {
+                    producto.tasa = res.tasa;
+                    lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
+                });
+
+                elementoTablaBuscarProducto.innerHTML = lista;
+                elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
+                e.target.value="";
+                await cargarAccionesDelCustomModal();
+                await cargarEventosDeAgregarProductoAFactura();
+            }
+        })
     }
 
 };
