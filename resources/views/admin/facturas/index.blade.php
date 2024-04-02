@@ -15,10 +15,65 @@
             <div class="col-lg-12 mt-4 ">
                 
                 <div class="card">
+                    <div class="card-header">
+                        <form action="{{route('admin.facturas.index')}}" method="GET" id="filtro" >
+                            @csrf
+                            @method('GET')
+                                <div class="input-group mb-3">
+                                
+                                    <div class="form-floating ">
+                                        <input type="text" class="form-control" id="floatingInput" 
+                                        name="filtro"
+                                        value="{{ $request->filtro ?? ''}}"
+                                        placeholder="Ingrese código, rif o nombre" required>
+                                        <label for="floatingInput">Buscar</label>
+                                    </div>
+                                    
+                                    <div class="form-floating">
+                                        <select class="form-select" id="floatingSelect"
+                                        name="campo" 
+                                        aria-label="Floating label select example">
+                                            @if ($request->campo)
+                                                <option value="{{ $request->campo }}" selected> 
+                                                    @switch($request->campo)
+                                                        @case('codigo')
+                                                                Codigo de factura
+                                                            @break
+                                                        @case('identificacion')
+                                                                Rif o cédula del cliente
+                                                            @break
+                                                        @case('razon_social')
+                                                                Por nombre de cliente
+                                                            @break
+                                                        @default
+                                                            
+                                                    @endswitch
+                                                </option>
+                                            @else
+                                                <option value="codigo" selected>Codigo de factura</option>
+                                            @endif
+                                            
+                                            <option value="codigo">Codigo de factura</option>
+                                            <option value="identificacion">Rif o cédula del cliente</option>
+                                            <option value="razon_social">Por nombre de cliente</option>
+                                        </select>
+                                        <label for="floatingSelect">Seleccione el tipo de filtro</label>
+                                    </div>
+                                    
+                                    
+                                        <button type="submit" class="btn btn-primary input-group-text"
+                                        id="inputGroup-sizing-default">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                  
+                                </div>  
+                            </form>
+                          
+                    </div>
                     <div class="card-body table-responsive">
                     
                         <!-- Table with stripped rows -->
-                            <table class="table" id="myTable">
+                            <table class="table">
                                 <thead>
                                     <tr>
 
@@ -84,8 +139,8 @@
                      
                         <!-- End Table with stripped rows -->
                         <!-- PAGINACION BLADE -->
-                        {{-- {{ $facturas->links() }}
-                        {{ "Total de facturas registrados: " . $facturas->total() }} --}}
+                        {{ $facturas->appends(["filtro" => $request->filtro, "campo" => $request->campo])->links() }}
+                        {{ "Total de facturas registrados: " . $facturas->total() }}
                     <!-- CIERRE PAGINACION BLADE -->
 
                     </div>

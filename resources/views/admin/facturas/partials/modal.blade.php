@@ -16,7 +16,7 @@
             ¿Esta seguro que desea eliminar la factura del cliente: <span class="text-danger fs-5">{{$factura->razon_social}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="{{ route('admin.facturas.destroy', $factura->id)}}" method="post" target="_self">
+            <form action="{{ route('admin.facturas.destroy', $factura->id)}}" method="post" >
             @csrf
             @method('delete')
                

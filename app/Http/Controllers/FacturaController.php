@@ -35,28 +35,38 @@ class FacturaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(HttpRequest $request)
     {
+        
         try {
             $menuSuperior = $this->data->menuSuperior;
+            $numeroDePagina = 15;
             $pathname = Request::path();
-            $facturas = Factura::orderBy('codigo', 'DESC')->get();
+            
+            switch ($request->campo) {
+                case 'codigo':
+                case 'identificacion':
+                    $facturas = Factura::where($request->campo, $request->filtro)
+                    ->paginate($numeroDePagina);                
+                    break;
+                case 'razon_social':
+                    $facturas = Factura::where($request->campo, 'like', "%{$request->filtro}%")
+                    ->orderBy('razon_social', 'asc')->paginate($numeroDePagina);
+                    break;
 
-            if (count($facturas)) {
-                foreach ($facturas as $key => $factura) {
-                    $factura->carrito = Carrito::where('codigo', $factura->codigo)->get();
-                    // $factura->total_articulos = Carrito::where('codigo', $factura->codigo)->count();
-                }
+                default:
+                    $facturas = Factura::orderBy('codigo', 'DESC')->paginate($numeroDePagina);
+                    break;
             }
 
-            // $pos = count(Po::all()) ? Po::all()[0]: [];
-
-            return view('admin.facturas.index', compact('facturas', 'menuSuperior', 'pathname'));
+            return view('admin.facturas.index', compact('facturas', 'menuSuperior', 'pathname', 'request'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
         }
     }
+   
+ 
 
     /**
      * DESPLIEGA LA VISTA DE LA FACTURA DE MANERA ESPESIFICA
@@ -117,10 +127,7 @@ class FacturaController extends Controller
             /** registramos movimiento al usuario */
             Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK, "Acción de eliminar factura ({$factura->codigo})");
 
-            return redirect()->route('admin.facturas.index', [
-                "mensaje" => "Factura eliminada correctamente",
-                "estatus" => Response::HTTP_OK
-            ]);
+            return back();
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar ELIMINAR factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

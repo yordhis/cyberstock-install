@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
 
     /** ADMINISTRADOR */
         /** RUTAS DE FACTURAS */
+        // Route::get('/facturas/filtrar', [FacturaController::class, "filtrar"])->name('admin.facturas.filtrar');
         Route::get('/facturas/{id}', [FacturaController::class, "show"])->name('admin.factura.ver');
         Route::resource('/cobrar', CobrarController::class)->names('admin.cuentas.por.cobrar');
         Route::resource('/pagar', PagarController::class)->names('admin.cuentas.por.pagar');

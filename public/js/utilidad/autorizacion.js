@@ -70,7 +70,7 @@ const componenteAlertaTwo = (mensaje, estatus, clasesExtras = "") => {
 
 /** MANAJADORES DE EVENTOS */
 const hanledFormularioDeAutorizacion = async (e) => {
-    if(e.target.id != "cerrarSesion"){
+    if(e.target.id != "cerrarSesion" && e.target.id != "filtro"){
         e.preventDefault();
 
         let autorizacion = new Autorizacion,
