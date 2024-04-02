@@ -92,7 +92,7 @@ const componenteTarjetaCliente = (cliente, mensaje) => {
 
 };
 
-const componenteFormularioAgregarCliente = () => {
+const componenteFormularioAgregarCliente = (data = []) => {
     return `
     <div class="card-header p-0">
     <p class="text-danger  card-title text-center">
@@ -103,14 +103,16 @@ const componenteFormularioAgregarCliente = () => {
     <div class="card-body p-0">
         <form action="#" method="post" id="formCrearCliente">
             <div class="form-floating m-2">
-                <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="Ingrese nombre y apellido">
+                <input type="text" class="form-control" name="nombre" 
+                id="floatingInput" placeholder="Ingrese nombre y apellido"
+                value="${data.nombre ? data.nombre : ""}">
                 <span class="text-danger"></span>
                 <label for="floatingInput">Nombre y apelldio</label>
                 </div>
                 
             <div class="form-floating m-2">
                 <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
-                <option selected>Tipo de documento</option>
+                value="${data.tipo ? `<option value="${data.tipo}">${data.tipo}</option>` : `<option selected>Tipo de documento</option>`}"
                 <option value="V">V</option>
                 <option value="E">E</option>
                 <option value="J">J</option>
@@ -119,23 +121,28 @@ const componenteFormularioAgregarCliente = () => {
                 <label for="floatingSelect">Seleccione tipo de documento</label>
             </div>
             <div class="form-floating m-2">
-                <input type="number" class="form-control" name="identificacion" id="floatingInput" placeholder="Ingrese número de identificación.">
+                <input type="number" class="form-control" name="identificacion" 
+                id="floatingInput" placeholder="Ingrese número de identificación."
+                value="${data.identificacion ? data.identificacion : ""}">
                 <span class="text-danger"></span>
                 <label for="floatingInput">RIF O ID</label>
             </div>
 
             <div class="form-floating m-2">
-                <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono.">
+                <input type="text" class="form-control" name="telefono" id="floatingInput" placeholder="Ingrese número de teléfono."
+                value="${data.telefono ? data.telefono : ""}">
                 <span class="text-danger"></span>
                 <label for="floatingInput">TELÉFONO</label>
             </div>
             <div class="form-floating m-2">
-                <input type="text" class="form-control" name="direccion" id="floatingInput" placeholder="Ingrese dirección.">
+                <input type="text" class="form-control" name="direccion" id="floatingInput" placeholder="Ingrese dirección."
+                value="${data.direccion ? data.direccion : ""}">
                 <span class="text-danger"></span>
                 <label for="floatingInput">DIRECCIÓN</label>
             </div>
             <div class="form-floating m-2">
-                <input type="text" class="form-control" name="correo" id="floatingInput" placeholder="Ingrese correo electrónico.">
+                <input type="text" class="form-control" name="correo" id="floatingInput" placeholder="Ingrese correo electrónico."
+                value="${data.correo ? data.correo : ""}">
                 <span class="text-danger"></span>
                 <label for="floatingInput">E-MAIL</label>
             </div>
@@ -731,28 +738,34 @@ const hanledFormulario = async (e) => {
             if (!resultado) return;
             e.target.innerHTML = spinner();
 
-            cliente = await storeCliente(resultado);
+           await storeCliente(resultado)
+           .then(res => {
+                if(res.estatus != 201){
+                    $.alert({
+                        title: "¡Error al registrar el cliente!",
+                        content: res.mensaje,
+                        type: "red",
+                        action: function(){
+                            elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente(resultado);
+                            cargarEventosAccionesDelCliente();
+                            cargarEventosDeFormularios();
+                        }()
+                    })
+                   
+                }else{
+                    /** Seteamos el cliente en la factura de local storage */
+                    factura.identificacion = res.data.identificacion;
+                    factura.tipoDocumento = res.data.tipo;
+                    factura.razon_social = res.data.nombre;
+                    localStorage.setItem('factura', JSON.stringify(factura));
 
-            if (cliente.estatus == 401) {
-                elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
-                let elementoValidarFormCrearCliente = d.querySelector('#respuesta-de-validacion');
-                elementoValidarFormCrearCliente.innerHTML = componenteAlerta(cliente.mensaje, cliente.estatus)
-                cargarEventosAccionesDelCliente();
-                cargarEventosDeFormularios();
-                return setTimeout(() => {
-                    elementoValidarFormCrearCliente.innerHTML = '';
-                }, 1500);
-            } else {
-                /** Seteamos el cliente en la factura de local storage */
-                factura.identificacion = cliente.data.identificacion;
-                factura.tipoDocumento = cliente.data.tipo;
-                factura.razon_social = cliente.data.nombre;
-                localStorage.setItem('factura', JSON.stringify(factura));
+                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                }
+           });
 
-                elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([cliente.data], cliente.mensaje);
-                cargarEventosAccionesDelCliente();
-                cargarEventosDeFormularios();
-            }
+          
 
             break;
         case 'formEditarCliente':
@@ -760,16 +773,34 @@ const hanledFormulario = async (e) => {
             if (!resultado) return;
             e.target.innerHTML = spinner();
 
-            cliente = await updateCliente(e.target.action, resultado);
-            /** Seteamos el cliente en la factura de local storage */
-            factura.identificacion = cliente.data[0].identificacion;
-            factura.tipoDocumento = cliente.data[0].tipo;
-            factura.razon_social = cliente.data[0].nombre;
-            localStorage.setItem('factura', JSON.stringify(factura));
+            await updateCliente(e.target.action, resultado)
+            .then(res =>{
+                log(res)
+                if(res.estatus != 200){
+                    $.alert({
+                        title: "¡Error al registrar cliente!",
+                        content: res.mensaje,
+                        type: "red",
+                        action: function(){
+                            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
+                            cargarEventosAccionesDelCliente();
+                            cargarEventosDeFormularios();
+                        }()
+                    });
+                   
+                }else{
+                     /** Seteamos el cliente en la factura de local storage */
+                    factura.identificacion = res.data[0].identificacion;
+                    factura.tipoDocumento = res.data[0].tipo;
+                    factura.razon_social = res.data[0].nombre;
+                    localStorage.setItem('factura', JSON.stringify(factura));
 
-            elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(cliente.data, cliente.mensaje);
-            cargarEventosAccionesDelCliente();
-            cargarEventosDeFormularios();
+                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
+                    cargarEventosAccionesDelCliente();
+                    cargarEventosDeFormularios();
+                }
+            });
+           
 
             break
 

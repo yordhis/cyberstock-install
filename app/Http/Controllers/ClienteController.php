@@ -116,7 +116,7 @@ class ClienteController extends Controller
             $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
         
             if(count($clienteExiste)){
-                $mensaje = "El cliente Ya existe.";
+                $mensaje = "El RIF o cédula del cliente ya esta registrado con otro cliente, por favor ingrese otro número de documento.";
                 $estatus = Response::HTTP_UNAUTHORIZED;
 
                 return response()->json([
@@ -150,7 +150,7 @@ class ClienteController extends Controller
 
     public function updateCliente( HttpRequest $request,  $idCliente ){
         try {
-          
+            $estatusEditar = "";
             $cliente = Cliente::where('id', $idCliente)->get();
 
             if(count($cliente)){
@@ -158,10 +158,10 @@ class ClienteController extends Controller
                     $clienteExiste = Cliente::where('identificacion', $request->identificacion)->get();
                     
                     if(count($clienteExiste)){
-                        $mensaje = "El cliente Ya existe.";
+                        $mensaje = "El RIF o cédula ingresado ya esta registrado con otro cliente, por favor ingrese un número de documento diferente";
                         $estatus = Response::HTTP_UNAUTHORIZED;
                     }else{
-                        $estatusEditar = Cliente::where( 'id', $idCliente )->update($request->all());
+                       $estatusEditar = Cliente::where( 'id', $idCliente )->update($request->all());
                         $mensaje = $estatusEditar ? "El cliente se actualizó correctamente." : "El cliente no se actualizó";
                         $estatus = $estatusEditar ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
                     }
@@ -174,7 +174,7 @@ class ClienteController extends Controller
                 $mensaje = "El cliente se consiguio en los registros.";
                 $estatus = Response::HTTP_NOT_FOUND;
             }
-            $cliente = $estatusEditar ? $cliente = Cliente::where('id', $idCliente)->get() : [];
+            $cliente = Cliente::where('id', $idCliente)->get();
             return response()->json([
                 "mensaje" => $mensaje,
                 "data" => $cliente,
@@ -184,8 +184,8 @@ class ClienteController extends Controller
 
         } catch (\Throwable $th) {
             return response()->json([
-                "mensaje" => "Error al editar el cliente, " . $th->getMessage(),
-                "data" => [],
+                "mensaje" => $th->getMessage(),
+                "data" =>  $cliente,
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
