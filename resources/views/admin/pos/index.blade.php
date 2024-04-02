@@ -179,7 +179,7 @@
                     </div>
                     <div class="col-sm-12  acciones-factura">
                         <button class="btn btn-warning  w-100 my-2" 
-                            id="finalizarFacturacion" >
+                            id="resetearFactura" >
                             <i class="bi bi-arrow-clockwise fs-3 text-white"></i>
                             <p> Resetear </p> 
                         </button>

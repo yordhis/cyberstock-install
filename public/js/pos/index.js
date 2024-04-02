@@ -639,6 +639,8 @@ const hanledLoad = async (e) => {
 
         /** Validamos si el carrito tiene productos para cargarlos a la factura */
         carritoStorage = localStorage.getItem('carrito') ? JSON.parse(localStorage.getItem('carrito')) : [];
+         /** CARGAMOS EL CARRITO */
+         localStorage.setItem('carrito', JSON.stringify(carritoStorage));
         listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage);
 
         /** Cargamos los datos de la factura */
@@ -1286,6 +1288,30 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             /** Eliminamos la factura del Storagr */
             localStorage.removeItem('carrito');
             localStorage.removeItem('factura');
+            window.location.href = "/pos";
+            break;
+        case 'resetearFactura':
+            log('Resetear Factura')
+            log(factura)
+            factura = {
+                codigo: factura.codigo,
+                razon_social: '', // nombre de cliente o proveedor
+                identificacion: '', // numero de documento
+                subtotal: 0, // se guarda en divisas
+                total: 0,
+                tasa: 0, // tasa en el momento que se hizo la transaccion
+                iva: 0, // impuesto
+                tipo: 'SALIDA', // fiscal o no fialcal
+                concepto: 'VENTA', // venta, compra ...
+                descuento: 0, // descuento
+                fecha: '', // fecha venta, compra ...
+                metodos: '',
+                estatusDeDevolucion: false,
+                estatus: true
+            }
+            /** Eliminamos la factura del Storagr */
+            localStorage.setItem('carrito', []);
+            localStorage.setItem('factura', JSON.stringify(factura));
             window.location.href = "/pos";
             break;
 
