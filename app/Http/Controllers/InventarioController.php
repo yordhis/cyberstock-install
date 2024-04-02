@@ -399,12 +399,13 @@ class InventarioController extends Controller
                 return response()->json([
                     "mensaje" => "PRODUCTO ELIMINADO DEL INVENTARIO EXITOSAMENTE",
                     "data" => [],
+                    "url" => back(),
                     "estatus" => Response::HTTP_OK
                 ], Response::HTTP_OK);
             } else {
                 return response()->json([
                     "mensaje" => "EL PRODUCTO NO SE PUDO ELIMINAR DEL INVENTARIO!",
-                    "data" => [],
+                    "data" => back(),
                     "estatus" => Response::HTTP_NOT_FOUND
                 ], Response::HTTP_NOT_FOUND);
             }

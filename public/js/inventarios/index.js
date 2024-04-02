@@ -7,7 +7,9 @@ elementoInputFiltroLimpiar = d.querySelector('#filtro-limpiar'),
 elementoSpanInvalido = d.querySelectorAll('.invalido'),
 elementoTablaPaginacion = d.querySelector('.paginacion'),
 elementoBotonResetearFiltro = d.querySelector('#limpiarFiltro'),
-config = {};
+config = {
+    href: ""
+};
 
 
 
@@ -38,16 +40,19 @@ const componenteFila = (data) => {
                 
                 <td class="d-flex align-items-stretch ">
                     ${componenteModalVer(data)}
-                    ${componenteModalEliminar(data)}
+                    
+                    <button type="button" class="btn btn-danger m-1 btn-eliminar" id="${data.id}" ><i class="bi bi-trash" id="${data.id}"></i></button>
+                    
                     ${componenteModalEditar(data)}
                     <!--<button type="button" class="btn btn-success m-1" id="activarModalVer/${data.id}"><i class="bi bi-eye"></i></button>-->
-                    <!--<button type="button" class="btn btn-danger m-1" id="activarModalEliminar/${data.id}"><i class="bi bi-trash"></i></button>-->
                     <!--<button type="button" class="btn btn-warning m-1" id="activarModalEditar/${data.id}"><i class="bi bi-pencil"></i></button>-->
                 </td>
             </tr>
         `;
     }
 };
+
+// ${componenteModalEliminar(data)}
 
 const componentePaginacion = (data) => {
     let itemsLi = '';
@@ -276,25 +281,72 @@ const hanledLoad = async (e) => {
 
 const hanledBotonEliminar = async (e) => {
     e.preventDefault();
-    // log(e.target.parentElement.parentElement.parentElement.isConnected);
+   log(config)
+    $.confirm({
+        title: "¿Seguro que deseas eliminar?",
+        content: "Click confirmar para continuar o cancelar para terminar la acción.",
+        type:"orange",
+        buttons:{
+            confirm:{ 
+                text: "SI, CONFIRMAR.",
+                btnClass: "btn-green",
+                action: async function() {
+                    log(e.target)
+                    await deleteProductoDelInventario(e.target.id)
+                    .then(res => {
+                        log(res)
+                        if(res.estatus != 200){
+                            $.alert({
+                                title:"Error al intentar eliminar el producto del inventario",
+                                content: res.mensaje,
+                                type:"red",
+                                action: function(){
+                
+                                }()
+                            })
+                        }else{
+                            $.alert({
+                                title:"Acción ejecutada con exito.",
+                                content: res.mensaje,
+                                type:"green",
+                                action: async function(){
+                                    await getInventariosFiltro(config.href,  config)
+                                    .then(async res =>{
+                                        elementoTablaCuerpo.innerHTML='';
+                                        await res.data.data.forEach( element => {
+                                            element.tasa = res.tasa;
+                                            elementoTablaCuerpo.innerHTML += componenteFila(adaptadorDeProducto(element));
+                                        });
+                                
+                                        /** Activamos los eventos del boton eliminar */
+                                        await cargarEventosDelBotonEliminar();
+                                        await cargarEventosDelBotonEditar();
+                                    
+                                        elementoTablaPaginacion.innerHTML = componentePaginacion(res.data);
+                                    })
+                                }()
+                            })
+                        }
+                    });
+                }
+                
+            },
+            cancel:{
+                text: "NO, DECLINAR ACCIÓN.",
+                btnClass: "btn-red",
+            }
+        }
+    })
  
     // Asignamos el spinner()
-    e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+    // e.target.parentElement.parentElement.children[1].innerHTML = spinner();
 
     // Ocultamos el boton eliminar al hacer la solicitud de eliminar
-    e.target.parentElement.children[1].classList.add('d-none');
+    // e.target.parentElement.children[1].classList.add('d-none');
 
     // Hacemos la peticion a la API para eliminar el producto del inventario
-    let resultado = await deleteProductoDelInventario(e.target.id);
-
-    // retornamos una respuesta
-    // e.target.parentElement.parentElement.children[1].innerHTML = respuesta( resultado.mensaje, resultado.estatus );
-    
-    setTimeout(() => {
-        window.location.href=`${URL_BASE_APP}/inventarios?mensaje=${resultado.mensaje}&estatus=${resultado.estatus}`;
-    }, 500);
+ 
    
-
 };
 
 const hanledPaginacion = async (e) => {
@@ -303,6 +355,7 @@ const hanledPaginacion = async (e) => {
         if(e.target.href.includes('getInventariosFiltro')){
             elementoTablaPaginacion.innerHTML = '';
             elementoTablaCuerpo.innerHTML = spinner();
+            config.href = e.target.href;    
 
             let inventarios = await getInventariosFiltro(`${e.target.href}`,  config);
         
@@ -323,6 +376,7 @@ const hanledPaginacion = async (e) => {
             }
         }else{
             elementoTablaPaginacion.innerHTML = '';
+            config.href = e.target.href;  
             await getLista(e.target.href);
             
             /** Activamos los eventos del boton eliminar */
