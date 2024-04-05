@@ -28,7 +28,7 @@ const componenteFila = (data) => {
                 <td>${data.numero}</td>
                 <td>${data.codigo}</td>
                 <td style="max-width:200px;">${data.descripcion}</td>
-                <td>${data.cantidad}</td>
+                <td>${darFormatoDeNumero(data.cantidad)}</td>
                 <td>REF ${darFormatoDeNumero(data.costo)}</td>
                 <td>
                     BS ${darFormatoDeNumero(data.pvp)} <br>

@@ -161,7 +161,7 @@ const reportePorRangoDetalladolHtml = (reporte, empresa, config) => {
                 <td class="descripcion-producto"> (${producto.codigo_producto}) - ${producto.descripcion} </td>
                 <td class="numero">${producto.cantidad}</td>
                 <td class="numero">${darFormatoDeNumero(producto.costoProveedor)}</td>
-                <td class="numero">${producto.iva == 0 ? 'Excento' : darFormatoDeNumero(producto.iva * producto.subtotal) }</td>
+                <td class="numero">${producto.iva == 0 ? 'Exento' : darFormatoDeNumero(producto.iva * producto.subtotal) }</td>
                 <td class="numero">${darFormatoDeNumero(producto.costo)}</td>
                 <td class="numero">${darFormatoDeNumero(producto.subtotal)}</td>
             </tr>
@@ -276,7 +276,7 @@ const reportePorRangoGeneralHtml = (reporte, empresa, config) => {
                 <td class="descripcion">${formasDePagoHtml}</td>
                 <td class="numero">${factura.cantidad_articulos}</td>
                 <td class="numero">${darFormatoDeNumero(factura.subtotal)}</td>
-                <td class="numero">${factura.iva == 0 ? 'Excento' : darFormatoDeNumero(factura.iva * factura.subtotal) }</td>
+                <td class="numero">${factura.iva == 0 ? 'Exento' : darFormatoDeNumero(factura.iva * factura.subtotal) }</td>
                 <td class="numero">${darFormatoDeNumero(factura.total)}</td>
             </tr>
         `;
@@ -412,7 +412,7 @@ const reporteHtmlGeneral = (reporte, empresa, config) => {
                 <td class="numero">${formasDePagoHtml}</td>
                 <td class="numero">${factura.cantidad_articulos}</td>
                 <td class="numero">${darFormatoDeNumero(factura.subtotal)}</td>
-                <td class="numero">${factura.iva == 0 ? 'Excento' : darFormatoDeNumero(factura.iva * factura.subtotal) }</td>
+                <td class="numero">${factura.iva == 0 ? 'Exento' : darFormatoDeNumero(factura.iva * factura.subtotal) }</td>
                 <td class="numero">${darFormatoDeNumero(factura.total)}</td>
             </tr>
         `;
@@ -524,7 +524,7 @@ const reporteHtml = (reporte, empresa, config) => {
                 <td class="descripcion-producto"> (${producto.codigo_producto}) - ${producto.descripcion} </td>
                 <td class="numero">${producto.cantidad}</td>
                 <td class="numero">${darFormatoDeNumero(producto.costoProveedor)}</td>
-                <td class="numero">${producto.iva == 0 ? 'Excento' : darFormatoDeNumero(producto.iva * producto.subtotal) }</td>
+                <td class="numero">${producto.iva == 0 ? 'Exento' : darFormatoDeNumero(producto.iva * producto.subtotal) }</td>
                 <td class="numero">${darFormatoDeNumero(producto.costo)}</td>
                 <td class="numero">${darFormatoDeNumero(producto.subtotal)}</td>
             </tr>

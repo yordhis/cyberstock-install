@@ -20,7 +20,7 @@ let elementoTarjetaCliente = d.querySelector('#tarjetaCliente'),
         tasa: '', // tasa en el momento que se hizo la transaccion
         iva: '', // impuesto
         tipo: 'ENTRADA', // 
-        concepto: '', // venta, compra ...
+        concepto: 'COMPRA', // venta, compra ...
         descuento: '', // descuento
         fecha: '', // fecha venta, compra ...
         observacion: '', // fecha venta, compra ...
@@ -202,7 +202,7 @@ const componenteListaClientes = (clientes) => {
     return `
         <div class="list-group">
             <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
-                Seleccione un cliente
+                Seleccione un proveedor
             </button>
 
             ${listaHtml}

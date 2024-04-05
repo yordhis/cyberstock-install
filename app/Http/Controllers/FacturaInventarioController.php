@@ -24,7 +24,8 @@ class FacturaInventarioController extends Controller
     {
         try {
             
-            $resultado =FacturaInventario::updateOrCreate(
+            /** Registramos la factura de compra */
+            $resultado = FacturaInventario::updateOrCreate(
                 [
                     "codigo" => $request->codigo
                 ],
@@ -44,7 +45,8 @@ class FacturaInventarioController extends Controller
                     "metodos" => $request->metodos
                 ]
             );
-            $mensaje = $resultado ? "Se proceso la compra correctamente correctamente." : "No se registro la factura de compra";
+
+            $mensaje = $resultado ? "Se proceso la compra correctamente." : "No se registro la factura de compra";
             $estatus = $resultado ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
             
             if($resultado){
@@ -80,8 +82,9 @@ class FacturaInventarioController extends Controller
                             "pvp" => $producto->pvp,
                             "pvp_2" => $producto->pvp_2 ?? $cantidadActualProducto[0]->pvp_2,
                             "pvp_3" => $producto->pvp_3 ?? $cantidadActualProducto[0]->pvp_3,
-                            "fecha_entrada" => date('Y-m-d'),
-                    ]);
+                            "fecha_entrada" => date('Y-m-d')
+                        ]
+                    );
 
                     $totalArticulos = $totalArticulos  + $producto->cantidad;
                 } 
