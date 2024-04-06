@@ -165,7 +165,7 @@ const hanledFormulario = async (e) => {
                     for (const iterator of e.target) if(iterator.localName == "button") iterator.disabled=false;
                     
                     /** consultamos para pagina y previsualizar */
-                    await getLista(config);
+                    await getLista(inventarioAdaptado,config);
               
                     
                 });
@@ -356,8 +356,8 @@ function adaptadorDeProducto(data, config){
 };
 
 /** Retorna la lista de inventario */
-async function getLista(config, url = `${URL_BASE}/getInventariosFiltro`){
-
+async function getLista(data, config, url = `${URL_BASE}/getInventariosFiltro`){
+    console.log(data);
     /** Mostramos una precarga */
     elementoTablaCuerpo.innerHTML = spinner();
 

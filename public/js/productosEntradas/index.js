@@ -585,7 +585,7 @@ const hanledLoad = async () => {
     if (!factura.estatus) {
         $.confirm({
             theme: 'supervan',
-            title: '¿Crear una factura?',
+            title: '¿Crear una factura de compra?',
             content: 'Click en Confirmar para crear factura o Cancelar para salir del pos',
             buttons: {
                 confirm: {
@@ -796,31 +796,31 @@ const hanledFormulario = async (e) => {
             e.target.innerHTML = spinner();
 
             await storeProveedor(resultado)
-            .then(res => {
-                log(res)
-                if (res.estatus != 201) {
-                    $.alert({
-                        title: "Error al registrar nuevo proveedor.",
-                        content: res.mensaje,
-                        type: "red"
-                    })
-                    elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                
-                } else {
-                    /** Seteamos el proveedor en la factura de local storage */
-                    factura.identificacion = res.data.codigo;
-                    factura.tipoDocumento = res.data.tipo_documento;
-                    factura.razon_social = res.data.empresa;
-                    localStorage.setItem('facturaInventario', JSON.stringify(factura));
-    
-                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                }
-                
-            })
+                .then(res => {
+                    log(res)
+                    if (res.estatus != 201) {
+                        $.alert({
+                            title: "Error al registrar nuevo proveedor.",
+                            content: res.mensaje,
+                            type: "red"
+                        })
+                        elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente();
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+
+                    } else {
+                        /** Seteamos el proveedor en la factura de local storage */
+                        factura.identificacion = res.data.codigo;
+                        factura.tipoDocumento = res.data.tipo_documento;
+                        factura.razon_social = res.data.empresa;
+                        localStorage.setItem('facturaInventario', JSON.stringify(factura));
+
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+                    }
+
+                })
 
 
             break;
@@ -829,32 +829,32 @@ const hanledFormulario = async (e) => {
             if (!resultado) return;
             e.target.innerHTML = spinner();
             await updateProveedor(e.target.action, resultado)
-            .then(res => {
-                log(res)
-                if(res.estatus != 200){
+                .then(res => {
+                    log(res)
+                    if (res.estatus != 200) {
 
-                    return $.alert({
-                        title:"Error al editar el proveedor",
-                        content: res.mensaje,
-                        type: "red",
-                        action: function(){
-                            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
-                            cargarEventosAccionesDelCliente();
-                            cargarEventosDeFormularios();
-                        }()
-                    });
-                }else{
-                    /** Seteamos el proveedor en la factura de local storage */
-                    factura.identificacion = res.data[0].codigo;
-                    factura.tipoDocumento = res.data[0].tipo_documento;
-                    factura.razon_social = res.data[0].empresa;
-                    localStorage.setItem('facturaInventario', JSON.stringify(factura));
-        
-                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                }
-            })
+                        return $.alert({
+                            title: "Error al editar el proveedor",
+                            content: res.mensaje,
+                            type: "red",
+                            action: function () {
+                                elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
+                                cargarEventosAccionesDelCliente();
+                                cargarEventosDeFormularios();
+                            }()
+                        });
+                    } else {
+                        /** Seteamos el proveedor en la factura de local storage */
+                        factura.identificacion = res.data[0].codigo;
+                        factura.tipoDocumento = res.data[0].tipo_documento;
+                        factura.razon_social = res.data[0].empresa;
+                        localStorage.setItem('facturaInventario', JSON.stringify(factura));
+
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+                    }
+                })
 
             break
 
@@ -981,24 +981,24 @@ const hanledBuscarProducto = async (e) => {
 
         let lista = '';
         await getProductosFiltro(`${URL_BASE}/getProductosFiltro`, filtro)
-        .then(async res => {
+            .then(async res => {
 
-            if (!res.data.data.length) {
-                return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), 
-                elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value="";
-            }else{
-                await res.data.data.forEach(async (producto) => {
-                    producto.tasa = res.tasa;
-                    lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
-                });
+                if (!res.data.data.length) {
+                    return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }),
+                        elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value = "";
+                } else {
+                    await res.data.data.forEach(async (producto) => {
+                        producto.tasa = res.tasa;
+                        lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
+                    });
 
-                elementoTablaBuscarProducto.innerHTML = lista;
-                elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
-                e.target.value="";
-                await cargarAccionesDelCustomModal();
-                await cargarEventosDeAgregarProductoAFactura();
-            }
-        })
+                    elementoTablaBuscarProducto.innerHTML = lista;
+                    elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
+                    e.target.value = "";
+                    await cargarAccionesDelCustomModal();
+                    await cargarEventosDeAgregarProductoAFactura();
+                }
+            })
     }
 
 };
@@ -1091,8 +1091,8 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         case 'salirDelPos':
 
             let redireccionar = "";
-            if(accion == "eliminarFactura") redireccionar = "/inventarios/crearEntrada";
-            if(accion == "salirDelPos")  redireccionar = "/inventarios/listaEntradas";
+            if (accion == "eliminarFactura") redireccionar = "/inventarios/crearEntrada";
+            if (accion == "salirDelPos") redireccionar = "/inventarios/listaEntradas";
 
             $.confirm({
                 title: "¿Desea anular factura?",
@@ -1146,7 +1146,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                     cancel: {
                         text: "NO, CANCELAR ACCIÓN.",
                         btnClass: "btn-red",
-                        action: async function () {}
+                        action: async function () { }
                     }
                 }
             })
@@ -1278,74 +1278,108 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                                     let facturaVender = JSON.parse(localStorage.getItem('facturaInventario')),
                                         carritoVender = JSON.parse(localStorage.getItem('carritoInventario'));
 
+
                                     /** Al procesar la facturacion del carrito agregamos al inventario las cantidades */
-                                    await carritoVender.forEach(async producto => {
-                                        facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, producto);
-                                    });
+                                    await facturarCarrito(`${URL_BASE}/facturarCarritoEntrada`, carritoVender)
+                                    .then(res => {
+                                        log(res);
+                                        if (res.estatus == 201) {
 
-                                    /** FACTURAR LA ENTRADA */
+                                            /** FACTURAR LA ENTRADA */
+                                            setFactura(`${URL_BASE}/setFacturaEntrada`, facturaVender)
+                                                .then(res => {
+                                                    if (res.estatus == 201) {
+                                                        $.confirm({
+                                                            title: '¡Factura de compra registrada correctamente!',
+                                                            type: 'green',
+                                                            content: '',
+                                                            buttons: {
 
-                                    /** Procesamos la factura y generamos el ticket */
-                                    await setFactura(`${URL_BASE}/setFacturaEntrada`, facturaVender)
-                                        .then(res => {
-                                            if (res.estatus == 201) {
-                                                $.confirm({
-                                                    title: '¡Factura de compra registrada correctamente!',
-                                                    type: 'green',
-                                                    content: '',
-                                                    buttons: {
+                                                                confirm: {
+                                                                    text: "Seguir comprando",
+                                                                    btnClass: "btn-green",
+                                                                    action: async function () {
 
-                                                        confirm: {
-                                                            text: "Seguir comprando",
-                                                            btnClass: "btn-green",
-                                                            action: async function () {
+                                                                        /** Eliminamos la factura del Storagr */
+                                                                        localStorage.removeItem('carritoInventario');
+                                                                        localStorage.removeItem('facturaInventario');
+                                                                        window.location.href = "/inventarios/crearEntrada";
+                                                                    }
 
-                                                                /** Eliminamos la factura del Storagr */
-                                                                localStorage.removeItem('carritoInventario');
-                                                                localStorage.removeItem('facturaInventario');
-                                                                window.location.href = "/inventarios/crearEntrada";
+                                                                },
+                                                                cancel: {
+                                                                    text: "Salir",
+                                                                    btnClass: "btn-red",
+                                                                    action: function () {
+                                                                        /** Eliminamos la factura del Storagr */
+                                                                        localStorage.removeItem('carritoInventario');
+                                                                        localStorage.removeItem('facturaInventario');
+                                                                        window.location.href = "/inventarios/listaEntradas";
+                                                                    }
+                                                                },
+                                                                somethingElse: {
+                                                                    text: 'Imprimir',
+                                                                    btnClass: 'btn-orange',
+                                                                    action: async function () {
+                                                                        localStorage.removeItem('carritoInventario');
+                                                                        localStorage.removeItem('facturaInventario');
+                                                                        let facturaDeCompra = await htmlTicketEntrada(res.data);
+                                                                        await imprimirElementoPos(facturaDeCompra);
+                                                                        window.location.href = "/inventarios/crearEntrada";
+                                                                    }
+                                                                }
                                                             }
-
-                                                        },
-                                                        cancel: {
-                                                            text: "Salir",
-                                                            btnClass: "btn-red",
-                                                            action: function () {
-                                                                /** Eliminamos la factura del Storagr */
-                                                                localStorage.removeItem('carritoInventario');
-                                                                localStorage.removeItem('facturaInventario');
-                                                                window.location.href = "/inventarios/listaEntradas";
-                                                            }
-                                                        },
-                                                        somethingElse: {
-                                                            text: 'Imprimir',
-                                                            btnClass: 'btn-orange',
-                                                            action: async function () {
-                                                                localStorage.removeItem('carritoInventario');
-                                                                localStorage.removeItem('facturaInventario');
-                                                                let facturaDeCompra = await htmlTicketEntrada(res.data);
-                                                                await imprimirElementoPos(facturaDeCompra);
-                                                                window.location.href = "/inventarios/crearEntrada";
-                                                            }
-                                                        }
+                                                        });
+                                                    } else {
+                                                        $.alert({
+                                                            title: 'Error al registrar factura de compra!',
+                                                            type: "red",
+                                                            content: res.mensaje
+                                                        });
                                                     }
                                                 });
-                                            } else {
-                                                $.alert({
-                                                    title: 'Error al registrar factura de compra!',
-                                                    type: "red",
-                                                    content: res.mensaje
-                                                });
-                                            }
-                                        });
+                                        } else {
+                                            /** Destroy el carrito */
+                                            destroyCarrito(`${URL_BASE}/destroyCarrito/${facturaVender.codigo}`)
+                                            .then(resDestroy => {
+                                                /** respuesta */
+                                                log(resDestroy)
+                                                if(resDestroy.estatus == 200){
+                                                    $.alert({
+                                                        title: "¡Conflicto de datos!",
+                                                        content: resDestroy.mensaje,
+                                                        type: "red",
+                                                        action: function(){
+                                                            hanledLoad()
+                                                        }()
 
+                                                    })
+                                                }else{
+                                                    $.alert({
+                                                        title: "¡Error al facturar!",
+                                                        content: resDestroy.mensaje,
+                                                        type: "red",
+                                                        action: function(){
+                                                            hanledLoad()
+                                                        }()
+                                                    })
+                                                }
+
+                                            })
+                                            
+                                        }
+                                    });
                                 }
                             },
                             cancel: {
                                 text: "No, seguir configurando.",
                                 btnClass: "btn-red",
                                 action: function () {
-                                    $.alert('Termine de configurar la factura de compra, por favor.');
+                                    $.alert({
+                                        title: "",
+                                        type: "orange",
+                                        content: 'Termine de configurar la factura de compra, por favor.'
+                                    });
                                 }
                             },
                         }

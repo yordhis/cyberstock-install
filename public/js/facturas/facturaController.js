@@ -26,6 +26,7 @@ const getCodigoFacturaE = async (url) => {
     .catch(err => err)
     .then(data => data)
 };
+
 const getCodigoFactura = async (url) => {
     return await fetch(`${url}`, {      
         method: "GET", // or 'PUT'
@@ -65,6 +66,19 @@ const facturarCarrito = async (url, carrito) => {
     .catch( (error) => error )
     .then( (response) => response ) 
 };
+
+const destroyCarrito = async (url) =>{
+    return await fetch(`${url}`, {
+        method: "DELETE", // or 'PUT'
+        //body: JSON.stringify(carrito), // data can be `string` or {object}!
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then( (res) => res.json() )
+    .catch( (error) => error )
+    .then( (response) => response ) 
+}
 
 /** REALIZAR DEVOLUCION */
 const realizarDevolucion = async (codigoFactura) => {
@@ -610,6 +624,7 @@ const getFacturaAdaptada = async (codigoFactura) => {
     .catch((error) => error)
     .then((response) => response )
 };
+
 const getFactura = async (codigoFactura) => {
     return await fetch(`${URL_BASE}/getFactura/${codigoFactura}`, {
         method: "GET", // or 'PUT'

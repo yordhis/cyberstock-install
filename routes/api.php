@@ -80,6 +80,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::put('editarProductoDelInventario/{id}', [InventarioController::class, 'editarProductoDelInventario'])->name('api.editarProductoDelInventario');
     
     /** FACTURAS DE INVENTARIO ENTRADA*/
+    Route::delete('destroyCarrito/{codigoCarrito}', [CarritoInventarioController::class, 'destroyCarrito'])->name('admin.destroyCarrito');
     Route::post('facturarCarritoEntrada', [CarritoInventarioController::class, 'facturarCarritoEntrada'])->name('admin.facturarCarritoEntrada');
     Route::post('setFacturaEntrada', [FacturaInventarioController::class, 'setFacturaEntrada'])->name('admin.setFacturaEntrada');
     Route::post('getFacturaES', [FacturaInventarioController::class, 'getFacturaES'])->name('admin.getFacturaES');
