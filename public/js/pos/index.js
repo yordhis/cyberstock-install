@@ -409,14 +409,14 @@ const componenteVuelto = async (metodos, factura) => {
         mensajeVuelto = "",
         estilos = "",
         vuelto = 0;
-    /** Guardamos los métodos de pagosen la variable global */
+    /** Guardamos los métodos de pagos en la variable global */
     metodosPagos = metodos;
 
     /** Recorremos los metodos de pagos para acumular los abonos */
-    metodos.forEach(elementoAbono => {
+    metodos.forEach(metodo => {
 
-        if (elementoAbono.tipoDePago == "DIVISAS") abonado += elementoAbono.montoDelPago;
-        else abonado += elementoAbono.montoDelPago / factura.tasa;
+        if (metodo.tipoDePago == "DIVISAS") abonado += metodo.montoDelPago;
+        else abonado += metodo.montoDelPago / factura.tasa;
     });
 
     vuelto = (Math.round(factura.total * 100) / 100) - (Math.round(abonado * 100) / 100);
@@ -447,8 +447,8 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
     let listaMetodos = '',
         metodoSeleccionado = "",
         total = 0;
-
-    metodosPagos.forEach(elementoPago => {
+    log(metodosPagos)
+    metodosPagos.forEach((elementoPago, index) => {
         /** Obtenemos el metodo de pago seleccionado */
         metodoSeleccionado = elementoPago.tipoDePago ? `<option value="${elementoPago.tipoDePago}" selected>${elementoPago.tipoDePago}</option>`
             : `<option selected>Método de pago</option>`;
@@ -470,13 +470,13 @@ const componenteMetodosForm = async (metodosPagos, factura) => {
                 </div>
 
                 <div class="col-md-4">
-                    <input type="number" step="any" class="form-control metodoPago acciones-pagos" 
-                    value="${elementoPago.montoDelPago}" id="montoDelPago" >
+                    <input type="text" step="any" class="form-control metodoPago acciones-pagos" 
+                    value="${darFormatoDeNumero(elementoPago.montoDelPago)}" id="montoDelPago" >
                     <span class="text-danger"></span>
                 </div>
 
                 <div class="col-md-2 " id="${elementoPago.id}">
-                    ${elementoPago.montoDelPago == 0 ? `<i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>`
+                    ${index == 0 ? `<i class='bx bx-plus-circle text-success fs-3 acciones-pagos' id="agregarMetodo"></i>`
                 : `<i class='bx bx-trash text-danger fs-3 acciones-pagos' id="eliminarMetodo"></i>`}
                 </div>
             </div>
@@ -525,8 +525,6 @@ const componenteMetodoDePago = async (factura) => {
 
 /** MANEJADORES DE EVENTOS */
 const hanledLoad = async (e) => {
-    let resultadoCliente = 0,
-        resultadoCodigoFactura = "";
     elementoAlertas.innerHTML = "";
 
     /** obtenemos la fatura que esta en local storage */
@@ -639,9 +637,9 @@ const hanledLoad = async (e) => {
 
         /** Validamos si el carrito tiene productos para cargarlos a la factura */
         carritoStorage = localStorage.getItem('carrito') ? JSON.parse(localStorage.getItem('carrito')) : [];
-         /** CARGAMOS EL CARRITO */
-         localStorage.setItem('carrito', JSON.stringify(carritoStorage));
-        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage);
+        /** CARGAMOS EL CARRITO */
+        localStorage.setItem('carrito', JSON.stringify(carritoStorage));
+        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
 
         /** Cargamos los datos de la factura */
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
@@ -676,17 +674,17 @@ const hanledAccionesCliente = async (e) => {
                 filtro: e.target.parentElement.pathname.substring(1),
                 campo: ["identificacion"]
             })
-            .then(res =>{
-                if(res.estatus == 200){
-                    log(res)
-                    elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                }else{
-                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({ estatus: 0 }, res.mensaje);
-                    cargarEventosAccionesDelCliente()
-                }
-            });
+                .then(res => {
+                    if (res.estatus == 200) {
+                        log(res)
+                        elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+                    } else {
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente({ estatus: 0 }, res.mensaje);
+                        cargarEventosAccionesDelCliente()
+                    }
+                });
             break;
 
         default:
@@ -740,34 +738,34 @@ const hanledFormulario = async (e) => {
             if (!resultado) return;
             e.target.innerHTML = spinner();
 
-           await storeCliente(resultado)
-           .then(res => {
-                if(res.estatus != 201){
-                    $.alert({
-                        title: "¡Error al registrar el cliente!",
-                        content: res.mensaje,
-                        type: "red",
-                        action: function(){
-                            elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente(resultado);
-                            cargarEventosAccionesDelCliente();
-                            cargarEventosDeFormularios();
-                        }()
-                    })
-                   
-                }else{
-                    /** Seteamos el cliente en la factura de local storage */
-                    factura.identificacion = res.data.identificacion;
-                    factura.tipoDocumento = res.data.tipo;
-                    factura.razon_social = res.data.nombre;
-                    localStorage.setItem('factura', JSON.stringify(factura));
+            await storeCliente(resultado)
+                .then(res => {
+                    if (res.estatus != 201) {
+                        $.alert({
+                            title: "¡Error al registrar el cliente!",
+                            content: res.mensaje,
+                            type: "red",
+                            action: function () {
+                                elementoTarjetaCliente.innerHTML = componenteFormularioAgregarCliente(resultado);
+                                cargarEventosAccionesDelCliente();
+                                cargarEventosDeFormularios();
+                            }()
+                        })
 
-                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                }
-           });
+                    } else {
+                        /** Seteamos el cliente en la factura de local storage */
+                        factura.identificacion = res.data.identificacion;
+                        factura.tipoDocumento = res.data.tipo;
+                        factura.razon_social = res.data.nombre;
+                        localStorage.setItem('factura', JSON.stringify(factura));
 
-          
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([res.data], res.mensaje);
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+                    }
+                });
+
+
 
             break;
         case 'formEditarCliente':
@@ -776,33 +774,33 @@ const hanledFormulario = async (e) => {
             e.target.innerHTML = spinner();
 
             await updateCliente(e.target.action, resultado)
-            .then(res =>{
-                log(res)
-                if(res.estatus != 200){
-                    $.alert({
-                        title: "¡Error al registrar cliente!",
-                        content: res.mensaje,
-                        type: "red",
-                        action: function(){
-                            elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
-                            cargarEventosAccionesDelCliente();
-                            cargarEventosDeFormularios();
-                        }()
-                    });
-                   
-                }else{
-                     /** Seteamos el cliente en la factura de local storage */
-                    factura.identificacion = res.data[0].identificacion;
-                    factura.tipoDocumento = res.data[0].tipo;
-                    factura.razon_social = res.data[0].nombre;
-                    localStorage.setItem('factura', JSON.stringify(factura));
+                .then(res => {
+                    log(res)
+                    if (res.estatus != 200) {
+                        $.alert({
+                            title: "¡Error al registrar cliente!",
+                            content: res.mensaje,
+                            type: "red",
+                            action: function () {
+                                elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data);
+                                cargarEventosAccionesDelCliente();
+                                cargarEventosDeFormularios();
+                            }()
+                        });
 
-                    elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
-                    cargarEventosAccionesDelCliente();
-                    cargarEventosDeFormularios();
-                }
-            });
-           
+                    } else {
+                        /** Seteamos el cliente en la factura de local storage */
+                        factura.identificacion = res.data[0].identificacion;
+                        factura.tipoDocumento = res.data[0].tipo;
+                        factura.razon_social = res.data[0].nombre;
+                        localStorage.setItem('factura', JSON.stringify(factura));
+
+                        elementoTarjetaCliente.innerHTML = componenteTarjetaCliente(res.data, res.mensaje);
+                        cargarEventosAccionesDelCliente();
+                        cargarEventosDeFormularios();
+                    }
+                });
+
 
             break
 
@@ -833,84 +831,110 @@ const hanledAgregarAFactura = async (e) => {
             filtro: e.target.id,
             campo: ["codigo"]
         },
-            resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
             cantidad = e.target.value;
 
-        /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
-        factura.tasa = resultado.tasa;
-        localStorage.setItem('factura', JSON.stringify(factura));
+        getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro)
+            .then(async res => {
+                if (res.estatus == 200) {
+                    /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
+                    factura.tasa = res.tasa;
+                    localStorage.setItem('factura', JSON.stringify(factura));
 
-
-        /** Validamos que la cantidad ingresada no sobrepase la del inventario */
-        if (parseFloat(cantidad) > parseFloat(resultado.data.data[0].cantidad)) {
-            elementoAlertas.innerHTML = componenteAlerta('No tiene SUFICIENTE STOCK para suplir el pedido, intente de nuevo.', 401);
-            return setTimeout(() => {
-                elementoAlertas.innerHTML = "";
-            }, 3500)
-        }
-        /** Validamos que la cantida sea agreagada */
-        if (cantidad > 0) {
-
-            /** Adaptamos el producto para añadirlo al carrito */
-            productoAdaptado = adaptadorDeProductoACarrito(resultado.data.data[0], cantidad, factura);
-
-            /** Si ya existe un carrito añadimos a ese carrito */
-            if (carritoActual.length) {
-                /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
-                carritoActualizado = carritoActual.map(producto => {
-                    if (productoAdaptado.codigo_producto == producto.codigo_producto) {
-                        if (parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeALertar++;
-                        else {
-                            producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                            producto.subtotal = producto.cantidad * producto.costo;
-                            producto.subtotalBs = producto.cantidad * producto.costoBs;
-                        };
-                    } else if (productoAdaptado.codigo_producto != producto.codigo_producto) {
-                        banderaDeProductoNuevo++;
+                    /** Validamos que la cantidad ingresada no sobrepase la del inventario */
+                    if (parseFloat(cantidad) > parseFloat(res.data.data[0].cantidad)) {
+                        return $.alert({
+                            title: "STOCK",
+                            content: 'No tiene SUFICIENTE STOCK para suplir el pedido, intente de nuevo.',
+                            type: "orange"
+                        });
                     }
-                    return producto;
-                });
 
-                /** Si se detecta que hay un producto nuevo se añade */
-                if (banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
 
-                /** Si hay un error damos respuesta */
-                if (banderaDeALertar) {
-                    elementoAlertas.innerHTML = componenteAlerta('El prodcuto NO se agregó a la factura STOCK INSUFICIENTE', 404);
-                    return setTimeout(() => {
-                        elementoAlertas.innerHTML = "";
-                    }, 2500);
+                    /** Validamos que la cantida sea agreagada */
+                    if (cantidad > 0) {
+
+                        /** Adaptamos el producto para añadirlo al carrito */
+                        productoAdaptado = adaptadorDeProductoACarrito(res.data.data[0], cantidad, factura);
+
+                        /** Si ya existe un carrito añadimos a ese carrito */
+                        if (carritoActual.length) {
+                            /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
+                            carritoActualizado = carritoActual.map(producto => {
+                                if (productoAdaptado.codigo_producto == producto.codigo_producto) {
+                                    if (parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeALertar++;
+                                    else {
+                                        producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
+                                        producto.subtotal = producto.cantidad * producto.costo;
+                                        producto.subtotalBs = producto.cantidad * producto.costoBs;
+                                    };
+                                } else if (productoAdaptado.codigo_producto != producto.codigo_producto) {
+                                    banderaDeProductoNuevo++;
+                                }
+                                return producto;
+                            });
+
+                            /** Si se detecta que hay un producto nuevo se añade */
+                            if (banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
+
+                            /** Si hay un error damos respuesta */
+                            if (banderaDeALertar) {
+
+                                return $.alert({
+                                    title: "Stock",
+                                    content: "El prodcuto NO se agregó a la factura STOCK INSUFICIENTE",
+                                    type: "orange"
+                                })
+                            }
+                        } else {
+                            carritoActualizado.push(productoAdaptado);
+                        }
+
+                        /** Guardamos en localStorage */
+                        localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
+
+                        /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
+                        carritoActual = JSON.parse(localStorage.getItem('carrito'));
+
+                        /** RESPUESTA */
+                        $.alert({
+                            title: "Producto agregado",
+                            content: productoAdaptado.descripcion,
+                            type: "green",
+                            autoClose: 'ok|1000',
+                            buttons: {
+                                ok: function () {
+                                    this.close();
+                                }
+                            }
+
+                        })
+
+                        /** CERRAMOS EL MODAL */
+                        e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
+
+                        /** Actualizamos la lista de productos en la factura */
+                        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActual.reverse());
+
+                        /** Cargamos la factura y sus eventos de acciones del carrito de factura */
+                        await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
+
+                    } else {
+                        return $.alert({
+                            title: "Faltan datos",
+                            content: 'Ingrese cantidad del pedido, intente de nuevo.',
+                            type: "red"
+                        });
+                    }
+
+                } else {
+                    return $.alert({
+                        title: "Algo salío mal. XD",
+                        content: res.mensaje,
+                        type: "red"
+                    })
                 }
-            } else {
-                carritoActualizado.push(productoAdaptado);
-            }
 
-            /** Guardamos en localStorage */
-            localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
-
-            /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
-            carritoActual = JSON.parse(localStorage.getItem('carrito'));
-            elementoAlertas.innerHTML = componenteAlerta('El prodcuto se agregó a la factura', 200);
-
-            /** CERRAMOS EL MODAL */
-            e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
-            setTimeout(() => {
-                elementoAlertas.innerHTML = "";
-            }, 2500);
-
-            /** Actualizamos la lista de productos en la factura */
-            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(JSON.parse(localStorage.getItem('carrito')));
-
-            /** Cargamos la factura y sus eventos de acciones del carrito de factura */
-            await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
-
-        } else {
-            elementoAlertas.innerHTML = componenteAlerta('Ingrese cantidad del pedido, intente de nuevo.', 404);
-            return setTimeout(() => {
-                elementoAlertas.innerHTML = "";
-            }, 3500);
-        }
-
+            });
     }
 };
 
@@ -931,24 +955,24 @@ const hanledBuscarProducto = async (e) => {
         // let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
         let lista = '';
         await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro)
-        .then(async res => {
-            if (!res.data.data.length) {
-                return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), 
-                elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value = "";
-            }
-            else{
-                
-                await res.data.data.forEach(async (producto) => {
-                    producto.tasa = res.tasa;
-                    lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
-                });
-                elementoTablaBuscarProducto.innerHTML = lista;
-                elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
-                e.target.value = ""
-                await cargarAccionesDelCustomModal();
-                await cargarEventosDeAgregarProductoAFactura();
-            }
-        });
+            .then(async res => {
+                if (!res.data.data.length) {
+                    return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }),
+                        elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value = "";
+                }
+                else {
+
+                    await res.data.data.forEach(async (producto) => {
+                        producto.tasa = res.tasa;
+                        lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
+                    });
+                    elementoTablaBuscarProducto.innerHTML = lista;
+                    elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
+                    e.target.value = ""
+                    await cargarAccionesDelCustomModal();
+                    await cargarEventosDeAgregarProductoAFactura();
+                }
+            });
 
 
     }
@@ -958,15 +982,13 @@ const hanledBuscarProducto = async (e) => {
 /** Esta funcion maneja los eventos de la FACTURA */
 const hanledAccionesDeCarritoFactura = async (e) => {
     e.preventDefault();
-    /** Declaracion de variables */
-    let cantidad = 0,
-        carritoActualizado = [],
+
+    let carritoActualizado = [],
         carritoActual = JSON.parse(localStorage.getItem('carrito')),
         accion = '',
         banderaDeError = 0,
         facturaActual = '',
         acumuladorSubtotal = 0;
-
 
     log(e.target)
     if (e.target.localName == 'button') {
@@ -985,61 +1007,134 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
     switch (accion) {
         case 'editarCantidadFactura':
-            cantidad = prompt('Ingrese nueva cantidad:');
+            $.confirm({
+                title: 'Editar cantidad del producto',
+                type: "green",
+                content: '' +
+                    '<form action="" class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Ingrese cantidad</label>' +
+                    '<input type="number" step="any" placeholder="Ingrese cantidad" class="cantidad form-control"  required />' +
+                    '</div>' +
+                    '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Cambiar',
+                        btnClass: 'btn-blue',
+                        action: async function () {
+                            /** Declaracion de variables */
+                            let cantidad = this.$content.find('.cantidad').val();
 
-            /** Validamos que la cantidad no este vacia */
-            if (cantidad.trim().length == 0) {
-                elementoAlertas.innerHTML = componenteAlerta('El campo cantidad es obligatorio, intente de nuevo.', 404);
-                return setTimeout(() => {
-                    elementoAlertas.innerHTML = "";
-                }, 3500);
-            } else if (!parseInt(cantidad)) {
-                elementoAlertas.innerHTML = componenteAlerta('El campo cantidad solo acepta números, intente de nuevo.', 401);
-                return setTimeout(() => {
-                    elementoAlertas.innerHTML = "";
-                }, 3500);
-            }
+                            if (!cantidad) {
+                                $.alert({
+                                    title: "No proceso",
+                                    type: "red",
+                                    content: 'El campo cantidad es obligatorio y solo acepta números, intente de nuevo.'
+                                });
+                                return false;
+                            } else {
+                                log(codigoProducto)
+                                log(banderaDeError)
 
-            /** actualizamos el carrito */
-            carritoActualizado = carritoActual.map(producto => {
-                if (parseFloat(cantidad) > parseFloat(producto.stock)) {
-                    banderaDeError++;
-                    return producto;
+                                /** actualizamos el carrito */
+                                carritoActualizado = carritoActual.map(producto => {
+                                    if (producto.codigo_producto == codigoProducto) {
+
+
+                                        if (parseFloat(cantidad) > parseFloat(producto.stock)) {
+                                            banderaDeError++;
+                                            return producto;
+                                        } else {
+                                            producto.cantidad = parseFloat(cantidad);
+                                            producto.subtotal = producto.costo * cantidad;
+                                            producto.subtotalBs = cantidad * producto.costoBs;
+                                        }
+
+                                    };
+                                    return producto;
+                                });
+                                /** Mostramos si el producto no tiene stock suficiente */
+                                log(banderaDeError)
+                                if (banderaDeError) {
+                                    banderaDeError = 0;
+                                    $.alert({
+                                        title: "No proceso",
+                                        type: "red",
+                                        content: 'No hay SUFUCIENTE STOCK, intente de nuevo.'
+                                    });
+                                    return false;
+                                } else {
+                                    /** Guardamos en local el nuevo carrito */
+                                    localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
+
+                                    /** Cargamos la lista del carrito de compra */
+                                    listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado.reverse());
+
+                                    /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
+                                    carritoActual = JSON.parse(localStorage.getItem('carrito'));
+
+                                    await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
+                                }
+
+                            }
+
+
+                        }
+                    },
+                    cancel: {
+                        text: "Cancelar",
+                        btnClass: "btn btn-red",
+                        action: function () {
+                            //close
+                        }
+                    },
+                },
+                onContentReady: function () {
+                    // bind to events
+                    var jc = this;
+                    this.$content.find('form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                    });
                 }
-                if (producto.codigo_producto == codigoProducto) {
-                    producto.cantidad = parseFloat(cantidad);
-                    producto.subtotal = producto.costo * cantidad;
-                    producto.subtotalBs = cantidad * producto.costoBs;
-                };
-                return producto;
             });
-
-            if (banderaDeError) {
-                elementoAlertas.innerHTML = componenteAlerta('No hay SUFUCIENTE STOCK, intente de nuevo.', 401);
-                return setTimeout(() => {
-                    elementoAlertas.innerHTML = "";
-                }, 3500);
-            }
-
-            /** Guardamos en local el nuevo carrito */
-            localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
-            /** Cargamos la lista del carrito de compra */
-            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado);
-
-
-            /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
-            carritoActual = JSON.parse(localStorage.getItem('carrito'));
-
-            await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
 
             break;
         case 'eliminarProductoFactura':
-            carritoActualizado = carritoActual.filter(producto => producto.codigo_producto != codigoProducto);
-            localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
-            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado);
 
-            /** Actualizamos la factura */
-            await cargarDatosDeFactura(carritoActualizado, factura, factura.iva, factura.descuento);
+            $.confirm({
+                title: "¿Desea quitar el producto de la lista?",
+                type: "orange",
+                buttons: {
+                    confirm: {
+                        text: "Si, quitar producto.",
+                        btnClass: "btn btn-green",
+                        action: async function () {
+                            carritoActualizado = carritoActual.filter(producto => producto.codigo_producto != codigoProducto);
+                            localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
+                            listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoActualizado);
+                            $.alert({
+                                title: "El producto se elimino correctamente",
+                                content: "",
+                                type: "green",
+                                autoClose: "ok|500",
+                                buttons: {
+                                    ok: function () { }
+                                }
+                            })
+                            /** Actualizamos la factura */
+                            await cargarDatosDeFactura(carritoActualizado, factura, factura.iva, factura.descuento);
+                        }
+                    },
+                    cancel: {
+                        text: "No, declinar acción.",
+                        btnClass: "btn btn-red",
+                    }
+                }
+            })
+
+
             break;
         case 'eliminarFactura':
 
@@ -1437,88 +1532,103 @@ const hanledAccionesDeMetodoDePago = async (e) => {
         arregloDeMetodosDePago = [],
         contadorID = 1,
         banderaDeError = 0,
-        pendiente = 0;
+        pendiente = 0,
+        abonado = 0;
 
     switch (accion) {
         case 'agregarMetodo':
-            if (metodosActuales.length >= 4) return alert('El limite de metodos de pago son 4.')
+    
+            /** Validamos que el tipo de pago este seleccionado */
+            metodosPagos.forEach((metodo, index) => {  
+                if (metodo.tipoDePago == "Método de pago" || metodo.tipoDePago == null) banderaDeError++;
+            });
 
-            metodosActuales.forEach((element, index) => {
-                arregloDeMetodosDePago.push({
-                    id: element.children[2].id,
-                    tipoDePago: element.children[0].children[0].value,
-                    montoDelPago: parseFloat(element.children[1].children[0].value),
+            /** Agregamos un nuevo input para otro metodo de pago */
+            if(!banderaDeError){
+                metodosPagos.push({
+                    id: Date.now(),
+                    tipoDePago: null,
+                    montoDelPago: 0,
                 });
-                if (arregloDeMetodosDePago[index].tipoDePago == "Método de pago" || arregloDeMetodosDePago[0].tipoDePago == null) {
-                    banderaDeError++;
-                }
-                contadorID++;
-            });
+                log(metodosPagos)
+                elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
+                await cargarEventosAccionesDeFactura();
+            }else{
+                return $.alert({
+                    title: "Alerta",
+                    content: 'Debe seleccionar un metodo de pago, si desea agregar otro.',
+                    type: "orange"
+                });
+            }
 
-            if (banderaDeError) return alert('Debe seleccionar un metodo de pago, si desea agregar otro.');
-
-            arregloDeMetodosDePago.push({
-                id: contadorID + 1,
-                tipoDePago: null,
-                montoDelPago: 0,
-            });
-
-            metodosPagos = arregloDeMetodosDePago;
-            elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
-            await cargarEventosAccionesDeFactura();
             break;
         case 'eliminarMetodo':
-            // elementoMetodoDePago.innerHTML += componenteMetodosForm();
-            metodosActuales.forEach(element => {
-                if (element.children[2].id != e.target.parentElement.id) {
-                    arregloDeMetodosDePago.push({
-                        id: element.children[2].id,
-                        tipoDePago: element.children[0].children[0].value,
-                        montoDelPago: parseFloat(element.children[1].children[0].value),
-                    });
-                }
-            });
+
+            arregloDeMetodosDePago = metodosPagos.filter( metodo => metodo.id != e.target.parentElement.id)
 
             elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
             elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
             await cargarEventosAccionesDeFactura();
             break;
         case 'tipoDePago':
-
-            if (metodosActuales.length == 1) {
-                if (e.target.value == "DIVISAS") e.target.parentElement.parentElement.children[1].children[0].value = factura.total;
-                else e.target.parentElement.parentElement.children[1].children[0].value = factura.total * factura.tasa;
-            }
-
+            /** Recorremos los inputs */
             metodosActuales.forEach(element => {
-                arregloDeMetodosDePago.push({
-                    id: element.children[2].id,
-                    tipoDePago: element.children[0].children[0].value,
-                    montoDelPago: parseFloat(element.children[1].children[0].value),
-                });
+                if(element.children[2].id == e.target.parentElement.parentElement.children[2].id){
+                    metodosPagos.map(metodo => {
+                        if(metodo.id == e.target.parentElement.parentElement.children[2].id){
+                            /** Seteamos el tipo de pago */
+                            metodo.tipoDePago = element.children[0].children[0].value;
+
+                            abonado = metodosPagos.reduce((a, b) => {
+                                if (b.tipoDePago == "DIVISAS") {
+                                    return a + (b.montoDelPago * factura.tasa)
+                                } else {
+                                    return a + b.montoDelPago
+                                }
+                            }, 0);
+                
+                            if (e.target.value == "DIVISAS") {
+                                pendiente = factura.total - (abonado / factura.tasa);
+                                // e.target.parentElement.parentElement.children[1].children[0].value = darFormatoDeNumero(pendiente);
+                            } else {
+                                pendiente = factura.total * factura.tasa - abonado;
+                                // e.target.parentElement.parentElement.children[1].children[0].value = darFormatoDeNumero(pendiente);
+                            }
+
+                            /** Seteamos el monto del pago */
+                            metodo.montoDelPago = pendiente;
+                        }
+
+                    })
+                }
             });
-            elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
+
+            elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
+            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
+            await cargarEventosAccionesDeFactura();
             break;
         case 'montoDelPago':
             /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
             metodosActuales.forEach(element => {
-                if (e.target.parentElement.parentElement.children[2].id == element.id) {
-                    arregloDeMetodosDePago.push({
-                        id: element.children[2].id,
-                        tipoDePago: element.children[0].children[0].value,
-                        montoDelPago: parseFloat(e.target.value), /** actualizamos el monto */
+                log(e.target.parentElement.parentElement.children[2].id )
+                log(element.children[2].id )
+
+                if (e.target.parentElement.parentElement.children[2].id == element.children[2].id ) {
+                    metodosPagos.map(metodo => {
+                        if(metodo.id == e.target.parentElement.parentElement.children[2].id){
+                            /** actualizamos el monto */
+                            metodo.montoDelPago = parseFloat(e.target.value); 
+                        }
                     });
 
-                } else {
-                    arregloDeMetodosDePago.push({
-                        id: element.children[2].id,
-                        tipoDePago: element.children[0].children[0].value,
-                        montoDelPago: parseFloat(element.children[1].children[0].value),
-                    });
                 }
 
             });
-            elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
+
+            
+            elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
+            elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
+            await cargarEventosAccionesDeFactura();
 
             break;
 
