@@ -952,6 +952,7 @@ const hanledAgregarAFactura = async (e) => {
 
             /** CERRAMOS EL MODAL */
             e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
+            elementoBuscarProducto.focus();
             setTimeout(() => {
                 elementoAlertas.innerHTML = "";
             }, 2500);
