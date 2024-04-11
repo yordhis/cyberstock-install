@@ -37,7 +37,7 @@
                             <span class="input-group-text bg-primary" id="basic-addon1">
                                 <i class="bi bi-box text-white"></i>
                             </span>
-                            <input type="text" class="form-control" placeholder="Ingrese código o descripción" id="buscarProducto">
+                            <input type="text" name="buscarProducto" class="form-control" placeholder="Ingrese código o descripción" id="buscarProducto" autofocus >
                         </div>
                     </div>
 

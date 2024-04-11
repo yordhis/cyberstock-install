@@ -895,20 +895,9 @@ const hanledAgregarAFactura = async (e) => {
                         /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
                         carritoActual = JSON.parse(localStorage.getItem('carrito'));
 
-                        /** RESPUESTA */
-                        $.alert({
-                            title: "Producto agregado",
-                            content: productoAdaptado.descripcion,
-                            type: "green",
-                            autoClose: 'ok|1000',
-                            buttons: {
-                                ok: function () {
-                                    this.close();
-                                }
-                            }
-
-                        })
-
+                    
+                        elementoBuscarProducto.focus();
+                        
                         /** CERRAMOS EL MODAL */
                         e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
 
@@ -917,6 +906,8 @@ const hanledAgregarAFactura = async (e) => {
 
                         /** Cargamos la factura y sus eventos de acciones del carrito de factura */
                         await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
+
+                    
 
                     } else {
                         return $.alert({

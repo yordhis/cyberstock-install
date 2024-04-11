@@ -37,7 +37,7 @@ class FacturaController extends Controller
      */
     public function index(HttpRequest $request)
     {
-        
+       
         try {
             $menuSuperior = $this->data->menuSuperior;
             $numeroDePagina = 15;
