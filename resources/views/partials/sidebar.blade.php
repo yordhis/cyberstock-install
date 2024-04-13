@@ -170,11 +170,11 @@ $subcategoria = 'LISTA';
                 data-bs-parent="#sidebar-nav">
 
                 <!-- Start Components Nav | Utilidades -->
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link"  href="{{ route('admin.porcentajes.index') }}" >
                         <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
                     </a>
-                </li>
+                </li> --}}
                 <!-- End Components Nav | Utilidades -->
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">
