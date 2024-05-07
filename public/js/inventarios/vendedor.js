@@ -408,6 +408,7 @@ const hanledFormulario = async (e) => {
                     hanledLoad();
                 break;
             default:
+                e.target.submit();
                 break;
         }
        

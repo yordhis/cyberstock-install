@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InventarioExportar;
 use App\Models\Inventario;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Http\Requests\UpdateInventarioRequest;
@@ -45,14 +46,24 @@ class InventarioController extends Controller
     }
 
     /** importar la data del archivo */
-    public function importarExcel(){
+    public function importarExcel(Request $request){
 
-        Excel::import(new InventarioImportar, request()->file('file'));
 
-        $menuSuperior = $this->data->menuSuperior;
-        return view("admin.inventarios.importar", compact('menuSuperior'));
+        Excel::import(new InventarioImportar, $request->file('file'));
+
+        Inventario::where('codigo', 'COGIDO')->delete();
+
+        return back()->with([
+            "mensaje" => "Data cargada",
+            "estatus" => 200
+        ]);
     }   
 
+    /** Exportar inventario */
+    public function exportarInventario() 
+    {
+        return Excel::download(new InventarioExportar, 'inventario.xlsx');
+    }
     /**
      *  Display a listing of the resource.
      *  DESPLEGAMOS LA LISTA DE RECURSOS

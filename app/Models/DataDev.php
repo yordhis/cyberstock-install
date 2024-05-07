@@ -69,13 +69,15 @@ class DataDev
                 "301" => "alert-warning",
                 "401" => "alert-warning",
                 "404" => "alert-danger",
+                "500" => "alert-danger",
             ],
             "icono" => [
                 "200" => "bi bi-check-circle me-1",
                 "201" => "bi bi-check-circle me-1",
                 "301" => "bi bi-exclamation-triangle me-1",
                 "401" => "bi bi-exclamation-octagon me-1",
-                "404" => "bi bi-exclamation-octagon me-1"
+                "404" => "bi bi-exclamation-octagon me-1",
+                "500" => "bi bi-exclamation-octagon me-1"
             ]
         ];
 

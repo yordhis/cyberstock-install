@@ -5,6 +5,9 @@
 @section('content')
     <section class="section dashboard">
         <div id="alert"></div>
+
+        @include('partials.alertSession')
+
         <div class="row">
             <!-- Left side columns -->
             <div class="col-lg-12">
@@ -15,7 +18,7 @@
                         <div class="card info-card sales-card rounded-3">
 
                             <div class="card-body">
-                                <h5 class="card-title">Productos</span></h5>
+                                <h5 class="card-title">Productos </span></h5>
 
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center ">

@@ -175,6 +175,7 @@ $subcategoria = 'LISTA';
                         <i class='bi bi-cash fs-3'></i><span >Configurar precios y costos</span>
                     </a>
                 </li> --}}
+                
                 <!-- End Components Nav | Utilidades -->
                 <!-- Start Components Nav | Utilidades -->
                 <li class="nav-item">

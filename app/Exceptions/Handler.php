@@ -55,18 +55,23 @@ class Handler extends ExceptionHandler
     public function register()
     {
       
-        // $this->renderable(function (NotFoundHttpException $e, $request) {
-        //     // dd($e);
-        //     $errorInfo = Helpers::getMensajeError($e, "Esta ruta no existe");
-        //     return response()->view('errors.404', compact("errorInfo"), 404);
-        // });
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+         
+            $errorInfo = Helpers::getMensajeError($e, "Esta ruta no existe");
+            return back()->with([
+                "mensaje" => $errorInfo,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        });
 
-        // $this->renderable(function (QueryException $e, $request) {
-        //     // dd($e);
-        //     // $errorInfo = Helpers::getMensajeError($e, "No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión,");
-        //     $errorInfo =  "No se puede establecer conexión con la base de datos, por favor verificar que XAMPP este iniciado.";
-        //     return response()->view('errors.500', compact("errorInfo"), 500);
-        // });
+        $this->renderable(function (QueryException $e, $request) {
+            
+            $errorInfo =  "No se puede establecer conexión con la base de datos, por favor verificar que XAMPP este iniciado.";
+            return back()->with([
+                "mensaje" => $errorInfo,
+                "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        });
 
         // $this->renderable(function (RouteNotFoundException $e, $request) {
         //     // dd($e);
@@ -74,11 +79,15 @@ class Handler extends ExceptionHandler
         //     return response()->view('errors.404', compact("errorInfo"), 404);
         // });
 
-        // $this->renderable(function (ViewException $e, $request) {
-        //     // dd($e);
-        //     $errorInfo = Helpers::getMensajeError($e, "Error de datos de la Vista,");
-        //     return response()->view('errors.404', compact("errorInfo"), Response::HTTP_NOT_FOUND);
-        // });
+        $this->renderable(function (ViewException $e, $request) {
+            // dd($e);
+            $errorInfo = Helpers::getMensajeError($e, "Error de datos de la Vista,");
+            return back()->with([
+                "mensaje" => $errorInfo,
+                "estatus" => Response::HTTP_NOT_FOUND
+            ]);
+            // return response()->view('errors.404', compact("errorInfo"), Response::HTTP_NOT_FOUND);
+        });
 
         // /** Se capturan los errores no definidos */
         // $this->renderable(function (Throwable $e, $request) {

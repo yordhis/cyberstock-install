@@ -15,8 +15,10 @@
 
 
 
-            <div class="col-sm-12">
-                <h2> Inventario </h2>
+            <div class="col-sm-12 mb-2">
+                <div class="d-flex justify-content-between">
+                    <h2> Inventario </h2>
+                </div>
             </div>
             <div class="col-sm-10 mb-1">
                 <form action="getProductosFiltro" id="formularioFiltro" method="post" target="_self">

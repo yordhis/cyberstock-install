@@ -15,8 +15,22 @@
 
 
 
-            <div class="col-sm-12">
-                <h2> Inventario </h2>
+            <div class="col-sm-12 mb-2">
+                <div class="d-flex justify-content-between">
+                    <h2> Inventario </h2>
+                    <form action="{{ route('admin.exportar.inventario') }}" method="post">
+                        @csrf
+                        @method('post')
+                        <div class="modal-body">
+                           
+                                
+                                
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary ">Imprimir inventario</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="col-sm-10 mb-3">
