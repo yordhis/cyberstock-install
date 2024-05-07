@@ -16,6 +16,7 @@ use App\Models\Pago;
 use App\Models\Po;
 use App\Models\Proveedore;
 use Barryvdh\DomPDF\Facade\PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -285,9 +286,9 @@ class FacturaController extends Controller
      */
     public function store(HttpRequest $request)
     {
-
         try {
-
+          
+          
             /** eliminamos la factura temporal de concepto anulada para la multicaja */
             Factura::where([
                 'codigo' => $request->codigo,
@@ -310,7 +311,7 @@ class FacturaController extends Controller
             }
 
             /** Si es una devolución eliminamos la factura y la volvemos a crear con los nuevos datos */
-            if ($request->estatusDeDevolucion) {
+            if ($request['estatusDeDevolucion']) {
                 Factura::where('codigo', $request->codigo)->delete();
             }
 
@@ -341,24 +342,16 @@ class FacturaController extends Controller
                 $resultado['fecha']  =  date_format(date_create(explode('T', $resultado->fecha)[0]), 'd-m-Y');
                 $resultado['totalArticulo']  = $totalArticulos;
 
+                return Helpers::getRespuestaJson("Factura registrada correctamente", $resultado, Response::HTTP_CREATED);
 
-                return response()->json([
-                    "mensaje" => "Factura registrada correctamente",
-                    "data" => $resultado,
-                    "estatus" => Response::HTTP_CREATED
-                ], Response::HTTP_CREATED);
             } else {
-                return response()->json([
-                    "mensaje" => "No se registró la Factura, intente de nuevo",
-                    "data" => $resultado,
-                    "estatus" => Response::HTTP_NOT_FOUND
-                ], Response::HTTP_NOT_FOUND);
+                return Helpers::getRespuestaJson("No se registró la Factura, intente de nuevo.",[], Response::HTTP_NOT_FOUND);
             }
         } catch (\Throwable $th) {
-            $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
+            $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura de venta, ");
             return response()->json([
                 "mensaje" => $mensaje,
-                "data" =>  $request->request,
+                "data" =>  [],
                 "estatus" => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

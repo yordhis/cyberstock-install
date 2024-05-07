@@ -140,3 +140,22 @@ const quitarFormato = (numeroString) =>{
     return parseFloat(arraysinformato.join(''));
 };
 
+const alertJQuery = ( mensaje, estatus, title = "¡Alerta!", type="red",
+    botones = {
+        tryAgain: {
+            text: 'Volver a intentar',
+            btnClass: 'btn-orange',
+            action: function () { }
+        }
+    }) => {
+
+    return $.confirm({
+        title: title + estatus,
+        content: mensaje,
+        type: type,
+        typeAnimated: true,
+        buttons: botones
+    });
+
+};
+

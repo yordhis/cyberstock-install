@@ -10,6 +10,8 @@ let elementoTarjetaCliente = d.querySelector('#tarjetaCliente'),
     elementoFactura = d.querySelector('#componenteFactura'),
     elementoMetodoDePagoModal = d.querySelector('#elementoMetodoDePagoModal'),
     elementoMensajeDeEspera = d.querySelector('#mensajeDeEspera'),
+    fecha = new Date(),
+    resultadoDeFacturar = {},
     factura = {
         codigo: '',
         razon_social: '', // nombre de cliente o proveedor
@@ -555,7 +557,6 @@ const hanledLoad = async (e) => {
                                     factura.tipo = 'SALIDA';
                                     factura.iva = 0.16;
                                     factura.estatus = true;
-                                    let fecha = new Date();
                                     factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
                                     localStorage.setItem('factura', JSON.stringify(factura));
 
@@ -814,6 +815,10 @@ const hanledFormulario = async (e) => {
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
 
+    if(!factura.identificacion.length) return alertJQuery(
+        'Antes de agregar un producto es necesario que el cliente este agregado a la factura',
+        "", "¡Cliente no agregado!");
+
     if (e.target.id == "cerrarModalCustom") {
         /** CERRAMOS EL MODAL */
         e.target.parentElement.parentElement.classList.remove('modal--show');
@@ -895,9 +900,9 @@ const hanledAgregarAFactura = async (e) => {
                         /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
                         carritoActual = JSON.parse(localStorage.getItem('carrito'));
 
-                    
+
                         elementoBuscarProducto.focus();
-                        
+
                         /** CERRAMOS EL MODAL */
                         e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
 
@@ -907,7 +912,7 @@ const hanledAgregarAFactura = async (e) => {
                         /** Cargamos la factura y sus eventos de acciones del carrito de factura */
                         await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
 
-                    
+
 
                     } else {
                         return $.alert({
@@ -1224,28 +1229,41 @@ const hanledAccionesDeCarritoFactura = async (e) => {
 
             break;
         case 'cargarModalMetodoPago':
-            if (factura.identificacion == "") return alert("Debes Ingresar un cliente para poder vender");
             await cargarEventosAccionesDeFactura();
             break;
         case 'vender':
             /** declaracion de variables */
-            let abonado = 0,
-                resultadoDefacturarCarrito = '';
+            let abonado = 0;
 
-            /** validamos que halla productos en la factura */
-            if (JSON.parse(localStorage.getItem('carrito')).length == 0) return e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
+            /** VALIDAMOS QUE HALLA PRODUCTOS EN LA FACTURA O CARRITO */
+            if (!carritoActual.length) return $.confirm({
+                title: '¡Faltan datos!',
+                content: "Debes ingresar productos a la factura de compra, para continuar.",
+                type: 'orange',
+                typeAnimated: true,
+                buttons: {
+                    tryAgain: {
+                        text: 'Volver a intentar',
+                        btnClass: 'btn-orange',
+                        action: function () { }
+                    },
+                }
+            });
 
             /** validamos si el cliente esta gregado a la factura  */
-            if (factura.identificacion == "") {
-                e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
-                let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                return setTimeout(() => {
-                    elementoAlertaVender.forEach(element => {
-                        element.classList.add('d-none')
-                    });
-                    cargarEventosAccionesDeFactura();
-                }, 2500);
-            }
+            if (factura.identificacion == "") return $.confirm({
+                title: '¡Faltan datos!',
+                content: "Por favor, agregue un cliente a la factura",
+                type: 'orange',
+                typeAnimated: true,
+                buttons: {
+                    tryAgain: {
+                        text: 'Volver a intentar',
+                        btnClass: 'btn-orange',
+                        action: function () { }
+                    },
+                }
+            });
 
 
             /** Sumamos todos los metodos de pago */
@@ -1257,6 +1275,11 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             /** Validamos si el monto es mayor o igual al total a pagar */
             if ((Math.round(abonado * 100) / 100) >= (Math.round(factura.total * 100) / 100)) {
 
+                /** MOSTRAR QUE ESTA CARGANDO  */
+                e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+                e.target.parentElement.children[0].classList.add('d-none');
+                e.target.parentElement.children[1].classList.add('d-none');
+
                 /** Agregamos los metodos en formato JSON a la factura */
                 factura.metodos = JSON.stringify(metodosPagos);
 
@@ -1267,89 +1290,155 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 let facturaVender = JSON.parse(localStorage.getItem('factura')),
                     carritoVender = JSON.parse(localStorage.getItem('carrito'));
 
-                log(carritoVender)
                 /** REALIZAR LA DEVOLUCION EN CASO DE SER UNA DEVOLUCION */
                 if (facturaVender.estatusDeDevolucion) {
-                    let resultadoDeRealizarDevolucion = await realizarDevolucion(facturaVender.codigo);
-                    log(resultadoDeRealizarDevolucion.mensaje);
-                    log(resultadoDeRealizarDevolucion.estatus);
+                    realizarDevolucion(facturaVender.codigo)
+                        .then(resDevolucion => {
+                            if (resDevolucion.estatus == 200) {
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, carritoVender)
+                                    .then(resFacturarCarrito => {
+                                        if (resFacturarCarrito.estatus == 200) {
+                                            facturaStore(facturaVender)
+                                                .then(resFacturar => {
+                                                    if (resFacturar.estatus == 201) {
+                                                        /** Registramos el movimiento del usuario */
+                                                        ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resFacturar.estatus);
 
-                    if (resultadoDeRealizarDevolucion.estatus == 200) {
-                        /** FACTURAR EL CARRITO */
-                        carritoVender.forEach(async (producto) => {
-                            producto.identificacion = facturaVender.identificacion;
-                            facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
-                        });
-                    } else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucion.mensaje, resultadoDeRealizarDevolucion.estatus)
+                                                        /** Eliminamos la factura del Storagr */
+                                                        localStorage.removeItem('carrito');
+                                                        localStorage.removeItem('factura');
+
+                                                        /** guardamos en memoria el resultado de la factura para imprimir ticket */
+                                                        resultadoDeFacturar = resFacturar;
+
+                                                        /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                                        e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
+                                                        e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
+                                                        e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
+                                                        setTimeout(() => { cargarEventosAccionesDeFactura() }, 1000);
+                                                    } else {
+                                                        return alertJQuery(resFacturar.mensaje, resFacturar.estatus);
+                                                    }
+                                                }).catch(err => {
+                                                    return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                                })
+                                        } else {
+                                            return alertJQuery(resFacturarCarrito.mensaje, resFacturarCarrito.estatus);
+                                        }
+                                    }).catch(err => {
+                                        return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                    })
+                            } else {
+                                return alertJQuery(resDevolucion.mensaje, resDevolucion.estatus);
+                            }
+                        }).catch(err => {
+                            return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                        })
+
+
                 } else {
 
                     /** En casos de fallas electricas
                      * Validamos que el carrito de la factura no se halla facturado
-                     * y si, si se facturo deve realizarse una devolucion y facturar denuevo
+                     * y si, si se facturo debe realizarse una devolucion y facturar denuevo
                      */
+
                     /** validar si el carrito se facturo */
-                    let carritoFacturado = await getCarrito(facturaVender.codigo),
-                        resultadoDeRealizarDevolucionLuz = "";
+                    await getCarrito(facturaVender.codigo)
+                        .then(resCarritoFacturado => {
+                            /** si se facturó realizamos la devolucion */
+                            if (resCarritoFacturado.data.length) {
+                                realizarDevolucion(facturaVender.codigo)
+                                    .then(resDevolucion => {
+                                        if (resDevolucion.estatus == 200) {
+                                            facturarCarrito(`${URL_BASE}/facturarCarrito`, carritoVender)
+                                                .then(resFacturarCarrito => {
+                                                    if (resFacturarCarrito.estatus == 200) {
+                                                        facturaStore(facturaVender)
+                                                            .then(resFacturar => {
+                                                                if (resFacturar.estatus == 201) {
+                                                                    /** Registramos el movimiento del usuario */
+                                                                    ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resFacturar.estatus);
 
-                    if (carritoFacturado.data.length) {
-                        resultadoDeRealizarDevolucionLuz = await realizarDevolucion(facturaVender.codigo);
-                        if (resultadoDeRealizarDevolucionLuz.estatus == 200) {
-                            /** FACTURAR EL CARRITO */
-                            carritoVender.forEach(async (producto) => {
-                                producto.identificacion = facturaVender.identificacion;
-                                facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
-                            });
-                        } else return elementoAlertas.innerHTML = componenteAlerta(resultadoDeRealizarDevolucionLuz.mensaje, resultadoDeRealizarDevolucionLuz.estatus)
+                                                                    /** Eliminamos la factura del Storagr */
+                                                                    localStorage.removeItem('carrito');
+                                                                    localStorage.removeItem('factura');
 
-                    } else {
-                        /** FACTURAR EL CARRITO */
-                        carritoVender.forEach(async (producto) => {
-                            producto.identificacion = facturaVender.identificacion;
-                            facturarCarrito(`${URL_BASE}/facturarCarrito`, producto);
+                                                                    /** guardamos en memoria el resultado de la factura para imprimir ticket */
+                                                                    resultadoDeFacturar = resFacturar;
+
+                                                                    /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                                                    e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
+                                                                    e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
+                                                                    e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
+                                                                    setTimeout(() => { cargarEventosAccionesDeFactura() }, 1000);
+                                                                } else {
+                                                                    return alertJQuery(resFacturar.mensaje, resFacturar.estatus);
+                                                                }
+                                                            }).catch(err =>{
+                                                                return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                                            })
+                                                    } else {
+                                                        return alertJQuery(resFacturarCarrito.mensaje, resFacturarCarrito.estatus);
+                                                    }
+                                                }).catch(err =>{
+                                                    return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                                })
+                                        } else {
+                                            return alertJQuery(resDevolucion.mensaje, resDevolucion.estatus);
+                                        }
+                                    }).catch(err => {
+                                        return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                    })
+                            } else {
+                                /** De lo contrario se procesa una nueva facturación */
+                              
+                                facturarCarrito(`${URL_BASE}/facturarCarrito`, carritoVender)
+                                    .then(resFacturarCarrito => {
+                                        if (resFacturarCarrito.estatus == 200) {
+                                            facturaStore(facturaVender)
+                                                .then(resFacturar => {
+                                            
+
+                                                    if (resFacturar.estatus == 201) {
+                                                        /** Registramos el movimiento del usuario */
+                                                        ejecutarRegistroDeAccionDelUsuario(resFacturar.codigo, resFacturar.estatus);
+
+                                                        /** Eliminamos la factura del Storagr */
+                                                        localStorage.removeItem('carrito');
+                                                        localStorage.removeItem('factura');
+
+                                                        /** guardamos en memoria el resultado de la factura para imprimir ticket */
+                                                        resultadoDeFacturar = resFacturar;
+                                                        /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                                        e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
+                                                        e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
+                                                        e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
+                                                        setTimeout(() => { cargarEventosAccionesDeFactura() }, 1000);
+                                                    } else {
+                                                        return alertJQuery(resFacturar.mensaje, resFacturar.estatus);
+                                                    }
+                                                }).catch(err => {
+                                                    return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                                })
+                                        } else {
+                                            return alertJQuery(resFacturar.mensaje, resFacturar.estatus);
+                                        }
+                                    }).catch(err => {
+                                        /** damos una rtespuesta del error interno */
+                                        return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
+                                    })
+
+
+                            }
+                        }).catch(err =>{
+                            return alertJQuery(err.mensaje, err.estatus, '¡Error interno! código: ', 'red');
                         });
-                    }
-
                 }
 
-
-                /** MOSTRAR QUE ESTA CARGANDO  */
-                e.target.parentElement.parentElement.children[1].innerHTML = spinner();
-                e.target.parentElement.children[0].classList.add('d-none');
-                e.target.parentElement.children[1].classList.add('d-none');
-
-                /** FACTURAR */
-                setTimeout(async () => {
-                    /** Procesamos la factura y generamos el ticket */
-                    resultadoDeFacturar = await facturaStore(facturaVender);
-
-                    /** Mostramos el dialogo de facturar */
-                    if (resultadoDeFacturar.estatus == 201) {
-                        /** Registramos el movimiento del usuario */
-                        ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
-                        /** Eliminamos la factura del Storagr */
-                        localStorage.removeItem('carrito');
-                        localStorage.removeItem('factura');
-                        /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
-                        e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
-                        e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
-                        e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
-                        await cargarEventosAccionesDeFactura();
-                    } else {
-                        alert(resultadoDeFacturar.mensaje)
-                    }
-                }, 1000)
-
             } else {
-                e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
-                let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-                return setTimeout(() => {
-                    elementoAlertaVender.forEach(element => {
-                        element.classList.add('d-none')
-                    });
-                    cargarEventosAccionesDeFactura();
-                }, 2500);
+                return alertJQuery("Por favor, debe cumplir con el pago", "", '¡Alerta pago incompleto!', 'orange');
             }
-
 
             break;
         case 'desactivarFacturaFiscal':
@@ -1377,8 +1466,6 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             window.location.href = "/pos";
             break;
         case 'resetearFactura':
-            log('Resetear Factura')
-            log(factura)
             factura = {
                 codigo: factura.codigo,
                 razon_social: '', // nombre de cliente o proveedor
@@ -1390,7 +1477,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                 tipo: 'SALIDA', // fiscal o no fialcal
                 concepto: 'VENTA', // venta, compra ...
                 descuento: 0, // descuento
-                fecha: '', // fecha venta, compra ...
+                fecha: factura.fecha, // fecha venta, compra ...
                 metodos: '',
                 estatusDeDevolucion: false,
                 estatus: true
@@ -1528,14 +1615,14 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 
     switch (accion) {
         case 'agregarMetodo':
-    
+
             /** Validamos que el tipo de pago este seleccionado */
-            metodosPagos.forEach((metodo, index) => {  
+            metodosPagos.forEach((metodo, index) => {
                 if (metodo.tipoDePago == "Método de pago" || metodo.tipoDePago == null) banderaDeError++;
             });
 
             /** Agregamos un nuevo input para otro metodo de pago */
-            if(!banderaDeError){
+            if (!banderaDeError) {
                 metodosPagos.push({
                     id: Date.now(),
                     tipoDePago: null,
@@ -1544,7 +1631,7 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                 log(metodosPagos)
                 elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
                 await cargarEventosAccionesDeFactura();
-            }else{
+            } else {
                 return $.alert({
                     title: "Alerta",
                     content: 'Debe seleccionar un metodo de pago, si desea agregar otro.',
@@ -1555,7 +1642,7 @@ const hanledAccionesDeMetodoDePago = async (e) => {
             break;
         case 'eliminarMetodo':
 
-            arregloDeMetodosDePago = metodosPagos.filter( metodo => metodo.id != e.target.parentElement.id)
+            arregloDeMetodosDePago = metodosPagos.filter(metodo => metodo.id != e.target.parentElement.id)
 
             elementoMetodoDePago.innerHTML = await componenteMetodosForm(arregloDeMetodosDePago, factura);
             elementoVuelto.innerHTML = await componenteVuelto(arregloDeMetodosDePago, factura);
@@ -1564,9 +1651,9 @@ const hanledAccionesDeMetodoDePago = async (e) => {
         case 'tipoDePago':
             /** Recorremos los inputs */
             metodosActuales.forEach(element => {
-                if(element.children[2].id == e.target.parentElement.parentElement.children[2].id){
+                if (element.children[2].id == e.target.parentElement.parentElement.children[2].id) {
                     metodosPagos.map(metodo => {
-                        if(metodo.id == e.target.parentElement.parentElement.children[2].id){
+                        if (metodo.id == e.target.parentElement.parentElement.children[2].id) {
                             /** Seteamos el tipo de pago */
                             metodo.tipoDePago = element.children[0].children[0].value;
 
@@ -1577,7 +1664,7 @@ const hanledAccionesDeMetodoDePago = async (e) => {
                                     return a + b.montoDelPago
                                 }
                             }, 0);
-                
+
                             if (e.target.value == "DIVISAS") {
                                 pendiente = factura.total - (abonado / factura.tasa);
                                 // e.target.parentElement.parentElement.children[1].children[0].value = darFormatoDeNumero(pendiente);
@@ -1601,14 +1688,14 @@ const hanledAccionesDeMetodoDePago = async (e) => {
         case 'montoDelPago':
             /** obtener el ID del elemento tipo de pago para actualizar el monto ingresado  */
             metodosActuales.forEach(element => {
-                log(e.target.parentElement.parentElement.children[2].id )
-                log(element.children[2].id )
+                log(e.target.parentElement.parentElement.children[2].id)
+                log(element.children[2].id)
 
-                if (e.target.parentElement.parentElement.children[2].id == element.children[2].id ) {
+                if (e.target.parentElement.parentElement.children[2].id == element.children[2].id) {
                     metodosPagos.map(metodo => {
-                        if(metodo.id == e.target.parentElement.parentElement.children[2].id){
+                        if (metodo.id == e.target.parentElement.parentElement.children[2].id) {
                             /** actualizamos el monto */
-                            metodo.montoDelPago = parseFloat(e.target.value); 
+                            metodo.montoDelPago = parseFloat(e.target.value);
                         }
                     });
 
@@ -1616,7 +1703,7 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 
             });
 
-            
+
             elementoMetodoDePago.innerHTML = await componenteMetodosForm(metodosPagos, factura);
             elementoVuelto.innerHTML = await componenteVuelto(metodosPagos, factura);
             await cargarEventosAccionesDeFactura();
