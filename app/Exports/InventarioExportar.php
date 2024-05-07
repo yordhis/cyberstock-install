@@ -42,7 +42,7 @@ class InventarioExportar implements FromCollection, ShouldAutoSize
 
 
         return new Collection([
-            ['CÓDIGO', 'DESCRIPCION', 'MARCA', 'CATEGORIA', 'CANTIDAD', 'COSTO', 'PVP', 'PVP_2', 'PVP_3'],
+            ['CODIGO', 'DESCRIPCION', 'MARCA', 'CATEGORIA', 'CANTIDAD', 'COSTO', 'PVP', 'PVP_2', 'PVP_3'],
             $inventario_array
         ]);
     }
