@@ -39,8 +39,8 @@ const hojaDeCodigos = (barcode) => {
 
     for (let index = 0; index < 100; index++) {
         list_img_barcode += `
-            <img alt='Barcode Generator TEC-IT & Cyber Staff, C.A.'
-            src='https://barcode.tec-it.com/barcode.ashx?data=${barcode}&code=Code128'
+            <img alt="Barcode Generator TEC-IT & Cyber Staff, C.A."
+            src="https://barcode.tec-it.com/barcode.ashx?data=${barcode}&code=Code128"
             id="generadorDeCodigoDeBarra"
             >
          `;

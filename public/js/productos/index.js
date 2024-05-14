@@ -73,6 +73,8 @@ const componentePaginacion = (data) => {
 };
 
 const componenteModalVer = (data) => {
+    let code = data.codigo;
+    log(code);
     return `
         <button type="button" class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable${data.id}" >
         <i class="bi bi-eye"></i>
@@ -99,7 +101,7 @@ const componenteModalVer = (data) => {
                             <h3><b>Código de barra: </b></h3>
 
                             <img alt='Barcode Generator TEC-IT & Cyber Staff, C.A.'
-                            src='https://barcode.tec-it.com/barcode.ashx?data=${data.codigo}&code=Code128'
+                            src="https://barcode.tec-it.com/barcode.ashx?data=${code}&code=Code128"
                             id="generadorDeCodigoDeBarra"
                             >
 
