@@ -5,7 +5,7 @@
 @section('content')
     <div id="alert"></div>
     <section class="section">
-         @include('partials.alertSession')
+        @include('partials.alertSession')
         <div class="row">
 
             <div class="col-sm-12">
@@ -151,13 +151,8 @@
         </div>
     </section>
 
-    <script src="{{ asset('js/utilidad/autorizacion.js') }}" defer>
-        < script >
-            <
-            script src = "{{ asset('js/main.js') }}"
-        defer >
-    </script>
-
+    <script src="{{ asset('js/utilidad/autorizacion.js') }}" defer></script>
+    <script src="{{ asset('/js/main.js') }}" defer></script>
 
 
 @endsection

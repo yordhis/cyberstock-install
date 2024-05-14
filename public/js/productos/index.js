@@ -96,7 +96,14 @@ const componenteModalVer = (data) => {
                         <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                             <img src="${ data.imagen }" alt="Profile" class="rounded-circle">
                             <h2>  ${ data.descripcion }</h2>
-                            <h3><b>Código de barra: </b>${ data.codigo } </h3>
+                            <h3><b>Código de barra: </b></h3>
+
+                            <img alt='Barcode Generator TEC-IT & Cyber Staff, C.A.'
+                            src='https://barcode.tec-it.com/barcode.ashx?data=${data.codigo}&code=Code128'
+                            id="generadorDeCodigoDeBarra"
+                            >
+
+                            <button class="btn btn-primary m-2 button__print__barcode"  id="${data.codigo}" >Generar PDF de códigos de barra</button>
 
                             <div class="container-fluid">
                             <div class="row">
@@ -262,6 +269,7 @@ const hanledLoad = async (e) => {
     await getLista();
     await cargarEventosDelBotonEliminar();
     await cargarEventosDelBotonEditar();
+    await cargarEventosDelBotonImprimirBarcode();
 };
 
 const hanledBotonEliminar = async (e) => {

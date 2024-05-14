@@ -20,7 +20,11 @@
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                     <img src="{{ $producto->imagen }}" alt="Profile" class="rounded-circle">
                     <h2>  {{ $producto->descripcion }}</h2>
-                    <h3><b>Código de barra: </b>{{ $producto->codigo }} </h3>
+                    <h3><b>Código de barra: </b>{{ $producto->codigo }}
+                    
+                   
+
+                    
 
                     <div class="container-fluid">
                       <div class="row">

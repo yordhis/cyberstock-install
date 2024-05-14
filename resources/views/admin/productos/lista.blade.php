@@ -87,6 +87,7 @@
     <script src=" {{ asset('js/main.js') }}" defer></script>
     <script src="{{ asset('js/productos/index.js') }}" defer></script>
     <script src="{{ asset('js/productos/productoController.js') }}" defer></script>
+    <script src="{{ asset('js/productos/generadorDeBarcode.js') }}" defer></script>
     <script src="{{ asset('js/productos/categorias/CategoriaController.js') }}" defer></script>
     <script src="{{ asset('js/productos/marcas/MarcaController.js') }}" defer></script>
     
