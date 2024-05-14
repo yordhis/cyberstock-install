@@ -122,7 +122,10 @@ Route::middleware(['auth'])->group(function () {
 
         /** POS VENTA */
         Route::get('imprimirFactura/{codigoFactura}', [FacturaController::class, 'imprimirFactura'])->name('admin.imprimirFactura');
-        Route::resource('facturas', FacturaController::class)->names('admin.facturas');
+        Route::get('facturas', [FacturaController::class, 'index'])->name('admin.facturas.index');
+        Route::get('facturas/{id}', [FacturaController::class, 'show'])->name('admin.facturas.show');
+        Route::delete('facturas/{id}', [FacturaController::class, 'destroy'])->name('admin.facturas.destroy');
+        // Route::resource('facturas', FacturaController::class)->names('admin.facturas');
         
         /** CLIENTES */
         Route::resource('clientes', ClienteController::class)->names('admin.clientes');

@@ -41,6 +41,7 @@ class FacturaController extends Controller
        
         try {
             $menuSuperior = $this->data->menuSuperior;
+            $respuesta = $this->data->respuesta;
             $numeroDePagina = 15;
             $pathname = Request::path();
             
@@ -60,7 +61,7 @@ class FacturaController extends Controller
                     break;
             }
 
-            return view('admin.facturas.index', compact('facturas', 'menuSuperior', 'pathname', 'request'));
+            return view('admin.facturas.index', compact('facturas', 'menuSuperior', 'pathname', 'request', 'respuesta'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);
@@ -116,9 +117,10 @@ class FacturaController extends Controller
      * @param  \App\Models\Factura  $factura
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Factura $factura)
+    public function destroy($id_factura)
     {
         try {
+            $factura = Factura::find($id_factura);
             Pago::where('codigo_factura', $factura->codigo)->delete();
             FacturaInventario::where('codigo_factura', $factura->codigo)->delete();
             CarritoInventario::where('codigo_factura', $factura->codigo)->delete();
@@ -128,7 +130,9 @@ class FacturaController extends Controller
             /** registramos movimiento al usuario */
             Helpers::registrarMovimientoDeUsuario(request(), Response::HTTP_OK, "Acción de eliminar factura ({$factura->codigo})");
 
-            return back();
+            $estatus = Response::HTTP_OK;
+            $mensaje = "Se elimino correctamente la factura.";
+            return back()->with(compact('mensaje', 'estatus'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar ELIMINAR factura, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

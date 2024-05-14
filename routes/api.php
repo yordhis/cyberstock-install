@@ -100,7 +100,8 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('getFacturaAdaptada/{codigoFactura}', [FacturaController::class, 'getFacturaAdaptada'])->name('admin.getFacturaAdaptada');
     Route::get('getFactura/{codigoFactura}', [FacturaController::class, 'getFactura'])->name('admin.getFactura');
     Route::get('getCodigoFactura/{tabla}', [FacturaController::class, 'getCodigoFactura'])->name('admin.getCodigoFactura');
-    Route::resource('facturas', FacturaController::class)->names('api.facturas');
+    Route::post('facturas', [FacturaController::class, 'store'])->name('api.facturas');
+    // Route::resource('facturas', FacturaController::class)->names('api.facturas');
     
     /** FACTURAS INVENTARIO */
     Route::get('getCodigoFacturaE/{tabla}', [FacturaController::class, 'getCodigoFacturaE'])->name('admin.getCodigoFacturaE');

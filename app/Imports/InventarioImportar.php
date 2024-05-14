@@ -18,7 +18,7 @@ class InventarioImportar implements ToModel
     */
     public function model(array $row)
     {
-      
+       
             /** de lo contrario se procesa el registro del producto en el inventario */
             $marcaExiste = Marca::select('id')->where('nombre', $row[2])->get();
             $categoriaExiste = Categoria::select('id')->where('nombre', $row[3])->get();

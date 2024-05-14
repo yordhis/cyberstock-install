@@ -5,6 +5,7 @@
 @section('content')
     <div id="alert"></div>
     <section class="section">
+         @include('partials.alertSession')
         <div class="row">
 
             <div class="col-sm-12">

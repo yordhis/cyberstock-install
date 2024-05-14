@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
-use Maatwebsite\Excel\Facades\Excel;
+use \Excel;
 
 class InventarioController extends Controller
 {
@@ -42,21 +42,24 @@ class InventarioController extends Controller
     /** vista importar datos */
     public function importarCreate(){
         $menuSuperior = $this->data->menuSuperior;
-        return view("admin.inventarios.importar", compact('menuSuperior'));
+        $respuesta = $this->data->respuesta;
+        return view("admin.inventarios.importar", compact('menuSuperior', 'respuesta'));
     }
 
     /** importar la data del archivo */
     public function importarExcel(Request $request){
+        try {
+            Excel::import(new InventarioImportar, $request->file('file'));
+            $mensaje = "Importación de datos realizada correctamente.";
+            $estatus = Response::HTTP_OK;
+            return redirect()->route('admin.importar.create');
 
-
-        Excel::import(new InventarioImportar, $request->file('file'));
-
-        Inventario::where('codigo', 'COGIDO')->delete();
-
-        return back()->with([
-            "mensaje" => "Data cargada",
-            "estatus" => 200
-        ]);
+        } catch (\Throwable $th) {
+            $mensaje = Helpers::getMensajeError($th, ", error al importar inventario.");
+            $estatus = Response::HTTP_INTERNAL_SERVER_ERROR;
+            return redirect()->route('admin.importar.create')->with(compact('mensaje', 'estatus'));
+        }
+       
     }   
 
     /** Exportar inventario */
