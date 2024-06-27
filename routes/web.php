@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     InventarioController,
     LoginController,
     MarcaController,
+    MembresiaController,
     NotificacioneController,
     PagarController,
     PoController,
@@ -44,12 +45,16 @@ Route::get('/', function () {
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 Route::post('/logout', [LoginController::class, 'logout'])->name('login.logout');
+Route::get('/logout', [LoginController::class, 'logout'])->name('login.logoute');
 Route::get('/preload', [ApiController::class, 'preload'])->name('api.preload');
 /** CIERRE LOGIN */
 
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'membresia'])->group(function () {
+    /** CONFIGURACION DE MEMBRESIAS */
+    Route::resource('membresias', MembresiaController::class)->names('admin.membresias');
+
     /** IMPORTACIONES Y EXPORTACIONES */
         Route::post('/importaciones', [InventarioController::class, 'importarExcel'])->name('admin.importar.store');
         Route::get('/importaciones', [InventarioController::class, 'importarCreate'])->name('admin.importar.create');

@@ -511,8 +511,8 @@ function adaptadorDeProducto(data){
 
 async function getLista(url = `${URL_BASE}/getInventarios`){
     elementoTablaCuerpo.innerHTML = spinner();
-    let inventarios = await getInventarios(url);
-
+    let inventarios = await getInventarios(url)
+   
     if(typeof(inventarios.data.data) == 'undefined'){
         return elementoTablaCuerpo.innerHTML = componenteFila({estatus: 0})
     }

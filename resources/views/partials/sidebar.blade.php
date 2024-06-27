@@ -205,6 +205,12 @@ $subcategoria = 'LISTA';
                             <i class="bi bi-tools fs-3"></i><span>Importación de datos</span>
                         </a>
                     </li><!-- End Components Nav | usuarios -->
+                    <!-- Start Components Nav | usuarios -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.membresias.index') }} " >
+                            <i class="bi bi-tools fs-3"></i><span>Configuración de licencia</span>
+                        </a>
+                    </li><!-- End Components Nav | usuarios -->
                 @endif
 
             </ul>

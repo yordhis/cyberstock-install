@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataDev;
 use App\Models\Helpers;
 use App\Models\Monitore;
 use App\Models\User;
@@ -54,7 +55,9 @@ class LoginController extends Controller
      */
     public function index()
     {
-        return view('login');
+        $dataDev = new DataDev;
+        $respuesta = $dataDev->respuesta;
+        return view('login', compact('respuesta'));
     }
 
     /**
@@ -101,11 +104,15 @@ class LoginController extends Controller
     {
         /** registramos movimiento al usuario */
         Helpers::registrarMovimientoDeUsuario($request, 200, "Cerro sesión");
+
+        $mensaje = session('mensaje');
+        $estatus = session('estatus');
+
         // Eliminamos la session
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return $redirect->to('/login');
+        return $redirect->to('/login')->with(compact('mensaje', 'estatus'));
     }
 }

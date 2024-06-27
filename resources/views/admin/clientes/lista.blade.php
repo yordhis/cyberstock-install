@@ -6,7 +6,7 @@
     @isset($respuesta)
         @include('partials.alert')
     @endisset
-    
+
     <div id="alert"></div>
     <section class="section">
         <div class="row">

@@ -6,6 +6,9 @@
       <section class="section register mt-5  d-flex flex-column align-items-center justify-content-center ">
         <div class="container">
               <div class="row justify-content-center">
+
+                @include('partials.alertSession')
+
                 <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                     <div class="d-flex justify-content-center pb-1">
@@ -32,7 +35,9 @@
                                     <div class="input-group has-validation">
                                         <span class="input-group-text bg-primary text-white" id="inputGroupPrepend">@</span>
                                         <input type="text" name="email" class="form-control" 
-                                            autofocus id="email"
+                                             id="email"
+                                             placeholder="su usuario, por ejemplo: @usuario"
+                                             autofocus
                                             required>
                                         <div class="invalid-feedback">Por favor, ingrese su nombre de usuario!</div>
                                     </div>
@@ -46,7 +51,9 @@
 
                                 <div class="col-12">
                                     <label for="yourPassword" class="form-label">Contraseña</label>
-                                    <input type="password" name="password" autocomplete="false" class="form-control" id="password" required>
+                                    <input type="password" name="password" autocomplete="false" class="form-control" id="password" 
+                                    placeholder="Ingrese su contraseña"
+                                    required>
                                     <div class="invalid-feedback">Por favor, ingrese su contraseña!</div>
                                     @error('password')
                                         <br>
