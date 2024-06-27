@@ -58,10 +58,10 @@ class MembresiaTokenIsValid
                     "estatus" => 401
                 ]);
                 return redirect('logout');
-                
+
             }elseif ( $diferenciaDeDias <= 5 ) {
                 session([
-                    "mensaje" => "Su licencia está por expirar, le quedan aproximadamente {$diferenciaDeDias} para renovar; Su fecha de vencimiento es: {$fvm[2]}-{$fvm[1]}-{$fvm[0]}. contactos: 0414-3534569 / 0412-6772002",
+                    "mensaje" => "Su licencia está por expirar, le quedan aproximadamente {$diferenciaDeDias} días para renovar; Su fecha de vencimiento es: {$fvm[2]}-{$fvm[1]}-{$fvm[0]}. contactos: 0414-3534569 / 0412-6772002",
                     "estatus" => 401
                 ]);
             }
