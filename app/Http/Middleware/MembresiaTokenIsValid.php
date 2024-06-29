@@ -27,7 +27,7 @@ class MembresiaTokenIsValid
             $membresia = explode(",", Crypt::decrypt($token->token, false));
             array_push($membresia, $token->id);
         }
-// Carbon::create()
+
 
         if(count($membresia) == 0){
             if($request->user()->rol == 1){
@@ -45,7 +45,7 @@ class MembresiaTokenIsValid
             $fechaActual = Carbon::now('America/Caracas');
            
             /** configurar la fecha de vencimiento de membresia */
-            $fvm = explode("-", $membresia[4]);
+            $fvm = explode("-", $membresia[3]);
 
             $fvmd = Carbon::create($fvm[0],$fvm[1],$fvm[2], 0, 0, 0, 'America/Caracas');
 
