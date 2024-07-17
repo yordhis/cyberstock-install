@@ -1290,6 +1290,9 @@ const hanledAccionesDeCarritoFactura = async (e) => {
                                             setFactura(`${URL_BASE}/setFacturaEntrada`, facturaVender)
                                                 .then(res => {
                                                     if (res.estatus == 201) {
+                                                         /** Registramos el movimiento del usuario */
+                                                        ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, res.estatus);
+
                                                         $.confirm({
                                                             title: '¡Factura de compra registrada correctamente!',
                                                             type: 'green',

@@ -1442,7 +1442,8 @@ const procesarConsumo = async (e) => {
 
         /** Mostramos el dialogo de facturar */
         if (resultadoDeFacturar.estatus == 201) {
-            /** Eliminamos la factura del Storagr */
+           /** Registramos el movimiento del usuario */
+           ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
             /** Eliminamos la factura del Storagr */
             localStorage.removeItem('carritoSalida');
             localStorage.removeItem('facturaSalida');
@@ -1558,9 +1559,13 @@ const procesarFactura = async (e) => {
 
             /** Mostramos el dialogo de facturar */
             if (resultadoDeFacturar.estatus == 201) {
+                /** Registramos el movimiento del usuario */
+                ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
+
                 /** Eliminamos la factura del Storagr */
                 localStorage.removeItem('carritoSalida');
                 localStorage.removeItem('facturaSalida');
+
                 /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
                 e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
                 e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');

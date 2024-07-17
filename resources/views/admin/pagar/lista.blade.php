@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Lista de facturas por cobrar')
+@section('title', 'Lista de facturas por pagar')
 
 @section('content')
     <div id="alert"></div>

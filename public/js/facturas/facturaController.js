@@ -869,8 +869,12 @@ const formulaLibreFacturaHtml = (factura) => {
     carritoHtml="",
     ivaHtml="",
     iva= factura.iva > 0 ? factura.iva : 0.16,
-    descuentoHtml="";
+    descuentoHtml="",
+    vendedorHtml="";
 
+    if(d.querySelector("#nombreUsuario")){
+        vendedorHtml=`VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}`
+    }
     
     /** RECORREMOS EL CARRITO DE COMPRA */
     // Recorremos el carrito
@@ -934,8 +938,8 @@ const formulaLibreFacturaHtml = (factura) => {
                 </tr>
                 <tr >
                     <th colspan="2" class="text__left">
-                        VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
-
+                        
+                        ${vendedorHtml}
                     </th>
                     <th colspan="3" class="text__right">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>
                 </tr>
@@ -983,7 +987,12 @@ const formulaLibreHtml = (factura) => {
     let metodosDePagoHtml = ``,
     carritoHtml="",
     ivaHtml="",
-    descuentoHtml="";
+    descuentoHtml="",
+    vendedorHtml="";
+
+    if(d.querySelector("#nombreUsuario")){
+        vendedorHtml=`VENDEDOR: ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}`
+    }
    
 
     /** RECORREMOS EL CARRITO DE COMPRA */
@@ -1039,7 +1048,7 @@ const formulaLibreHtml = (factura) => {
                 </tr>
                 <tr >
                     <th colspan="2" class="text__left">
-                    VENDEDOR:  ${d.querySelector("#nombreUsuario").value ? d.querySelector("#nombreUsuario").value : 'VENDEDOR'}
+                        ${vendedorHtml}
 
                     </th>
                     <th colspan="3" class="text__right">FECHA DE EMISIÓN: <span class="">${factura.fecha} - ${factura.hora}</span></th>

@@ -47,16 +47,68 @@ const hanledImprimirFactura = async (e) => {
     if(e.target.localName == 'bottom') codigoFactura = e.target.id;
 
     elementoCargando.innerHTML = spinner();
-    resultado = await getFactura(e.target.id);
-    // log(resultado);
-    if (resultado.estatus == 200) {
-        let ticket = htmlTicket(resultado.data);
-        setTimeout(()=>imprimirElementoPos(ticket), 1000);
-        elementoCargando.innerHTML = '';
-    } else {
-        alert(resultado.mensaje)
-        elementoCargando.innerHTML = '';
-    }
+    await getFactura(e.target.id)
+    .then(res =>{
+        if (res.estatus == 200) {
+            elementoCargando.innerHTML = '';
+            $.confirm({
+                title: '¡Datos preparado para imprimir!',
+                content: 'Seleccione formato de impresión de la factura.',
+                theme: 'modern',
+                buttons: {
+                    nota:{
+                        text: 'Imprimir Nota de entrega en formato libre',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let formulaLN = formulaLibreHtml(res.data);
+                            setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
+                            return false; 
+                        } 
+                    }, 
+                        
+                    factura:{
+                        text: 'Imprimir Factura en formato libre',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let formulaLF = formulaLibreFacturaHtml(res.data);
+                            setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
+                            return false; 
+                        } 
+                    }, 
+
+                    ticket:{
+                        text: 'Imprimir Ticket',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let hTicket = htmlTicket(res.data);
+                            setTimeout(() => imprimirElementoPos(hTicket), 1000);
+                            return false; 
+                        } 
+                    }, 
+
+                    cancel: function () {}
+                }
+            });
+
+        }else{
+            $.alert({
+                title: 'Ups! algo salio mal',
+                theme: 'modern',
+                content: 'Vuelve a intentar, y si el error persiste contacta con soporte.',
+                buttons:{
+                    error:{
+                        text: 'Ver detalles del error',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            $.alert(res.mensaje);
+                        } 
+                    }
+                }
+            })
+            elementoCargando.innerHTML = '';
+        }
+    });
+
 };
 
 /** EVENTOS */
