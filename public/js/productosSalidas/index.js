@@ -1422,7 +1422,7 @@ const procesarConsumo = async (e) => {
     facturaVender.observacion = d.querySelector('#observacion').value
         ? d.querySelector('#observacion').value
         : "Sin observación asignada.";
-    log(facturaVender)
+   
     /** PROCESAR CARRITO */
     carritoVender.forEach(async producto => {
         producto.identificacion = facturaVender.identificacion;
@@ -1443,13 +1443,52 @@ const procesarConsumo = async (e) => {
         /** Mostramos el dialogo de facturar */
         if (resultadoDeFacturar.estatus == 201) {
             /** Eliminamos la factura del Storagr */
+            /** Eliminamos la factura del Storagr */
             localStorage.removeItem('carritoSalida');
             localStorage.removeItem('facturaSalida');
-            confirmoLaImpresion = confirm('Se proceso correctamente la factura de consumo, presione aceptar para imprimir comprobante.');
-            if (confirmoLaImpresion) {
-                imprimirElementoPos(htmlTicket(resultadoDeFacturar.data))
-            }
-            setTimeout(() => window.location.href = "/inventarios/crearSalida", 1500);
+            /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+            $.confirm({
+                title: '¡Factura procesada con éxito!',
+                content: 'Seleccione formato de impresión de la factura.',
+                buttons: {
+                    nota:{
+                        text: 'Imprimir Nota de entrega en formato libre',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let formulaLN = formulaLibreHtml(resultadoDeFacturar.data);
+                            setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
+                            return false; 
+                        } 
+                    }, 
+                        
+                    factura:{
+                        text: 'Imprimir Factura en formato libre',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let formulaLF = formulaLibreFacturaHtml(resultadoDeFacturar.data);
+                            setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
+                            return false; 
+                        } 
+                    }, 
+
+                    ticket:{
+                        text: 'Imprimir Ticket',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            let hTicket = htmlTicket(resultadoDeFacturar.data);
+                            setTimeout(() => imprimirElementoPos(hTicket), 1000);
+                            return false; 
+                        } 
+                    }, 
+
+                    cancel: function () {
+                        setTimeout(() => window.location.href = "/inventarios/crearSalida", 1500);
+                    }
+                }
+            });
+
+
+     
         } else {
             /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
             /** Eliminamos la factura del Storagr */
