@@ -51,7 +51,7 @@ Route::get('/preload', [ApiController::class, 'preload'])->name('api.preload');
 
 
 
-Route::middleware(['auth', 'membresia'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     /** CONFIGURACION DE MEMBRESIAS */
     Route::resource('membresias', MembresiaController::class)->names('admin.membresias');
 
