@@ -56,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('membresias', MembresiaController::class)->names('admin.membresias');
 
     /** IMPORTACIONES Y EXPORTACIONES */
+        Route::post('/importaciones/clientes', [ClienteController::class, 'setImportarCliente'])->name('admin.importar.cliente');
         Route::post('/importaciones', [InventarioController::class, 'importarExcel'])->name('admin.importar.store');
         Route::get('/importaciones', [InventarioController::class, 'importarCreate'])->name('admin.importar.create');
         Route::post('/exportarInventario', [InventarioController::class, 'exportarInventario'])->name('admin.exportar.inventario');
