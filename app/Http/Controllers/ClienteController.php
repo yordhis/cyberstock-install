@@ -192,14 +192,27 @@ class ClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(HttpRequest $request)
     {
         try {
-            $clientes = Cliente::orderBy('id', 'desc')->get();
-            $pathname = Request::path();
+            if($request->filtro){
 
+                $clientes = Cliente::where('id', $request->filtro)
+                ->orWhere('identificacion', '=', $request->filtro)
+                ->orWhere('nombre', 'LIKE', "%{$request->filtro}%")
+                ->orderBy('id', 'desc')
+                ->paginate(12);
+            }else{
+
+                $clientes = Cliente::orderBy('id', 'desc')->paginate(12);
+            }
+
+
+
+            $pathname = $request->path();
+            $respuesta =  $this->data->respuesta;
             $menuSuperior = $this->data->menuSuperior;
-            return view('admin.clientes.lista', compact('clientes', 'menuSuperior', 'pathname'));
+            return view('admin.clientes.lista', compact('clientes', 'menuSuperior', 'pathname', 'request', 'respuesta'));
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar consultar los clientes, ");
             return response()->view('errors.404', compact("errorInfo"), 404);

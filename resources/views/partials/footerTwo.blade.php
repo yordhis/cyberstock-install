@@ -31,7 +31,7 @@
                 perPage: "Entradas por página",
                 noRows: "No hay resultados",
                 info: "Demostración {start} a {end} de {rows} entradas",
-                noResults: "Ningún resultado coincide con su consulta de búsqueda",
+                noResults: "Ningún resultado coincide con su búsqueda",
             },
         })
   } catch (error) {
