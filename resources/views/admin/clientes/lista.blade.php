@@ -29,6 +29,7 @@
                 <h2> Lista de clientes </h2>
             </div>
             <div class="col-sm-6 col-xs-12">
+                
                 @include('admin.clientes.partials.modalCrear')
             </div>
             <div class="col-sm-6 col-xs-12">
@@ -44,6 +45,8 @@
                         </button>
                     </div>
                 </form>
+
+                
             </div>
 
             <div class="col-lg-12 mt-4 ">
@@ -58,6 +61,7 @@
                                 <th scope="col">RIF O documento</th>
                                 <th scope="col">Teléfono</th>
                                 <th scope="col">Acciones</th>
+                                <th scope="col">@include('admin.clientes.partials.modalimprir')</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,6 +79,7 @@
                                         @include('admin.clientes.partials.modal')
 
                                     </td>
+                                    <td></td>
                                 </tr>
                             @endforeach
 

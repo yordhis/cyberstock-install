@@ -134,6 +134,8 @@ Route::middleware(['auth'])->group(function () {
         // Route::resource('facturas', FacturaController::class)->names('admin.facturas');
         
         /** CLIENTES */
+        Route::get('generar/lista/clientes/excel', [ClienteController::class, 'exportExcel'])->name('admin.clientes.export.excel');
+        Route::get('generar/lista/clientes/pdf', [ClienteController::class, 'exportPdf'])->name('admin.clientes.export.pdf');
         Route::resource('clientes', ClienteController::class)->names('admin.clientes');
   
         /** POS CONFIGURACIÓN */

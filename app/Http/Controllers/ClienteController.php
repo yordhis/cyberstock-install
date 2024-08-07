@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ClienteExportar;
 use App\Models\Cliente;
 use App\Http\Requests\StoreClienteRequest;
 use App\Http\Requests\UpdateClienteRequest;
@@ -172,7 +173,7 @@ class ClienteController extends Controller
 
 
 
-    /** importar la data del archivo */
+    /** SECCION DE EXPORTACIÓN E IMPORTACIÓN */
     public function setImportarCliente(HttpRequest $request)
     {
         try {
@@ -186,6 +187,18 @@ class ClienteController extends Controller
             return redirect()->route('admin.importar.create')->with(compact('mensaje', 'estatus'));
         }
     }
+
+    public function exportExcel()
+    {
+        return Excel::download(new ClienteExportar, 'clientes.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        return Excel::download(new ClienteExportar, 'clientes.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+    }
+    /** CIERRE SECCION DE EXPORTACIÓN E IMPORTACIÓN */
+
 
     /**
      * Display a listing of the resource.
