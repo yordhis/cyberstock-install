@@ -557,6 +557,7 @@ const hanledLoad = async (e) => {
                                     factura.tipo = 'SALIDA';
                                     factura.iva = 0.16;
                                     factura.estatus = true;
+                                    factura.vendedor = d.querySelector("#vendedor").value;
                                     factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
                                     localStorage.setItem('factura', JSON.stringify(factura));
 
@@ -1719,6 +1720,13 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 
 /** EVENTOS */
 addEventListener('load', hanledLoad);
+
+/** Invocamos el evento change para detectar los cambio del select de @VEDEDORES */
+d.querySelector("#vendedor").addEventListener('change', (e) => {
+    factura.vendedor = e.target.value
+    localStorage.setItem('factura', JSON.stringify(factura))
+});
+
 
 elementoTarjetaCliente.addEventListener('keyup', hanledBuscarCliente);
 elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddVendedorToFacturas extends Migration
+class AddVendedorToFacturaInventarios extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddVendedorToFacturas extends Migration
      */
     public function up()
     {
-        Schema::table('facturas', function (Blueprint $table) {
-            $table->string('vendedor', 255)->nullable()->after('concepto');
+        Schema::table('factura_inventarios', function (Blueprint $table) {
+            $table->string('vendedor', 255)->nullable();
         });
     }
 
@@ -25,7 +25,7 @@ class AddVendedorToFacturas extends Migration
      */
     public function down()
     {
-        Schema::table('facturas', function (Blueprint $table) {
+        Schema::table('factura_inventarios', function (Blueprint $table) {
             $table->dropColumn('vendedor');
         });
     }

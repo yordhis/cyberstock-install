@@ -7,7 +7,6 @@ let elementoTarjetaCliente = d.querySelector('#tarjetaCliente'),
     elementoAlertas = d.querySelector('#alertas'),
     listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'),
     elementoFactura = d.querySelector('#componenteFactura'),
-    vendedor = d.querySelector("#nombreUsuario").value,
     elementoMetodoDePagoModal = d.querySelector('#elementoMetodoDePagoModal'),
     factura = {
         codigo: '',
@@ -577,6 +576,8 @@ const componenteBotonesDeImpresion = () => {
 
 /** MANEJADORES DE EVENTOS */
 const hanledLoad = async () => {
+    
+    
     let resultadoCliente = 0,
         numeroMovimiento = "",
         resultadoNumeroDeFactura = "";
@@ -620,6 +621,7 @@ const hanledLoad = async () => {
                                                 factura.tipo = 'SALIDA';
                                                 factura.iva = 0.16;
                                                 factura.estatus = true;
+                                                factura.vendedor = d.querySelector("#vendedor").value;
                                                 let fecha = new Date();
                                                 factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
                                                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
@@ -662,6 +664,10 @@ const hanledLoad = async () => {
     } else {
         /** CARGAR FACTURA ACTUAL */
 
+        /** Mantenemos el vendedor seleccionado */
+        // log(factura.vendedor)
+        // d.getElementById("vendedor").options[parseInt(factura.vendedor)].selected=true
+      
         /** CLIENTE */
         await getCliente({
             filtro: factura.identificacion,
@@ -686,6 +692,7 @@ const hanledLoad = async () => {
         carritoStorage = localStorage.getItem('carritoSalida') ? JSON.parse(localStorage.getItem('carritoSalida')) : [];
         /** Se carga la lista de productos */
         listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
+          
 
         /** Cargamos los datos de la factura */
         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
@@ -1430,6 +1437,12 @@ const hanledAccionesDeMetodoDePago = async (e) => {
 /** EVENTOS */
 addEventListener('load', hanledLoad);
 
+/** Invocamos el evento change para detectar los cambio del select de @VEDEDORES */
+d.querySelector("#vendedor").addEventListener('change', (e) => {
+    factura.vendedor = e.target.value
+    localStorage.setItem('facturaSalida', JSON.stringify(factura))
+});
+
 elementoTarjetaCliente.addEventListener('keyup', hanledBuscarCliente);
 elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);
 
@@ -1455,7 +1468,7 @@ const procesarConsumoCredito = async (e) => {
         carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
     /** VACIAMOS EL CODIGO DE FACTURA Y OTROS DATOS ESTATICOS */
-    facturaVender.vendedor = vendedor;
+    facturaVender.vendedor = d.querySelector("#vendedor").value;
     facturaVender.codigo_factura = facturaVender.concepto == "CREDITO" ? facturaVender.codigo_factura : "";
     facturaVender.observacion = d.querySelector('#observacion').value;
     facturaVender.tipo = "SALIDA";

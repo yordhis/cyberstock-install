@@ -10,6 +10,7 @@ use App\Models\DataDev;
 use App\Models\Factura;
 use App\Models\Helpers;
 use App\Models\Po;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 
@@ -31,8 +32,8 @@ class PoController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = Request::path();
-           
-            return view('admin.pos.index', compact('menuSuperior',  'pathname'));
+            $usuarios = User::where('rol', '!=', 1)->get();
+            return view('admin.pos.index', compact('menuSuperior',  'pathname', 'usuarios'));
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error al entrar al pos de venta index, ");
             return view('errors.404', compact('mensajeError'));

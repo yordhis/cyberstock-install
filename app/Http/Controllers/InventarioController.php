@@ -20,6 +20,7 @@ use App\Models\{
     Pago,
     Po,
     Proveedore,
+    User,
     Utilidade,
     Utility
 };
@@ -70,10 +71,6 @@ class InventarioController extends Controller
     /**
      *  Display a listing of the resource.
      *  DESPLEGAMOS LA LISTA DE RECURSOS
-     * @return \Illuminate\Http\Response
-     * 
-     * @return pathname
-     * @return menuSuperior
      */
     public function index()
     {
@@ -523,7 +520,8 @@ class InventarioController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = $request->path();
-            return view('admin.salidas.index', compact( 'menuSuperior', 'pathname'));
+            $usuarios = User::where('rol', '!=', 1)->get();
+            return view('admin.salidas.index', compact( 'menuSuperior', 'pathname', 'usuarios'));
 
         } catch (\Throwable $th) {
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de salidas, ");
