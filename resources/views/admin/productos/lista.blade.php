@@ -4,93 +4,114 @@
 
 @section('content')
 
-    @include('partials.alert')
-    <div id="alert"></div>
+    @if (session('mensaje'))
+        @include('partials.alert')
+    @endif
+
+
+    {{-- respuesta de validadciones --}}
+    <div class="col-12">
+        @if ($errors->any())
+            <div class="alert alert-danger text-start">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </div>
 
     <section class="section">
         <div class="row">
 
-            <div class="col-sm-8">
-                <h2>Lista de Productos</h2>
+            <div class="col-12">
+                <h2> Lista de productos </h2>
             </div>
-            <div class="col-sm-4 text-end">
+            <div class="col-sm-6 col-xs-12">
+                
                 @include('admin.productos.partials.modalCrear')
             </div>
-
-            <div class="col-sm-10 mb-1">
-                <form action="getProductosFiltro" id="formularioFiltro" method="post" target="_self">
-                    <div class="input-group">
-                     
-                        <input type="text" class="form-control" id="filtro" name="filtro" placeholder="Buscar producto por Código o Descripcion" aria-label="Buscar producto" aria-describedby="basic-addon1">
-                        <span class="text-danger invalido"></span>
-    
-                        <select class="form-select" id="categorias" name="id_categoria">
-                            <option selected>CATEGORIAS</option>
-                            @foreach ($categorias as $categoria)
-                                <option value="{{ $categoria->id }}"> {{ $categoria->nombre }} </option>
-                            @endforeach
-                     
-                        </select>
-    
-                        <select class="form-select" id="marcas" name="id_marca">
-                            <option selected>MARCAS</option>
-                            @foreach ($marcas as $marca)
-                                <option value="{{ $marca->id }}"> {{ $marca->nombre }} </option>
-                            @endforeach
-                        </select>
-
-                        <button class="btn btn-outline-secondary" type="submit">
+            <div class="col-sm-6 col-xs-12">
+                <form action="{{ route('admin.productos.index') }}" method="post">
+                    @csrf
+                    @method('get')
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" name="filtro"
+                            placeholder="Filtrar (Por codigo de barra y Por descripción )" aria-label="Filtrar"
+                            aria-describedby="button-addon2" required>
+                        <button class="btn btn-primary" type="submit" id="button-addon2">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </form>
+
+                
             </div>
 
-            <div class="col-sm-2">
-                <button class="btn btn-outline-danger w-100" type="bottom" id="limpiarFiltro">
-                    <i class="bi bi-trash3"></i> Limpiar filtro
-                </button>
-            </div>
-    
+            <div class="col-lg-12 mt-4 ">
 
-            <div class="col-lg-12 mt-1">
+                <div class="table-responsive">
+                    <!-- LISTA DE PRODUCTOS -->
+                    <table class="table table-hover bg-white">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                <th scope="col">N°</th>
+                                <th scope="col">Código de barra</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Marca</th>
+                                <th scope="col">Acciones</th>
+                                {{-- <th scope="col">@include('admin.clientes.partials.modalimprir')</th> --}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($productos as $producto)
+                                <tr>
+                                    <td scope="row">{{ $producto->id }}</td>
+                                    <td scope="row">{{ $producto->codigo }}</td>
+                                    <td>{{ $producto->descripcion }}</td>
+                                    <td>{{ $producto->categoria ?? 'N/A'}}</td>
+                                    <td>{{ $producto->marca ?? 'N/A' }}</td>
 
-                <div class="card">
-                    <div class="card-body table-responsive">
-                    
-                        <!-- Table with stripped rows -->
-                        
-                        {{-- <table class="table datatable "> --}}
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Código de barra</th>
-                                        <th scope="col">Descripción</th>
-                                        <th scope="col">Categoria</th>
-                                        <th scope="col">Marca</th>
-                                        <th scope="col">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="lista">
-                                </tbody>
-                            </table>
-                            <!-- PAGINACION JS -->
-                            <nav class="paginacion" aria-label="Page navigation example"></nav>
+                                    <td>
+                                        
+                                        @include('admin.productos.partials.modalEditar')
+                                        @include('admin.productos.partials.modaldialog')
+                                        @include('admin.productos.partials.modalEliminar')
+
+                                    </td>
+                                    {{-- <td></td> --}}
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+
+                                <td colspan="7" class="text-center table-secondary">
+                                    Total de productos: {{ $productos->total() }} |
+                                    <a href="{{ route('admin.productos.index') }}" class="text-primary">
+                                        Ver todo
+                                    </a>
+                                    <br>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <!-- End LISTA DE CLIENTES -->
+                    <!-- PAGINACIÓN DE CLIENTES -->
+                    <div class="col-xs-12 col-sm-6 ">
+                        {{ $productos->appends(['filtro' => $request->filtro])->links() }}
                     </div>
+                    <!-- CIERRE PAGINACIÓN DE CLIENTES -->
                 </div>
+
             </div>
         </div>
     </section>
 
-
-    <script src=" {{ asset('js/main.js') }}" defer></script>
-    <script src="{{ asset('js/productos/index.js') }}" defer></script>
-    <script src="{{ asset('js/productos/productoController.js') }}" defer></script>
     <script src="{{ asset('js/productos/generadorDeBarcode.js') }}" defer></script>
-    <script src="{{ asset('js/productos/categorias/CategoriaController.js') }}" defer></script>
-    <script src="{{ asset('js/productos/marcas/MarcaController.js') }}" defer></script>
-    
- 
+
 
 @endsection

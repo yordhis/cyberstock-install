@@ -54,19 +54,21 @@ const hojaDeCodigos = (barcode) => {
 
 /** Manejador del evento imprimir codigos de barra */
 const hanledBarcode = (e) => {
-    console.log("generando codigo de barra");
     imprimirElementoFormulaLibre(hojaDeCodigos(e.target.id));
 };
-
-
 
 async function cargarEventosDelBotonImprimirBarcode() {
     let botonesDeImprimirBarcode = document.querySelectorAll(".button__print__barcode");
 
-    console.log(botonesDeImprimirBarcode);
-
     botonesDeImprimirBarcode.forEach(boton => {
-        console.log(boton);
         boton.addEventListener('click', hanledBarcode);
     });
 }
+
+/** MANEJADORES DE EVENTO */
+const hanledLoad = async (e) => {
+    await cargarEventosDelBotonImprimirBarcode();
+};
+
+/** EVENTOS */
+addEventListener('load', hanledLoad);

@@ -1,5 +1,5 @@
  <!-- Modal Dialog Scrollable -->
- <a type="button" class="" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$producto->id}}">
+ <a type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable{{$producto->id}}">
     <i class="bi bi-eye"></i>
  </a>
   <div class="modal fade" id="modalDialogScrollable{{$producto->id}}" tabindex="-1">
@@ -20,8 +20,14 @@
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                     <img src="{{ $producto->imagen }}" alt="Profile" class="rounded-circle">
                     <h2>  {{ $producto->descripcion }}</h2>
-                    <h3><b>Código de barra: </b>{{ $producto->codigo }}
+             
                     
+                      <img alt='Barcode Generator TEC-IT & Cyber Staff, C.A.'
+                      src="https://barcode.tec-it.com/barcode.ashx?data={{ $producto->codigo }}&code=Code128"
+                      id="generadorDeCodigoDeBarra"
+                      >
+
+                      <button class="btn btn-primary m-2 button__print__barcode"  id="{{ $producto->codigo }}" >Generar PDF de códigos de barra</button>
                    
 
                     
@@ -30,19 +36,19 @@
                       <div class="row">
                         <hr>
                         <div class="col-md-12">
-                          <h3>Mas detalles</h3>
+                          <strong>Mas detalles</strong>
                         </div>
 
                         <div class="col-md-12 label"> 
-                          <span class="text-primary">Marca: </span> {{ $producto->id_marca->nombre  }} <br>
-                          <span class="text-primary">Categoria: </span> {{ $producto->id_categoria->nombre  }} <br>
+                          <span class="text-primary">Marca: </span> {{ $producto->marca  }} <br>
+                          <span class="text-primary">Categoria: </span> {{ $producto->categoria  }} <br>
                         </div>
 
                         <div class="col-md-12 label"> 
-                          <span class="text-primary">Fecha de creación:</span>  {{ date_format(date_create($producto->created_at), "d-m-Y h:m") }}
-                          @empty($producto->created_at)
-                          {{ isset($producto->created_at) ? date_format(date_create($producto->created_at), "d-m-Y") : "" }}
                           
+                          @empty($producto->creado)
+                            <span class="text-primary">Fecha de creación:</span> 
+                            {{ isset($producto->creado) ? date_format(date_create($producto->creado), "d-m-Y") : "" }}
                           @endempty
                         </div>     
                       </div>

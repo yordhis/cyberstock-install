@@ -1,7 +1,7 @@
 
         
 <!-- Vertically centered Modal -->
-<a type="button" class="text-warning" data-bs-toggle="modal" data-bs-target="#modalEditarProducto{{$producto->id}}">
+<a type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modalEditarProducto{{$producto->id}}">
     <i class="bi bi-pencil "></i>
 </a>
     
@@ -16,10 +16,10 @@
         </div>
      
             <div class="modal-body">
-                <form action="/productos/{{$producto->id}}" method="post" target="_self" enctype="multipart/form-data"
+                <form action="{{ route('admin.productos.update', $producto->id) }}" method="post" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
-                @method('put')
+                @method('PUT')
 
                 <div class="modal-body">
                     <div class="row">
@@ -72,19 +72,13 @@
                             <select name="id_categoria" id="id_categoria" class="form-select" required>
                                 <option value="">Seleccione Categoria</option>
                                 @foreach ($categorias as $categoria)
-                                    @isset($producto->id_categoria->id)
-                                        @if ($producto->id_categoria->id == $categoria->id)
+
+                                    @isset($producto->id_cat)
+                                        @if ($producto->id_cat == $categoria->id)
                                             <option value="{{ $categoria->id }}" selected>{{ $categoria->nombre }}
                                             </option>
                                         @endif
                                     @endisset
-
-                                    {{-- @isset($request->id_categoria)
-                                        @if ($request->id_categoria == $categoria->id)
-                                            <option value="{{ $categoria->id }}" selected>{{ $categoria->nombre }}
-                                            </option>
-                                        @endif
-                                    @endisset --}}
     
                                     <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
                                 @endforeach
@@ -101,19 +95,12 @@
                                 <option value="">Seleccione Marca</option>
                                 @foreach ($marcas as $marca)
 
-                                    @isset($producto->id_marca->id)
-                                        @if ($producto->id_marca->id == $marca->id)
+                                    @isset($producto->id_mar)
+                                        @if ($producto->id_mar == $marca->id)
                                             <option value="{{ $marca->id }}" selected>{{ $marca->nombre }}
                                             </option>
                                         @endif
                                     @endisset
-
-                                    {{-- @isset($request->id_marca)
-                                        @if ($request->id_marca == $marca->id)
-                                            <option value="{{ $marca->id }}" selected>{{ $marca->nombre }}
-                                            </option>
-                                        @endif
-                                    @endisset --}}
     
                                     <option value="{{ $marca->id }}">{{ $marca->nombre }}</option>
                                 @endforeach
@@ -124,7 +111,7 @@
                         </div>
 
                          {{-- inputs Fecha de vencimiento --}}
-                         {{-- <div class="col-12 text-start mt-2">
+                         <div class="col-12 text-start mt-2">
                             <label for="yourUsername" class="form-label">Fecha de vencimiento (Opcional)</label>
                             <div class="input-group has-validation">
     
@@ -142,7 +129,7 @@
                                     {{ $message }}
                                 </span>
                             @enderror
-                        </div> --}}
+                        </div>
 
                         {{-- Imagen --}}
                         <div class="col-12 text-start mt-2">
@@ -150,78 +137,11 @@
                             <input type="file" name="file" class="form-control " id="foto">
                             <div class="invalid-feedback">Ingrese una imagen valida</div>
                         </div>
-                        <div class="col-12 mt-2 ">
-                            <img src="{{ $producto->imagen ?? '' }}"  alt="imagen" class="img-thumbnail">
+
+                        <div class="col-12 mt-2">
+                            <img src="{{ asset($producto->imagen)  ?? '' }}"  alt="imagen" class="img-thumbnail w-50">
                         </div>
 
-                        <div class="col-12">
-                            <hr>
-                            <p class="text-start text-mute">
-                                Los siguientes datos solicitados son opcionales; y pertenecen a una entrada inicial del 
-                                inventario si desea actualizar afectará los datos de inventario de este producto.
-                            </p>
-                        </div>
-    
-                        {{-- inputs Cantidad Inicial --}}
-                        <div class="col-sm-6 col-xs-12 text-start mt-2">
-                            <label for="yourUsername" class="form-label">Cantidad Inicial (opcional)</label>
-                            <div class="input-group has-validation">
-    
-                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
-                                    <i class="bx bx-checkbox-minus fs-3"></i>
-                                </span>
-    
-                                <input type="number" name="cantidad_inicial" step="any" class="form-control" id="cantidad_inicial"
-                                    placeholder="Ingrese cantidad inical del producto"
-                                    value="{{ $producto->inventario->cantidad  ?? ''}}">
-                                <div class="invalid-feedback">Por favor ingrese El cantidad inical del producto! </div>
-                                @error('cantidad_inicial')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-    
-                        {{-- inputs Costo --}}
-                        <div class="col-sm-6 col-xs-12 text-start mt-2">
-                            <label for="yourUsername" class="form-label">Costo (opcional)</label>
-                            <div class="input-group has-validation">
-    
-                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
-                                    <i class="bx bx-checkbox-minus fs-3"></i>
-                                </span>
-    
-                                <input type="number" name="costo" step="any" class="form-control"
-                                    id="costo" placeholder="Ingrese costo proveedor"
-                                    value="{{ $producto->inventario->costo ?? '' }}">
-                                @isset($mensaje)
-                                    <div class="{{ $mensaje['input'] == 'costo' ? 'text-danger' : "" }}">{{ $mensaje['input'] == 'costo' ? $mensaje['texto'] : '' }} </div>                                
-                                @endisset
-
-                                @error('costo')
-                                    <span class="text-danger">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-    
-                        {{-- inputs Utilidad --}}
-                        <div class="col-12 text-start mt-2">
-                            <label for="yourUsername" class="form-label">Precio de Venta al público (PVP)</label>
-                            <div class="input-group has-validation">
-    
-                                <span class="input-group-text text-white bg-primary" id="inputGroupPrepend">
-                                    <i class="bx bx-building fs-3"></i>
-                                </span>
-    
-                                <input type="number" name="pvp" step="any" class="form-control"
-                                    id="pvp" placeholder="Ingrese PVP"
-                                    value="{{ $producto->inventario->pvp ??   '' }}">
-                                <div class="invalid-feedback">Por favor, ingrese El PVP! </div>
-                            </div>
-                        </div>
                     </div>
 
                 </div> <!--Fin div body-->

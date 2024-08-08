@@ -1,7 +1,7 @@
 
         
 <!-- Vertically centered Modal -->
-<a type="button" class="text-primary" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$producto->id}}">
+<a type="button" class="btn btn-danger text-white" data-bs-toggle="modal" data-bs-target="#verticalycentered{{$producto->id}}">
     <i class="bi bi-trash"></i>
 </a>
 
@@ -16,11 +16,11 @@
             ¿Esta seguro que desea eliminar el producto <span class="text-danger fs-5">{{$producto->descripcion}}</span>? 
         </div>
         <div class="modal-footer">
-            <form action="productos/{{$producto->id}}" method="post" target="_self">
+            <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="post" >
             @csrf
             @method('delete')
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="submit" class="btn btn-primary">Si, proceder a eliminar.</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Si, proceder a eliminar.</button>
             </form>
         </div>
     </div>

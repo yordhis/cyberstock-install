@@ -1,5 +1,5 @@
 <!-- Vertically centered Modal -->
-<button type="button" class="nav-item text-green bg-primary p-2 rounded-2 " data-bs-toggle="modal"
+<button type="button" class="nav-item text-white bg-primary p-2 rounded-2 " data-bs-toggle="modal"
     data-bs-target="#modalCrear" >
     <i class="bi bi-box "></i> Crear Producto
 </button>
@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="/productos" method="post" target="_self" id="crearProductoLaravel" enctype="multipart/form-data"
+            <form action="{{ route('admin.productos.store') }}" method="post" id="crearProductoLaravel" enctype="multipart/form-data"
                 class=" g-3 needs-validation">
                 @csrf
                 @method('post')
