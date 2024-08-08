@@ -314,7 +314,13 @@ const componenteNumeroDeFactura = (data) => {
 };
 
 const componenteFactura = async (factura) => {
+    let totalItems = JSON.parse(localStorage.getItem('carrito')).length
+
     return `
+        <div class="col-sm-12 p-2">
+            <strong>Total items: ${totalItems}</strong>
+        </div>
+
         <div class="col-sm-6 form-floating mb-3">
             <input type="number" class="form-control acciones-factura" id="editarDescuento" >
             <label for="floatingInput">Descuento %</label>
@@ -557,7 +563,7 @@ const hanledLoad = async (e) => {
                                     factura.tipo = 'SALIDA';
                                     factura.iva = 0.16;
                                     factura.estatus = true;
-                                    factura.vendedor = d.querySelector("#vendedor").value;
+                                    factura.vendedor = parseInt(d.querySelector("#vendedor").value);
                                     factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
                                     localStorage.setItem('factura', JSON.stringify(factura));
 
@@ -1907,6 +1913,15 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;
     factura.total = parseFloat((acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento / 100));
+
+    /** Mantenemos el vendedor seleccionado */
+    for (const key in d.getElementById("vendedor").options) {
+        if (Object.prototype.hasOwnProperty.call(d.getElementById("vendedor").options, key)) {
+            const element = d.getElementById("vendedor").options[key];
+            if(factura.vendedor == element.value) d.getElementById("vendedor").options[key].selected=true
+            
+        }
+    }
 
     localStorage.setItem('factura', JSON.stringify(factura));
 

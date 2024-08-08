@@ -506,7 +506,9 @@ class InventarioController extends Controller
         try {
             $menuSuperior = $this->data->menuSuperior;
             $pathname = $request->path();
-            return view('admin.entradas.index', compact('menuSuperior', 'pathname'));
+            $usuarios = User::where('rol', '!=', 1)->get();
+
+            return view('admin.entradas.index', compact('usuarios','menuSuperior', 'pathname'));
         } catch (\Throwable $th) {
           
             $errorInfo = Helpers::getMensajeError($th, "Error al intentar mostrar formulario de entradas, ");

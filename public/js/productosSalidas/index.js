@@ -621,7 +621,7 @@ const hanledLoad = async () => {
                                                 factura.tipo = 'SALIDA';
                                                 factura.iva = 0.16;
                                                 factura.estatus = true;
-                                                factura.vendedor = d.querySelector("#vendedor").value;
+                                                factura.vendedor = parseInt(d.querySelector("#vendedor").value);
                                                 let fecha = new Date();
                                                 factura.fecha = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}T${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
                                                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
@@ -663,10 +663,6 @@ const hanledLoad = async () => {
         })
     } else {
         /** CARGAR FACTURA ACTUAL */
-
-        /** Mantenemos el vendedor seleccionado */
-        // log(factura.vendedor)
-        // d.getElementById("vendedor").options[parseInt(factura.vendedor)].selected=true
       
         /** CLIENTE */
         await getCliente({
@@ -1439,7 +1435,7 @@ addEventListener('load', hanledLoad);
 
 /** Invocamos el evento change para detectar los cambio del select de @VEDEDORES */
 d.querySelector("#vendedor").addEventListener('change', (e) => {
-    factura.vendedor = e.target.value
+    factura.vendedor = parseInt(e.target.value)
     localStorage.setItem('facturaSalida', JSON.stringify(factura))
 });
 
@@ -1725,8 +1721,9 @@ const procesarFactura = async (e) => {
         let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
             carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
+            log(facturaVender)
+        
         /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-
         facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, carritoVender)
             .then(resultadoCarritoSalida => {
 
@@ -2042,6 +2039,17 @@ async function cargarDatosDeFactura(carritoActual, factura, iva = 0.16, descuent
     factura.subtotal = acumuladorSubtotal;
     factura.descuento = descuento;
     factura.total = parseFloat((acumuladorSubtotal * factura.iva) + acumuladorSubtotal) - parseFloat(acumuladorSubtotal * (factura.descuento / 100));
+
+     /** Mantenemos el vendedor seleccionado */
+     for (const key in d.getElementById("vendedor").options) {
+        if (Object.prototype.hasOwnProperty.call(d.getElementById("vendedor").options, key)) {
+            const element = d.getElementById("vendedor").options[key];
+            if(factura.vendedor == element.value) d.getElementById("vendedor").options[key].selected=true
+            
+        }
+     }
+    
+    //  d.getElementById("vendedor").options[parseInt(factura.vendedor)].selected=true
 
     localStorage.setItem('facturaSalida', JSON.stringify(factura));
 

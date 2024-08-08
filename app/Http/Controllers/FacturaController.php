@@ -382,7 +382,8 @@ class FacturaController extends Controller
                         "concepto" => $request->concepto, // venta, compra ...
                         "descuento" => $request->descuento, // descuento
                         "fecha" => $request->fecha, // fecha venta, compra ...
-                        "metodos" => $request->metodos
+                        "metodos" => $request->metodos,
+                        "vendedor" => $request->vendedor,
                     ]
                 );
             

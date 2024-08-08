@@ -2,28 +2,32 @@
 <div class="card" style="height: auto; width: 100%;">
     <div class="card-body">
         {{-- <img src="{{ Auth::user()->foto }}" alt="" class="img rounded w-50"> --}}
-        <i>Asigne un vendedor</i>
-        <h5 class="card-text text-danger">
-            <strong>Vendedor: </strong>  
-        </h5>
-        <select name="vendedor" id="vendedor" class="form-control">
+        <div class="{{ $pathname == "pos" || $pathname == "inventarios/crearEntrada" ? 'd-none' : ''}}">
 
-            @foreach ($usuarios as $usuario)
-                @if($usuario->id == Auth::user()->id)
-                    <option value="{{ $usuario->id }}" selected>{{ $usuario->nombre}}</option>
+            <i>Asigne un vendedor</i>
+            <h5 class="card-text text-danger">
+                <strong>Vendedor: </strong>  
+            </h5>
+            <select name="vendedor" id="vendedor" class="form-control">
 
-                @else
+                @foreach ($usuarios as $usuario)
+                    @if($usuario->id == Auth::user()->id)
+                        <option value="{{ $usuario->id }}" selected>{{ $usuario->nombre}}</option>
 
-                    <option value="{{ $usuario->id }}">{{ $usuario->nombre}}</option>
-                @endif
+                    @else
 
-            @endforeach
-        </select>
-        <hr>
-        <p class="card-text mt-0" style="">
+                        <option value="{{ $usuario->id }}">{{ $usuario->nombre}}</option>
+                    @endif
+
+                @endforeach
+            </select>
+            <hr>
+        </div>
+        
+        <p class="card-text mt-1" style="">
             
             <span>
-                <b>Usuario:</b>  
+                {!! $pathname == "pos" || $pathname == "inventarios/crearEntrada" ? "<strong class='text-danger'>Vendedor: </strong>" : "<strong>Usuario: </strong>" !!}
                 <span id="idUsuario" class="text-dark">
                     N°: {{ Auth::user()->id }} -
                 </span> 

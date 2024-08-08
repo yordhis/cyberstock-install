@@ -81,7 +81,8 @@ class FacturaInventarioController extends Controller
                     "concepto" => $request->concepto, // venta, compra ...
                     "descuento" => $request->descuento, // descuento
                     "fecha" => $request->fecha, // fecha venta, compra ...
-                    "metodos" => $request->metodos
+                    "metodos" => $request->metodos,
+                    "vendedor" => $request->vendedor,
                 ]
             );
 
@@ -131,7 +132,8 @@ class FacturaInventarioController extends Controller
                     "observacion" => $request->observacion, // venta, compra ...
                     "descuento" => $request->descuento, // descuento
                     "fecha" => $request->fecha, // fecha venta, compra ...
-                    "metodos" => $request->metodos
+                    "metodos" => $request->metodos,
+                    "vendedor" => $request->vendedor,
                 ]
             );
 
@@ -152,7 +154,8 @@ class FacturaInventarioController extends Controller
                         "concepto" => $request->concepto, // venta, compra ...
                         "descuento" => $request->descuento, // descuento
                         "fecha" => $request->fecha, // fecha venta, compra ...
-                        "metodos" => $request->metodos
+                        "metodos" => $request->metodos,
+                        "vendedor" => $request->vendedor,
                     ]
                 );
             } else {
