@@ -50,48 +50,16 @@ class CarritoInventarioController extends Controller
     {
         try {
 
-            /** Creamos el carrito de la factura en caso de que sea 
-             * @param VENTA
-             * @param CREDITO
-             */
-            if ($request->concepto != 'CONSUMO') {
-                Carrito::create([
-                    "codigo" => $request->codigo_factura,
-                    "codigo_producto" => $request->codigo_producto,
-                    "identificacion"  => $request->identificacion,
-                    "cantidad"  => $request->cantidad,
-                    "costo"  => $request->costo,
-                    "subtotal"  => $request->subtotal,
-                    "descripcion"  => $request->descripcion
-                ]);
+            /** Crear carrito */
+            foreach ($request->all() as $producto) {
+                CarritoInventario::create($producto);
             }
 
-
-            $estatusCrear = CarritoInventario::create($request->all());
-
-            if ($estatusCrear) {
-                return response()->json([
-                    "mensaje" => "Producto del carrito facturado correctamente",
-                    "data" => $estatusCrear,
-                    "estatus" =>  Response::HTTP_CREATED
-                ], Response::HTTP_CREATED);
-            } else {
-                return response()->json([
-                    "mensaje" => "Producto del carrito NO se facturó.",
-                    "data" => $estatusCrear,
-                    "estatus" =>  Response::HTTP_NOT_FOUND
-                ], Response::HTTP_NOT_FOUND);
-            }
+            return Helpers::getRespuestaJson("El carrito se facturó correctamente", [], Response::HTTP_OK);
+            
         } catch (\Throwable $th) {
             $mensajeError = Helpers::getMensajeError($th, "Error Al crear la carrito de salida, ");
-            return response()->json(
-                [
-                    "mensaje" => $mensajeError,
-                    "data" => [],
-                    "estatus" =>  Response::HTTP_INTERNAL_SERVER_ERROR
-                ],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+            return Helpers::getRespuestaJson($mensajeError, [], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

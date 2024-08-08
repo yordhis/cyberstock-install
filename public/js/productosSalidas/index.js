@@ -7,6 +7,7 @@ let elementoTarjetaCliente = d.querySelector('#tarjetaCliente'),
     elementoAlertas = d.querySelector('#alertas'),
     listaDeProductosEnFactura = d.querySelector('#listaDeProductosEnFactura'),
     elementoFactura = d.querySelector('#componenteFactura'),
+    vendedor = d.querySelector("#nombreUsuario").value,
     elementoMetodoDePagoModal = d.querySelector('#elementoMetodoDePagoModal'),
     factura = {
         codigo: '',
@@ -257,13 +258,13 @@ const componenteAgregarCantidadDeProductoModal = (producto) => {
                 <p class="modal__paragraph">${producto.descripcion}</p>
 
                 <div class="form-floating mb-3">
-                    <input type="number" class="form-control ${producto.codigo}_data" name="cantidad" value="1" >
+                    <input type="number" class="form-control ${producto.codigo}_data agregar-producto" name="cantidad" value="1" >
                     <label for="floatingInput">Cantidad</label>
                     <span class="text-danger  w-90"></span>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="number" class="form-control ${producto.codigo}_data" name="precio" value="${producto.pvp}" >
+                    <input type="number" class="form-control ${producto.codigo}_data agregar-producto" name="precio" value="${producto.pvp}" >
                     <label for="floatingInput">Precio</label>
                     <span class="text-danger  w-90"></span>
                 </div>
@@ -332,7 +333,8 @@ const componenteNumeroDeFactura = (codigo, nombre) => {
 const componenteFactura = async (factura) => {
 
     let botonDeProcesarHtml = ``,
-        inputObservacionHtml = ``;
+        inputObservacionHtml = ``,
+        totalItems = JSON.parse(localStorage.getItem('carritoSalida')).length
 
 
     if (factura.concepto == 'VENTA') {
@@ -351,7 +353,7 @@ const componenteFactura = async (factura) => {
         `;
 
         botonDeProcesarHtml = `
-        <button class="btn btn-success  w-100 fs-3 acciones-factura" id="procesarConsumo"  >
+        <button class="btn btn-success  w-100 fs-3 acciones-factura" id="${factura.concepto}"  >
             <box-icon name='cart-download'></box-icon> PROCESAR ${factura.concepto} 
         </button>
         `;
@@ -359,6 +361,9 @@ const componenteFactura = async (factura) => {
 
 
     return `
+        <div class="col-sm-12 p-2">
+            <strong>Total items: ${totalItems}</strong>
+        </div>
         <div class="col-sm-6 form-floating mb-3">
             <input type="number" class="form-control acciones-factura" id="editarDescuento" >
             <label for="floatingInput">Descuento %</label>
@@ -656,11 +661,11 @@ const hanledLoad = async () => {
         })
     } else {
         /** CARGAR FACTURA ACTUAL */
-        
+
         /** CLIENTE */
         await getCliente({
             filtro: factura.identificacion,
-            campo:['identificacion']
+            campo: ['identificacion']
         })
             .then(res => {
                 log(res)
@@ -672,18 +677,18 @@ const hanledLoad = async () => {
                 cargarEventosAccionesDelCliente();
             });
 
-         /** CODIGO DE MOVIMIENTO Y FACTURA */
-         codigoFactura.innerHTML = componenteNumeroDeFactura(factura.codigo, 'Movimiento');
-         codigoFactura.innerHTML += '<br>';
-         codigoFactura.innerHTML += componenteNumeroDeFactura(factura.codigo_factura, 'Factura');
+        /** CODIGO DE MOVIMIENTO Y FACTURA */
+        codigoFactura.innerHTML = componenteNumeroDeFactura(factura.codigo, 'Movimiento');
+        codigoFactura.innerHTML += '<br>';
+        codigoFactura.innerHTML += componenteNumeroDeFactura(factura.codigo_factura, 'Factura');
 
-         /** Validamos si el carrito tiene productos para cargarlos a la factura */
+        /** Validamos si el carrito tiene productos para cargarlos a la factura */
         carritoStorage = localStorage.getItem('carritoSalida') ? JSON.parse(localStorage.getItem('carritoSalida')) : [];
-         /** Se carga la lista de productos */
-         listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
+        /** Se carga la lista de productos */
+        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(carritoStorage.reverse());
 
-         /** Cargamos los datos de la factura */
-         await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
+        /** Cargamos los datos de la factura */
+        await cargarDatosDeFactura(carritoStorage, factura, factura.iva, factura.descuento);
     }
     let elementoVuelto = d.querySelector('#elementoVuelto');
 }; /** HANLEDLOAD */
@@ -713,12 +718,12 @@ const hanledAccionesCliente = async (e) => {
             await getCliente({
                 filtro: e.target.parentElement.pathname.substring(1),
                 campo: ['identificacion']
-            }).then(res =>{
-                if(res.estatus == 200){
+            }).then(res => {
+                if (res.estatus == 200) {
                     elementoTarjetaCliente.innerHTML = componenteFormularioEditarCliente(res.data.data);
                     cargarEventosAccionesDelCliente();
                     cargarEventosDeFormularios();
-                }else{
+                } else {
                     elementoTarjetaCliente.innerHTML = componenteTarjetaCliente([], "Debe ingresar  un cliente, por favor.");
                     cargarEventosAccionesDelCliente();
                 }
@@ -873,8 +878,18 @@ const hanledFormulario = async (e) => {
 
 const hanledAgregarAFactura = async (e) => {
     e.preventDefault();
+    // console.log(e.key);
+    // console.log(e.target.parentElement.parentElement.children[5].children[0].name);
+    let idCase = "", codigoProductoFiltrar = ""
+    if (e.key) {
+        idCase = e.key.toUpperCase() == "ENTER" ? 'agregarProductoAlCarrito' : e.target.id;
+        codigoProductoFiltrar = e.key.toUpperCase() == "ENTER" ? e.target.parentElement.parentElement.children[5].children[0].name : e.target.name;
+    } else {
+        idCase = e.target.id;
+        codigoProductoFiltrar = e.target.name;
+    }
 
-    switch (e.target.id) {
+    switch (idCase) {
         case "cerrarModalCustom":
             /** CERRAMOS EL MODAL */
             e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
@@ -892,109 +907,133 @@ const hanledAgregarAFactura = async (e) => {
                 banderaDeAlertar = 0,
                 banderaDeProductoNuevo = 0;
 
+            console.log(codigoProductoFiltrar);
+
             /** Configuramos el filtro de productos Inventario */
             let filtro = {
-                filtro: e.target.name,
+                filtro: codigoProductoFiltrar,
                 campo: ["codigo"]
-            },
-                resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro);
+            };
 
-            if (resultado.estatus == 200) {
-                /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
-                let classIdentificadora = resultado.data.data[0].codigo + "_data",
-                    datosDeSalida = await d.getElementsByClassName(classIdentificadora),
-                    esquemaDeDatosDeSalida = {}; // tipo de dato OBJECT
+            getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro)
+                .then(async resultado => {
 
-                /** Validamos que la cantida sea agreagada y el costo y pvp detal */
-                for (const datosSalida of datosDeSalida) {
-                    if (datosSalida.name == "cantidad" || datosSalida.name == "precio") {
+                    if (resultado.estatus == 200) {
+                        /** Configuramos la clase y seleccionamos los datos de entrada del formulario */
+                        let classIdentificadora = resultado.data.data[0].codigo + "_data",
+                            datosDeSalida = await d.getElementsByClassName(classIdentificadora),
+                            esquemaDeDatosDeSalida = {}; // tipo de dato OBJECT
 
-                        if (datosSalida.value == "") banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El campo ${datosSalida.name.toUpperCase()} es obligatorio.`;
-                        else if (datosSalida.name == "precio" && parseFloat(datosSalida.value) < resultado.data.data[0].costo) banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El ${datosSalida.name.toUpperCase()} debe ser mayor al costo.`;
-                        else if (datosSalida.value <= 0) banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El campo ${datosSalida.name.toUpperCase()} debe poseer un número mayor a cero.`;
-                        else datosSalida.parentElement.children[2].textContent = "";
-                    }
-                }
+                        /** Validamos que la cantida sea agreagada y el costo y pvp detal */
+                        for (const datosSalida of datosDeSalida) {
+                            if (datosSalida.name == "cantidad" || datosSalida.name == "precio") {
 
-                /** Si en el formulario de entrada hay algo mal paramos la ejecucion */
-                if (banderaDeAlertar) return;
-
-                /** Creamos el esquema de datos de entrada */
-                for (const data of datosDeSalida) {
-                    esquemaDeDatosDeSalida[data.name] = parseFloat(data.value);
-                }
-
-                /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
-                factura.tasa = parseFloat(resultado.tasa);
-                localStorage.setItem('facturaSalida', JSON.stringify(factura));
-
-
-                /** Validamos que la cantidad ingresada no sobrepase la del inventario */
-                if (parseFloat(esquemaDeDatosDeSalida.cantidad) > parseFloat(resultado.data.data[0].cantidad)) {
-                    elementoAlertas.innerHTML = componenteAlerta('No tiene SUFICIENTE STOCK para suplir el pedido, intente de nuevo.', 401);
-                    return setTimeout(() => {
-                        elementoAlertas.innerHTML = "";
-                    }, 3500)
-                }
-
-                /** Adaptamos el producto para añadirlo al carrito */
-                productoAdaptado = adaptadorDeProductoACarrito(resultado.data.data[0], esquemaDeDatosDeSalida, factura);
-
-
-
-                /** Si ya existe un producto añadimos a ese carrito */
-                if (carritoActual.length) {
-                    /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
-                    carritoActualizado = carritoActual.map(producto => {
-                        if (productoAdaptado.codigo_producto == producto.codigo_producto) {
-                            if (parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
-                            else {
-                                producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
-                                producto.subtotal = producto.cantidad * productoAdaptado.costo;
-                                producto.subtotalBs = producto.cantidad * productoAdaptado.costoBs;
-                            };
-                        } else if (productoAdaptado.codigo_producto != producto.codigo_producto) {
-                            banderaDeProductoNuevo++;
+                                if (datosSalida.value == "") banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El campo ${datosSalida.name.toUpperCase()} es obligatorio.`;
+                                else if (datosSalida.name == "precio" && parseFloat(datosSalida.value) < resultado.data.data[0].costo) banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El ${datosSalida.name.toUpperCase()} debe ser mayor al costo.`;
+                                else if (datosSalida.value <= 0) banderaDeAlertar++, datosSalida.parentElement.children[2].textContent = `El campo ${datosSalida.name.toUpperCase()} debe poseer un número mayor a cero.`;
+                                else datosSalida.parentElement.children[2].textContent = "";
+                            }
                         }
-                        return producto;
-                    });
 
-                    /** Si se detecta que hay un producto nuevo se añade */
-                    if (banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
+                        /** Si en el formulario de entrada hay algo mal paramos la ejecucion */
+                        if (banderaDeAlertar) return;
 
-                    /** Si hay un error damos respuesta */
-                    if (banderaDeAlertar) {
-                        elementoAlertas.innerHTML = componenteAlerta('El prodcuto NO se agregó a la factura STOCK INSUFICIENTE', 404);
-                        return setTimeout(() => {
+                        /** Creamos el esquema de datos de entrada */
+                        for (const data of datosDeSalida) {
+                            esquemaDeDatosDeSalida[data.name] = parseFloat(data.value);
+                        }
+
+                        /** AÑADIMOS LA TASA DE VENTA A LA FACTURA */
+                        factura.tasa = parseFloat(resultado.tasa);
+                        localStorage.setItem('facturaSalida', JSON.stringify(factura));
+
+
+                        /** Validamos que la cantidad ingresada no sobrepase la del inventario */
+                        if (parseFloat(esquemaDeDatosDeSalida.cantidad) > parseFloat(resultado.data.data[0].cantidad)) {
+
+                            return $.alert({
+                                title: "Alerta",
+                                content: 'No tiene SUFICIENTE STOCK para suplir el pedido, intente de nuevo.',
+                                theme: "modern",
+                                type: 'orange',
+                            });
+                        }
+
+                        /** Adaptamos el producto para añadirlo al carrito */
+                        productoAdaptado = adaptadorDeProductoACarrito(resultado.data.data[0], esquemaDeDatosDeSalida, factura);
+
+
+
+                        /** Si ya existe un producto añadimos a ese carrito */
+                        if (carritoActual.length) {
+                            /** Recorremos el carrito para verificar si se añade un producto nuevo o se suma al existente */
+                            carritoActualizado = carritoActual.map(producto => {
+                                if (productoAdaptado.codigo_producto == producto.codigo_producto) {
+                                    if (parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad) > parseFloat(producto.stock)) banderaDeAlertar++;
+                                    else {
+                                        producto.cantidad = parseFloat(productoAdaptado.cantidad) + parseFloat(producto.cantidad);
+                                        producto.subtotal = producto.cantidad * productoAdaptado.costo;
+                                        producto.subtotalBs = producto.cantidad * productoAdaptado.costoBs;
+                                    };
+                                } else if (productoAdaptado.codigo_producto != producto.codigo_producto) {
+                                    banderaDeProductoNuevo++;
+                                }
+                                return producto;
+                            });
+
+                            /** Si se detecta que hay un producto nuevo se añade */
+                            if (banderaDeProductoNuevo == carritoActual.length) carritoActualizado.push(productoAdaptado);
+
+                            /** Si hay un error damos respuesta */
+                            if (banderaDeAlertar) {
+                                return $.alert({
+                                    title: "Alerta",
+                                    content: 'El prodcuto NO se agregó a la factura STOCK INSUFICIENTE',
+                                    theme: "modern",
+                                    type: 'orange',
+                                });
+                            }
+                        } else {
+                            carritoActualizado.push(productoAdaptado);
+                        }
+
+                        /** Guardamos en localStorage */
+                        localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizado));
+
+                        /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
+                        carritoActual = JSON.parse(localStorage.getItem('carritoSalida'));
+                        elementoAlertas.innerHTML = componenteAlerta('El prodcuto se agregó a la factura', 200);
+
+                        /** CERRAMOS EL MODAL */
+                        e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
+                        elementoBuscarProducto.focus();
+                        setTimeout(() => {
                             elementoAlertas.innerHTML = "";
                         }, 2500);
+
+                        /** Actualizamos la lista de productos en la factura */
+                        listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(JSON.parse(localStorage.getItem('carritoSalida')).reverse());
+
+                        /** Cargamos la factura y sus eventos de acciones del carrito de factura */
+                        await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
+                    } else {
+                        $.alert({
+                            title: "Alerta",
+                            content: "Error al agregar el producto a la factura",
+                            theme: "modern",
+                            type: 'red',
+                        });
                     }
-                } else {
-                    carritoActualizado.push(productoAdaptado);
-                }
+                })
+                .catch(err => {
+                    $.alert({
+                        title: "Error interno",
+                        content: err.getMessage(),
+                        theme: "modern",
+                        type: 'red',
+                    });
+                })
 
-                /** Guardamos en localStorage */
-                localStorage.setItem('carritoSalida', JSON.stringify(carritoActualizado));
-
-                /** Actualizamos FACTURA SUBTOTAL - IVA - DESCUENTO - TOTAL - TOTLA REF */
-                carritoActual = JSON.parse(localStorage.getItem('carritoSalida'));
-                elementoAlertas.innerHTML = componenteAlerta('El prodcuto se agregó a la factura', 200);
-
-                /** CERRAMOS EL MODAL */
-                e.target.parentElement.parentElement.parentElement.classList.remove('modal--show');
-                elementoBuscarProducto.focus();
-                setTimeout(() => {
-                    elementoAlertas.innerHTML = "";
-                }, 2500);
-
-                /** Actualizamos la lista de productos en la factura */
-                listaDeProductosEnFactura.innerHTML = await cargarListaDeProductoDelCarrito(JSON.parse(localStorage.getItem('carritoSalida')).reverse());
-
-                /** Cargamos la factura y sus eventos de acciones del carrito de factura */
-                await cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
-            } else {
-                alert(resultado.mensaje);
-            }
             break;
 
         default:
@@ -1020,25 +1059,25 @@ const hanledBuscarProducto = async (e) => {
         // let resultado = await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro),
         let lista = '';
         await getInventariosFiltro(`${URL_BASE}/getInventariosFiltro`, filtro)
-        .then(async res => {
-            if (!res.data.data.length) {
-                return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }), 
-                elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value ="";
-            }else{
+            .then(async res => {
+                if (!res.data.data.length) {
+                    return elementoTablaBuscarProducto.innerHTML += componenteListaDeProductoFiltrados({ estatus: 0 }),
+                        elementoTotalProductos.innerHTML = `<p>Total resultados: 0</p>`, e.target.value = "";
+                } else {
 
-                await res.data.data.forEach(async (producto) => {      
-                    producto.tasa = res.tasa;
-                    lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
-                });
-       
-                elementoTablaBuscarProducto.innerHTML = lista;
-                elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
-                e.target.value ="";
-                await cargarAccionesDelCustomModal();
-                await cargarEventosDeAgregarProductoAFactura();
-            }
-            
-        })
+                    await res.data.data.forEach(async (producto) => {
+                        producto.tasa = res.tasa;
+                        lista += `${componenteListaDeProductoFiltrados(adaptadorDeProducto(producto))}`;
+                    });
+
+                    elementoTablaBuscarProducto.innerHTML = lista;
+                    elementoTotalProductos.innerHTML = `<p>Total resultados: ${res.data.total}</p>`;
+                    e.target.value = "";
+                    await cargarAccionesDelCustomModal();
+                    await cargarEventosDeAgregarProductoAFactura();
+                }
+
+            })
 
 
 
@@ -1054,9 +1093,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         carritoActual = JSON.parse(localStorage.getItem('carritoSalida')),
         accion = '',
         banderaDeError = 0,
-        facturaActual = '',
-        acumuladorSubtotal = 0,
-        inputObservacion = "";
+        facturaActual = ''
 
     log(e.target)
     log(e.target.localName)
@@ -1210,16 +1247,18 @@ const hanledAccionesDeCarritoFactura = async (e) => {
         case 'cargarModalMetodoPago':
             await cargarEventosAccionesDeFactura()
             break;
+
         case 'vender':
-
             await procesarFactura(e);
-
             break;
-        case 'procesarConsumo':
 
-            await procesarConsumo(e);
-
+        case 'CREDITO':
+        case 'CONSUMO':
+            console.log('Entro aqui');
+            
+            await procesarConsumoCredito(e);
             break;
+
         case 'desactivarFacturaFiscal':
             cargarDatosDeFactura(carritoActual, factura, 0, factura.descuento);
             break;
@@ -1233,7 +1272,7 @@ const hanledAccionesDeCarritoFactura = async (e) => {
             if (e.target.value != factura.concepto) {
                 factura.concepto = e.target.value;
                 localStorage.setItem('facturaSalida', JSON.stringify(factura));
-                cargarDatosDeFactura(carritoActual, factura, factura.iva, 0);
+                cargarDatosDeFactura(carritoActual, factura, factura.iva, factura.descuento);
             }
 
             break;
@@ -1397,109 +1436,243 @@ elementoBuscarProducto.addEventListener('keyup', hanledBuscarProducto);
 
 /** ULTILIDADES */
 
-const procesarConsumo = async (e) => {
+const procesarConsumoCredito = async (e) => {
 
     /** validamos que halla productos en la factura */
     if (JSON.parse(localStorage.getItem('carritoSalida')).length == 0) return e.target.parentElement.innerHTML += componenteAlerta('No hay productos para facturar.', 404);
 
     /** validamos si el cliente esta gregado a la factura  */
     if (factura.identificacion == "") {
-        e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para procesar la salida de consumo.', 401);
-        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-        return setTimeout(() => {
-            elementoAlertaVender.forEach(element => {
-                element.classList.add('d-none')
-            });
-            cargarEventosAccionesDeFactura();
-        }, 2500);
+        return $.alert({
+            title: "¡Alerta!",
+            content: 'Debe agregar un cliente para procesar la salida de consumo.',
+            theme: "modern",
+            type: 'orange',
+        });
     }
 
     let facturaVender = JSON.parse(localStorage.getItem('facturaSalida')),
         carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
-    /** VACIAMOS EL CODIGO DE FACTURA */
+    /** VACIAMOS EL CODIGO DE FACTURA Y OTROS DATOS ESTATICOS */
+    facturaVender.vendedor = vendedor;
     facturaVender.codigo_factura = facturaVender.concepto == "CREDITO" ? facturaVender.codigo_factura : "";
-    facturaVender.observacion = d.querySelector('#observacion').value
-        ? d.querySelector('#observacion').value
-        : "Sin observación asignada.";
-   
-    /** PROCESAR CARRITO */
-    carritoVender.forEach(async producto => {
-        producto.identificacion = facturaVender.identificacion;
-        producto.codigo_factura = facturaVender.codigo_factura;
-        producto.concepto = facturaVender.concepto;
-        await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
-    });
+    facturaVender.observacion = d.querySelector('#observacion').value;
+    facturaVender.tipo = "SALIDA";
 
+    console.log(facturaVender);
+    
     /** MOSTRAR QUE ESTA CARGANDO  */
     e.target.innerHTML = spinner();
 
-    /** FACTURAR */
-    setTimeout(async () => {
-        /** Procesamos la factura y generamos el ticket */
-        facturaVender.tipo = "SALIDA";
-        resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
+    /** PROCESAR CARRITO */
+    facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, carritoVender)
+        .then(resultadoCarritoSalida => {
 
-        /** Mostramos el dialogo de facturar */
-        if (resultadoDeFacturar.estatus == 201) {
-           /** Registramos el movimiento del usuario */
-           ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
-            /** Eliminamos la factura del Storagr */
-            localStorage.removeItem('carritoSalida');
-            localStorage.removeItem('facturaSalida');
-            /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
-            $.confirm({
-                title: '¡Factura procesada con éxito!',
-                content: 'Seleccione formato de impresión de la factura.',
-                buttons: {
-                    nota:{
-                        text: 'Imprimir Nota de entrega en formato libre',
-                        btnClass: 'btn-green',
-                        action: function () {
-                            let formulaLN = formulaLibreHtml(resultadoDeFacturar.data);
-                            setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
-                            return false; 
-                        } 
-                    }, 
-                        
-                    factura:{
-                        text: 'Imprimir Factura en formato libre',
-                        btnClass: 'btn-green',
-                        action: function () {
-                            let formulaLF = formulaLibreFacturaHtml(resultadoDeFacturar.data);
-                            setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
-                            return false; 
-                        } 
-                    }, 
+            if (resultadoCarritoSalida.estatus == 200) {
 
-                    ticket:{
-                        text: 'Imprimir Ticket',
-                        btnClass: 'btn-green',
-                        action: function () {
-                            let hTicket = htmlTicket(resultadoDeFacturar.data);
-                            setTimeout(() => imprimirElementoPos(hTicket), 1000);
-                            return false; 
-                        } 
-                    }, 
+                if (facturaVender.concepto == "CREDITO") {
+                    facturarCarrito(`${URL_BASE}/facturarCarrito`, carritoVender)
+                        .then(resultadoCarrito => {
+                            if (resultadoCarrito.estatus == 200) {
+                                /** Procesamos la factura y generamos el ticket */
+                                setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender)
+                                    .then(resultadoFacturarSalida => {
+                                        /** Mostramos el dialogo de facturar */
+                                        if (resultadoFacturarSalida.estatus == 201) {
 
-                    cancel: function () {
-                        setTimeout(() => window.location.href = "/inventarios/crearSalida", 1500);
-                    }
+                                            /** Registramos el movimiento del usuario */
+                                            ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoFacturarSalida.estatus);
+
+                                            /** Eliminamos la factura del Storagr */
+                                            localStorage.removeItem('carritoSalida');
+                                            localStorage.removeItem('facturaSalida');
+
+                                            /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                            $.confirm({
+                                                title: '¡Factura procesada con éxito!',
+                                                content: 'Seleccione formato de impresión de la factura.',
+                                                columnClass: 'medium',
+                                                theme: 'modern',
+                                                buttons: {
+                                                    nota: {
+                                                        text: 'Nota de entrega forma libre',
+                                                        btnClass: 'btn-orange',
+                                                        action: function () {
+                                                            let formulaLN = formulaLibreHtml(resultadoFacturarSalida.data);
+                                                            setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
+                                                            return false;
+                                                        }
+                                                    },
+
+                                                    factura: {
+                                                        text: 'Factura forma libre',
+                                                        btnClass: 'btn-green',
+                                                        action: function () {
+                                                            let formulaLF = formulaLibreFacturaHtml(resultadoFacturarSalida.data);
+                                                            setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
+                                                            return false;
+                                                        }
+                                                    },
+
+                                                    ticket: {
+                                                        text: 'Imprimir Ticket',
+                                                        btnClass: 'btn-green',
+                                                        action: function () {
+                                                            let hTicket = htmlTicket(resultadoFacturarSalida.data);
+                                                            setTimeout(() => imprimirElementoPos(hTicket), 1000);
+                                                            return false;
+                                                        }
+                                                    },
+
+                                                    cancel: {
+                                                        text: "Seguir vendiendo",
+                                                        btnClass: 'btn-blue',
+                                                        action: function () {
+                                                            window.location.href = "/inventarios/crearSalida";
+                                                        }
+                                                    },
+                                                    out: {
+                                                        text: "Salir",
+                                                        btnClass: 'btn-red',
+                                                        action: function () {
+                                                            window.location.href = "/facturas";
+                                                        }
+                                                    }
+                                                }
+                                            });
+
+                                        } else {
+                                            /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
+                                            /** Eliminamos la factura del Storagr */
+                                            localStorage.removeItem('carritoSalida');
+                                            localStorage.removeItem('facturaSalida');
+
+                                            return $.alert({
+                                                title: "Error!",
+                                                content: 'No se registro la factura.',
+                                                theme: "modern",
+                                                type: 'red',
+                                                buttons: {
+                                                    confirm: {
+                                                        text: "OK",
+                                                        action: function () {
+                                                            window.location.href = "/inventarios/crearSalida";
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                    })
+                            }
+                        })
+                } else {
+
+                    /** Procesamos la factura y generamos el ticket */
+                    setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender)
+                        .then(resultadoFacturarSalida => {
+                            /** Mostramos el dialogo de facturar */
+                            if (resultadoFacturarSalida.estatus == 201) {
+
+                                /** Registramos el movimiento del usuario */
+                                ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoFacturarSalida.estatus);
+
+                                /** Eliminamos la factura del Storagr */
+                                localStorage.removeItem('carritoSalida');
+                                localStorage.removeItem('facturaSalida');
+
+                                /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                $.confirm({
+                                    title: '¡Factura procesada con éxito!',
+                                    content: 'Seleccione formato de impresión de la factura.',
+                                    columnClass: 'medium',
+                                    theme: 'modern',
+                                    buttons: {
+                                        nota: {
+                                            text: 'Nota de entrega forma libre',
+                                            btnClass: 'btn-orange',
+                                            action: function () {
+                                                let formulaLN = formulaLibreHtml(resultadoFacturarSalida.data);
+                                                setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
+                                                return false;
+                                            }
+                                        },
+
+                                        factura: {
+                                            text: 'Factura forma libre',
+                                            btnClass: 'btn-green',
+                                            action: function () {
+                                                let formulaLF = formulaLibreFacturaHtml(resultadoFacturarSalida.data);
+                                                setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
+                                                return false;
+                                            }
+                                        },
+
+                                        ticket: {
+                                            text: 'Imprimir Ticket',
+                                            btnClass: 'btn-green',
+                                            action: function () {
+                                                let hTicket = htmlTicket(resultadoFacturarSalida.data);
+                                                setTimeout(() => imprimirElementoPos(hTicket), 1000);
+                                                return false;
+                                            }
+                                        },
+
+                                        cancel: {
+                                            text: "Seguir vendiendo",
+                                            btnClass: 'btn-blue',
+                                            action: function () {
+                                                window.location.href = "/inventarios/crearSalida";
+                                            }
+                                        },
+                                        out: {
+                                            text: "Salir",
+                                            btnClass: 'btn-red',
+                                            action: function () {
+                                                window.location.href = "/facturas";
+                                            }
+                                        }
+                                    }
+                                });
+
+                            } else {
+                                /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
+                                /** Eliminamos la factura del Storagr */
+                                localStorage.removeItem('carritoSalida');
+                                localStorage.removeItem('facturaSalida');
+
+                                return $.alert({
+                                    title: "Error!",
+                                    content: 'No se registro la factura.',
+                                    theme: "modern",
+                                    type: 'red',
+                                    buttons: {
+                                        confirm: {
+                                            text: "OK",
+                                            action: function () {
+                                                window.location.href = "/inventarios/crearSalida";
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
+                        })
                 }
-            });
 
 
-     
-        } else {
-            /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
-            /** Eliminamos la factura del Storagr */
-            localStorage.removeItem('carritoSalida');
-            localStorage.removeItem('facturaSalida');
-            // e.target.parentElement.children[1].classList.add('d-none');
-            e.target.innerHTML = componenteAlerta(`NO SE PROCESO LA FACTURA DE ${facturaVender.concepto} (ERROR)`, 404, 'fs-1 m-2');
-            setTimeout(() => window.location.href = "/inventarios/crearSalida", 1500);
-        }
-    }, 1000);
+            } else {
+                return $.alert({
+                    title: "¡Alerta!",
+                    content: 'El carrito de compra no se registro',
+                    theme: "modern",
+                    type: 'orange',
+                });
+            }
+
+        });
+
 }
 
 const procesarFactura = async (e) => {
@@ -1511,14 +1684,13 @@ const procesarFactura = async (e) => {
 
     /** validamos si el cliente esta gregado a la factura  */
     if (factura.identificacion == "") {
-        e.target.parentElement.innerHTML += componenteAlerta('Debe agregar un cliente para esta factura.', 401);
-        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-        return setTimeout(() => {
-            elementoAlertaVender.forEach(element => {
-                element.classList.add('d-none')
-            });
-            cargarEventosAccionesDeFactura();
-        }, 2500);
+        return $.alert({
+            title: "¡Alerta!",
+            content: 'Debe agregar un cliente para esta factura.',
+            theme: "modern",
+            type: 'orange',
+        });
+        // cargarEventosAccionesDeFactura();
     }
 
     /** Sumamos todos los metodos de pago */
@@ -1541,59 +1713,171 @@ const procesarFactura = async (e) => {
             carritoVender = JSON.parse(localStorage.getItem('carritoSalida'));
 
         /** Al procesar la facturacion del carrito descontamos del inventario las cantidades */
-        carritoVender.forEach(async producto => {
-            producto.identificacion = facturaVender.identificacion;
-            await facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, producto);
-        });
 
-        /** MOSTRAR QUE ESTA CARGANDO  */
-        e.target.parentElement.parentElement.children[1].innerHTML = spinner();
-        e.target.parentElement.children[0].classList.add('d-none');
-        e.target.parentElement.children[1].classList.add('d-none');
-        /** FACTURAR */
-        setTimeout(async () => {
+        facturarCarrito(`${URL_BASE}/facturarCarritoSalida`, carritoVender)
+            .then(resultadoCarritoSalida => {
 
-            /** Procesamos la factura y generamos el ticket */
-            facturaVender.tipo = "SALIDA";
-            resultadoDeFacturar = await setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender);
-
-            /** Mostramos el dialogo de facturar */
-            if (resultadoDeFacturar.estatus == 201) {
-                /** Registramos el movimiento del usuario */
-                ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoDeFacturar.estatus);
-
-                /** Eliminamos la factura del Storagr */
-                localStorage.removeItem('carritoSalida');
-                localStorage.removeItem('facturaSalida');
-
-                /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
-                e.target.parentElement.parentElement.children[0].innerHTML = "<h4>IMPRIMIR</h4>";
-                e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("Factura procesada correctamente", 200, 'fs-1 m-2');
-                e.target.parentElement.parentElement.children[1].innerHTML += componenteBotonesDeImpresion();
-                await cargarEventosAccionesDeFactura();
-
-            } else {
-                /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
-                /** Eliminamos la factura del Storagr */
-                localStorage.removeItem('carritoSalida');
-                localStorage.removeItem('facturaSalida');
+                /** MOSTRAR QUE ESTA CARGANDO  */
+                e.target.parentElement.parentElement.children[1].innerHTML = spinner();
+                e.target.parentElement.children[0].classList.add('d-none');
                 e.target.parentElement.children[1].classList.add('d-none');
-                e.target.parentElement.parentElement.children[1].innerHTML = componenteAlerta("NO SE PROCESO LA FACTUA (ERROR)", 404, 'fs-1 m-2');
-                setTimeout(() => window.location.href = "/inventarios/crearSalida", 1500);
-            }
 
-        }, 1500);
+                if (resultadoCarritoSalida.estatus == 200) {
+                    /** Evaluamos que concepto de venta es para tambien factura en la Table ventas */
+                    if (facturaVender.concepto != "CONSUMO") {
+
+                        /** Facturamos el carrito en ventas */
+                        facturarCarrito(`${URL_BASE}/facturarCarrito`, carritoVender)
+                            .then(resultadoCarrito => {
+
+                                if (resultadoCarrito.estatus == 200) {
+
+                                    /** Procesamos la factura y generamos el ticket */
+                                    facturaVender.tipo = "SALIDA";
+                                    setFactura(`${URL_BASE}/setFacturaSalida`, facturaVender)
+                                        .then(async resultadoFacturarSalida => {
+
+                                            /** Mostramos el dialogo de facturar */
+                                            if (resultadoFacturarSalida.estatus == 201) {
+
+                                                /** Se oculta el modal de metodos de pago */
+                                                e.target.parentElement.parentElement.parentElement.innerHTML = "";
+
+                                                /** Registramos el movimiento del usuario */
+                                                ejecutarRegistroDeAccionDelUsuario(facturaVender.codigo, resultadoFacturarSalida.estatus);
+
+                                                /** Eliminamos la factura del Storagr */
+                                                localStorage.removeItem('carritoSalida');
+                                                localStorage.removeItem('facturaSalida');
+
+
+
+                                                /** RESPUESTA POSITIVA DE LA ACCIÓN FACTURAR */
+                                                $.confirm({
+                                                    title: '¡Factura procesada con éxito!',
+                                                    content: 'Seleccione formato de impresión de la factura.',
+                                                    columnClass: 'medium',
+                                                    theme: "modern",
+                                                    buttons: {
+                                                        nota: {
+                                                            text: 'Nota de entrega forma libre',
+                                                            btnClass: 'btn-orange',
+                                                            action: function () {
+                                                                let formulaLN = formulaLibreHtml(resultadoFacturarSalida.data);
+                                                                setTimeout(() => imprimirElementoFormulaLibre(formulaLN), 1000);
+                                                                return false;
+                                                            }
+                                                        },
+
+                                                        factura: {
+                                                            text: 'Factura forma libre',
+                                                            btnClass: 'btn-green',
+                                                            action: function () {
+                                                                let formulaLF = formulaLibreFacturaHtml(resultadoFacturarSalida.data);
+                                                                setTimeout(() => imprimirElementoFormulaLibre(formulaLF), 1000);
+                                                                return false;
+                                                            }
+                                                        },
+
+                                                        ticket: {
+                                                            text: 'Imprimir Ticket',
+                                                            btnClass: 'btn-green',
+                                                            action: function () {
+                                                                let hTicket = htmlTicket(resultadoFacturarSalida.data);
+                                                                setTimeout(() => imprimirElementoPos(hTicket), 1000);
+                                                                return false;
+                                                            }
+                                                        },
+
+                                                        cancel: {
+                                                            text: "Seguir vendiendo",
+                                                            btnClass: 'btn-blue',
+                                                            action: function () {
+                                                                window.location.href = "/inventarios/crearSalida";
+                                                            }
+                                                        },
+                                                        out: {
+                                                            text: "Salir",
+                                                            btnClass: 'btn-red',
+                                                            action: function () {
+                                                                window.location.href = "/facturas";
+                                                            }
+                                                        }
+                                                    }
+                                                });
+
+
+                                            } else {
+                                                /** RESPUESTA NEGATIVA DE LA ACCIÓN FACTURAR */
+                                                /** Eliminamos la factura del Storagr */
+                                                localStorage.removeItem('carritoSalida');
+                                                localStorage.removeItem('facturaSalida');
+
+                                                /** Se oculta el modal de metodos de pago */
+                                                e.target.parentElement.parentElement.parentElement.innerHTML = "";
+
+                                                return $.alert({
+                                                    title: "Error!",
+                                                    content: 'No se registro la factura.',
+                                                    theme: "modern",
+                                                    type: 'red',
+                                                    buttons: {
+                                                        confirm: {
+                                                            text: "OK",
+                                                            action: function () {
+                                                                window.location.href = "/inventarios/crearSalida";
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+
+                                        })
+
+
+                                } else {
+                                    return $.alert({
+                                        title: "¡Alerta!",
+                                        content: "No se guardo el carrito de compra en facturas de ventas",
+                                        theme: "modern",
+                                        type: 'orange',
+                                    });
+                                }
+                            })
+                    } else {
+                        return $.alert({
+                            title: "¡Alerta!",
+                            content: "El concepto no es valido",
+                            theme: "modern",
+                            type: 'orange',
+                        });
+                    }
+                } else {
+                    return $.alert({
+                        title: "¡Error!",
+                        content: resultadoCarritoSalida.mensaje,
+                        theme: "modern",
+                        type: 'red',
+                    });
+                }
+            })
+            .catch(err => {
+                return $.alert({
+                    title: "¡Error interno 500!",
+                    content: err.mensaje,
+                    theme: "modern",
+                    type: 'red',
+                });
+            });
 
     } else {
-
-        e.target.parentElement.innerHTML += componenteAlerta('Debe cumplir con el pago para procesar la factura.', 401);
-        let elementoAlertaVender = d.querySelectorAll('.alertaGlobal');
-        return setTimeout(() => {
-            elementoAlertaVender.forEach(element => {
-                element.classList.add('d-none')
-            });
-            cargarEventosAccionesDeFactura();
-        }, 2500);
+        return $.alert({
+            title: "¡Alerta!",
+            content: 'Debe cumplir con el pago para procesar la factura.',
+            theme: "modern",
+            type: 'orange',
+        });
+        // cargarEventosAccionesDeFactura();
     }
 }
 
@@ -1670,6 +1954,10 @@ async function cargarEventosDeAgregarProductoAFactura() {
     });
 
     /** Cargamos los eventos de agregar al carrito */
+    elementoAgregarAFactura.forEach(inputAgregarCantidad => {
+        inputAgregarCantidad.addEventListener('keyup', hanledAgregarAFactura);
+    });
+
     elementoAgregarAFactura.forEach(inputAgregarCantidad => {
         inputAgregarCantidad.addEventListener('click', hanledAgregarAFactura);
     });

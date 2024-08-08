@@ -128,6 +128,7 @@ class FacturaInventarioController extends Controller
                     "iva" => $request->iva, // impuesto
                     "tipo" => $request->tipo, // fiscal o no fialcal
                     "concepto" => $request->concepto, // venta, compra ...
+                    "observacion" => $request->observacion, // venta, compra ...
                     "descuento" => $request->descuento, // descuento
                     "fecha" => $request->fecha, // fecha venta, compra ...
                     "metodos" => $request->metodos
@@ -190,6 +191,7 @@ class FacturaInventarioController extends Controller
                     "data" =>  $resultado,
                     "estatus" =>  $estatus
                 ],  $estatus);
+
             } else {
                 return response()->json([
                     "mensaje" => $mensaje,
@@ -197,6 +199,7 @@ class FacturaInventarioController extends Controller
                     "estatus" =>  $estatus
                 ],  $estatus);
             }
+
         } catch (\Throwable $th) {
             $mensaje = Helpers::getMensajeError($th, "Error al intentar registrar factura, ");
             return response()->json([
